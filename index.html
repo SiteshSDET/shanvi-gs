@@ -176,7 +176,8 @@
     .customer-order-details > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 52px; padding: 10px 12px; list-style: none; cursor: pointer; }
     .customer-order-details > summary::after { content: "⌄"; flex: 0 0 auto; color: var(--green-dark); font-size: 18px; }
     .customer-order-details[open] > summary::after { content: "⌃"; }
-    .customer-order-reference { overflow-wrap: anywhere; color: var(--green-dark); font-size: 12px; font-weight: 850; }
+    .customer-order-reference { overflow-wrap: anywhere; color: var(--green-dark); font-size: 12px; font-weight: 850; text-decoration: underline; text-decoration-color: #93b69a; text-underline-offset: 3px; }
+    .customer-order-view-hint { flex: 0 0 auto; color: var(--muted); font-size: 10px; font-weight: 650; }
     .customer-order-details-content { padding: 0 12px 13px; border-top: 1px solid var(--line); }
     .customer-order-card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 13px 0; box-shadow: 0 5px 18px rgba(35, 55, 39, .05); }
     .customer-order-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
@@ -199,6 +200,7 @@
     .order-filters button[aria-pressed="true"] { border-color: var(--green-dark); background: var(--green-dark); color: white; }
     .order-status-actions .btn { min-width: 105px; }
     .order-status-actions .btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.3); }
+    .manager-order-print { margin: 8px 0 4px; }
     .admin-card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 22px; margin: 15px 0; }
     .admin-card h3 { margin: 0 0 15px; font-size: 16px; }
     .manager-accordion { padding: 0; overflow: hidden; }
@@ -641,6 +643,7 @@
         helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.",
         noCustomerOrders: "Your placed orders will appear here.", orderItems: "Items",
         orderAddress: "Delivery address", orderStatusPending: "Waiting for store confirmation", orderStatusApproved: "Accepted by store",
+        viewOrderDetails: "Tap to view details",
         orderStatusDelivered: "Delivered", orderStatusCompleted: "Completed", orderStatusRejected: "Rejected",
         copyOrderId: "Copy order ID", copyOrderDetails: "Copy order details", copied: "Copied",
         whatsappOrder: "💬 WhatsApp store", orderWhatsAppIntro: "Hello Shanvi General Store, I am contacting you about my order.",
@@ -729,6 +732,7 @@
         helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।",
         noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", orderItems: "सामान",
         orderAddress: "डिलीवरी का पता", orderStatusPending: "दुकान की पुष्टि बाकी", orderStatusApproved: "दुकान ने स्वीकार किया",
+        viewOrderDetails: "विवरण देखने के लिए दबाएँ",
         orderStatusDelivered: "डिलीवर हो गया", orderStatusCompleted: "पूरा हुआ", orderStatusRejected: "ऑर्डर अस्वीकार हुआ",
         copyOrderId: "ऑर्डर ID कॉपी करें", copyOrderDetails: "ऑर्डर की जानकारी कॉपी करें", copied: "कॉपी हो गया",
         whatsappOrder: "💬 WhatsApp पर भेजें", orderWhatsAppIntro: "नमस्ते Shanvi General Store, मैं अपने ऑर्डर के बारे में पूछ रहा/रही हूँ।",
@@ -983,12 +987,16 @@
     function customerOrderStatusLabel(status) {
       const labels = {
         "Awaiting manager approval": tr("orderStatusPending"),
+        "Awaiting store confirmation": tr("orderStatusPending"),
+        "COD order placed": tr("orderStatusPending"),
+        "Awaiting UPI payment verification": tr("orderStatusPending"),
+        Pending: tr("orderStatusPending"),
         Approved: tr("orderStatusApproved"),
         Delivered: tr("orderStatusDelivered"),
         Completed: tr("orderStatusCompleted"),
         Rejected: tr("orderStatusRejected")
       };
-      return labels[status] || status || tr("orderStatusPending");
+      return labels[status] || tr("orderStatusPending");
     }
     function customerOrderShareText(order) {
       const reference = order.id || order.reference;
@@ -1049,7 +1057,7 @@
         const paymentMethod = order.paymentMethod === "cod" ? tr("cod")
           : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
         return `<details class="customer-order-details" data-customer-order-id="${escapeAttr(reference)}" ${expandedCustomerOrderDetails.has(reference) ? "open" : ""}>
-          <summary><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-status" data-state="${rejected ? "rejected" : "active"}">${escapeHtml(customerOrderStatusLabel(order.status))}</span></summary>
+          <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(order.status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${rejected ? "rejected" : "active"}">${escapeHtml(customerOrderStatusLabel(order.status))}</span></summary>
           <div class="customer-order-details-content">
             <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
             <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(order.status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
@@ -1136,7 +1144,7 @@
             if (error) throw error;
             if (
               data?.reference !== (order.id || order.reference)
-              || !["Awaiting manager approval", "Approved", "Delivered", "Completed", "Rejected"].includes(data.status)
+              || !["Awaiting manager approval", "Awaiting store confirmation", "COD order placed", "Awaiting UPI payment verification", "Pending", "Approved", "Delivered", "Completed", "Rejected"].includes(data.status)
             ) {
               throw new Error("The order status response was invalid.");
             }
@@ -1775,6 +1783,9 @@
           else setOrderStatus(orderReference, orderAction, button);
         });
       });
+      container.querySelectorAll("[data-print-order]").forEach((button) => {
+        button.addEventListener("click", () => printManagerOrderBill(button.dataset.printOrder));
+      });
       if (db) $("load-more-orders").hidden = lastPageSize < 100 && managerOrders.length <= 100;
       else $("load-more-orders").hidden = true;
     }
@@ -1820,6 +1831,7 @@
           <div class="order-line"><strong>Total</strong><strong>${money(total)}</strong></div>
           <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer UPI ID: ${escapeHtml(payerUpi)}` : ""}</p>
         </section>
+        <button class="btn btn-soft manager-order-print" type="button" data-print-order="${escapeAttr(reference)}">Generate / print bill</button>
         <div class="order-status-actions">
           <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen ? "disabled" : ""}>Accept</button>
           <button class="btn btn-soft" data-order-action="Delivered" data-order-reference="${escapeAttr(reference)}" ${!isAccepted ? "disabled" : ""}>Delivered</button>
@@ -1827,6 +1839,57 @@
           <button class="btn btn-primary" data-order-action="Completed" data-order-reference="${escapeAttr(reference)}" ${!isDelivered ? "disabled" : ""}>Complete</button>
         </div>
       </article>`;
+    }
+    function printManagerOrderBill(reference) {
+      if (!isAuthorizedManager) return;
+      const order = managerOrders.find((item) => String(item.reference || item.id || "") === reference);
+      if (!order) {
+        showToast("Could not find this order. Refresh the order list and try again.");
+        return;
+      }
+      const items = Array.isArray(order.items) ? order.items : [];
+      const phone = order.customer_phone || order.phone || "";
+      const name = order.customer_name || order.name || "";
+      const address = order.delivery_note || order.address || "";
+      const total = Number(order.total) || 0;
+      const delivery = Number(order.delivery_fee ?? order.deliveryFee) || 0;
+      const discount = Number(order.discount) || 0;
+      const subtotal = Number(order.subtotal) || Math.max(0, total - delivery + discount);
+      const createdAt = order.created_at || order.createdAt;
+      const date = createdAt ? new Date(createdAt) : null;
+      const dateLabel = date && !Number.isNaN(date.getTime()) ? date.toLocaleString() : "Not available";
+      const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
+      const status = customerOrderStatusLabel(order.status || "Awaiting manager approval");
+      const itemRows = items.map((item) => {
+        const quantity = Math.max(0, Number(item.quantity) || 0);
+        const price = Math.max(0, Number(item.price) || 0);
+        return `<tr><td>${escapeHtml(item.name || "Item")}</td><td class="number">${quantity}</td><td class="number">${money(price)}</td><td class="number">${money(price * quantity)}</td></tr>`;
+      }).join("");
+      const printWindow = window.open("", "_blank", "width=800,height=900");
+      if (!printWindow) {
+        showToast("Allow pop-ups for this store to generate and print the bill.");
+        return;
+      }
+      printWindow.opener = null;
+      printWindow.document.open();
+      printWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order bill ${escapeHtml(reference)}</title><style>
+        *{box-sizing:border-box}body{font:14px Arial,sans-serif;color:#202820;max-width:760px;margin:32px auto;padding:0 22px}
+        h1{font-size:24px;margin:0 0 5px;color:#205b35}h2{font-size:17px;margin:26px 0 8px}
+        .muted{color:#626d64;font-size:12px;line-height:1.6}.head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #205b35;padding-bottom:15px}
+        .meta{text-align:right}.customer{margin-top:20px;padding:13px;background:#f4f7f2;border-radius:8px;line-height:1.6}
+        table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:9px 6px;border-bottom:1px solid #dfe4dd;text-align:left}th{font-size:12px;color:#526055}
+        .number{text-align:right;white-space:nowrap}.totals{width:min(100%,330px);margin:15px 0 0 auto}.totals div{display:flex;justify-content:space-between;padding:5px 0}
+        .grand{border-top:1px solid #89978a;margin-top:5px;padding-top:10px!important;font-size:17px;font-weight:bold}.footer{margin-top:30px;text-align:center}
+        @media print{body{margin:0 auto;padding:0 10px}@page{margin:16mm}}
+      </style></head><body>
+        <header class="head"><div><h1>Shanvi General Store</h1><div class="muted">Order bill</div></div><div class="meta"><strong>Order ${escapeHtml(reference)}</strong><div class="muted">${escapeHtml(dateLabel)}</div><div class="muted">${escapeHtml(status)}</div></div></header>
+        <section class="customer"><strong>Customer</strong><br>${escapeHtml(name || "Name not provided")}<br>${escapeHtml(phone || "Phone not provided")}<br>${escapeHtml(address || "No delivery address saved.")}</section>
+        <h2>Items</h2><table><thead><tr><th>Item</th><th class="number">Qty</th><th class="number">Price</th><th class="number">Amount</th></tr></thead><tbody>${itemRows || '<tr><td colspan="4">No item details were saved.</td></tr>'}</tbody></table>
+        <section class="totals"><div><span>Items subtotal</span><span>${money(subtotal)}</span></div>${discount ? `<div><span>Discount</span><span>−${money(discount)}</span></div>` : ""}<div><span>Delivery</span><span>${money(delivery)}</span></div><div class="grand"><span>Total</span><span>${money(total)}</span></div></section>
+        <p class="muted">Payment method: ${escapeHtml(paymentMethod)}</p><p class="muted footer">Thank you for shopping with Shanvi General Store.</p>
+        <script>window.addEventListener("load",()=>{window.focus();window.print()});<\/script>
+      </body></html>`);
+      printWindow.document.close();
     }
     async function approveOrder(reference, button) {
       if (!isAuthorizedManager) return;
