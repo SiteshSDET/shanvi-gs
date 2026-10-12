@@ -164,6 +164,8 @@
     .customer-order-card h3 { margin: 0 0 6px; font-size: 15px; }
     .customer-order-card ul { padding-left: 20px; font-size: 13px; line-height: 1.6; }
     .customer-order-status { display: inline-block; margin: 6px 0; padding: 5px 9px; border-radius: 999px; background: #edf3ed; color: var(--green-dark); font-size: 12px; font-weight: 750; }
+    .customer-order-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .customer-order-actions .btn { font-size: 12px; }
     .customer-help-contact { display: block; margin: 14px 0; font-size: 20px; font-weight: 750; color: var(--green-dark); }
     .order-filters, .order-status-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
     .order-filters button { border: 1px solid var(--line); border-radius: 999px; background: #f6f7f3; color: var(--ink); padding: 9px 14px; font-weight: 700; cursor: pointer; }
@@ -256,6 +258,7 @@
       .nav-actions { gap: 0; }
       .nav-actions .btn-quiet { display: none; }
       .nav-actions .btn { padding: 9px 8px; font-size: 12px; }
+      .customer-order-actions .btn { padding: 9px 10px; }
       .hero { min-height: 290px; padding: 29px 22px; }
       .hero:before { right: -14px; bottom: 0; font-size: 110px; opacity: .55; }
       .hero:after { width: 260px; height: 260px; top: 55px; right: -120px; }
@@ -330,6 +333,7 @@
     <aside class="drawer">
       <div class="drawer-head"><h2 id="profile-heading">My profile & orders</h2><button class="close" id="profile-close" aria-label="Close profile">×</button></div>
       <p class="small-note" id="profile-note">Your orders are saved in this browser. Keep this device/browser to check their latest status.</p>
+      <p class="small-note" id="profile-sync-status" aria-live="polite"></p>
       <div id="customer-orders" aria-live="polite"></div>
     </aside>
   </div>
@@ -505,6 +509,11 @@
         noCustomerOrders: "Your placed orders will appear here.", refreshStatus: "Refresh status", orderItems: "Items",
         orderAddress: "Delivery address", orderStatusPending: "Waiting for store confirmation", orderStatusApproved: "Accepted by store",
         orderStatusDelivered: "Out for delivery", orderStatusCompleted: "Completed", orderStatusRejected: "Rejected",
+        copyOrderId: "Copy order ID", copyOrderDetails: "Copy order details", copied: "Copied",
+        whatsappOrder: "💬 WhatsApp store", orderWhatsAppIntro: "Hello Shanvi General Store, I am contacting you about my order.",
+        orderIdLabel: "Order ID", orderStatusLabel: "Status", orderItemsLabel: "Items", orderTotalLabel: "Total",
+        orderStatusSyncFailed: "Could not refresh order status. Please try again.",
+        orderStatusSynced: "Order statuses are up to date.",
         noProducts: "No products found. Try another search or section.",
         picked: "Picked with care", pickedSub: "Useful little things, all in one place",
         local: "Local and friendly", localSub: "Your neighborhood store is here to help",
@@ -581,6 +590,11 @@
         noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", refreshStatus: "स्थिति अपडेट करें", orderItems: "सामान",
         orderAddress: "डिलीवरी का पता", orderStatusPending: "दुकान की पुष्टि बाकी", orderStatusApproved: "दुकान ने स्वीकार किया",
         orderStatusDelivered: "डिलीवरी के लिए निकल गया", orderStatusCompleted: "पूरा हुआ", orderStatusRejected: "ऑर्डर अस्वीकार हुआ",
+        copyOrderId: "ऑर्डर ID कॉपी करें", copyOrderDetails: "ऑर्डर की जानकारी कॉपी करें", copied: "कॉपी हो गया",
+        whatsappOrder: "💬 WhatsApp पर भेजें", orderWhatsAppIntro: "नमस्ते Shanvi General Store, मैं अपने ऑर्डर के बारे में पूछ रहा/रही हूँ।",
+        orderIdLabel: "ऑर्डर ID", orderStatusLabel: "स्थिति", orderItemsLabel: "सामान", orderTotalLabel: "कुल",
+        orderStatusSyncFailed: "ऑर्डर की स्थिति अपडेट नहीं हो पाई। फिर कोशिश करें।",
+        orderStatusSynced: "ऑर्डर की स्थिति अपडेट है।",
         noProducts: "कोई सामान नहीं मिला। दूसरी खोज या श्रेणी चुनें।",
         picked: "ध्यान से चुना गया", pickedSub: "घर की ज़रूरत की चीज़ें, एक ही जगह",
         local: "आपकी अपनी दुकान", localSub: "आपकी आस-पड़ोस की दुकान मदद के लिए यहाँ है",
@@ -674,6 +688,8 @@
     let storeHelpPhone = "";
     let customerOrders = storage.read("shanvi-customer-orders", []);
     if (!Array.isArray(customerOrders)) customerOrders = [];
+    let customerStatusRefreshTimer = null;
+    let customerStatusRefreshInProgress = false;
     let brandLogo = storage.read("shanvi-brand-logo", "");
     let brandLogoDraft = brandLogo;
     let offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...storage.read("shanvi-offer", {}) };
@@ -825,6 +841,29 @@
       };
       return labels[status] || status || tr("orderStatusPending");
     }
+    function customerOrderShareText(order) {
+      const reference = order.id || order.reference;
+      const items = Array.isArray(order.items) ? order.items : [];
+      return [
+        tr("orderWhatsAppIntro"),
+        `${tr("orderIdLabel")}: ${reference}`,
+        `${tr("orderStatusLabel")}: ${customerOrderStatusLabel(order.status)}`,
+        `${tr("orderItemsLabel")}:`,
+        ...items.map((item) => `- ${item.name} x${Number(item.quantity) || 1} (${money(Number(item.price) || 0)})`),
+        `${tr("orderTotalLabel")}: ${money(Number(order.total) || 0)}`
+      ].join("\n");
+    }
+    function customerOrderWhatsAppUrl(order) {
+      return `https://wa.me/919876543210?text=${encodeURIComponent(customerOrderShareText(order))}`;
+    }
+    async function copyCustomerOrderText(value) {
+      try {
+        await navigator.clipboard.writeText(value);
+        showToast(tr("copied"));
+      } catch (error) {
+        showToast(error.message || "Could not copy. Please select and copy the order details.");
+      }
+    }
     function renderCustomerOrders() {
       const container = $("customer-orders");
       if (!customerOrders.length) {
@@ -838,6 +877,11 @@
           : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
         return `<article class="customer-order-card">
           <h3>${tr("order")} ${escapeHtml(reference)}</h3>
+          <div class="customer-order-actions">
+            <button class="btn btn-soft" type="button" data-copy-customer-order-id="${escapeAttr(reference)}">${tr("copyOrderId")}</button>
+            <button class="btn btn-soft" type="button" data-copy-customer-order-details="${escapeAttr(reference)}">${tr("copyOrderDetails")}</button>
+            <a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a>
+          </div>
           <span class="customer-order-status">${escapeHtml(customerOrderStatusLabel(order.status))}</span>
           <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
           <strong>${tr("orderItems")}</strong>
@@ -854,6 +898,15 @@
       container.querySelectorAll("[data-refresh-customer-order]").forEach((button) => {
         button.addEventListener("click", () => refreshCustomerOrderStatus(button.dataset.refreshCustomerOrder, button));
       });
+      container.querySelectorAll("[data-copy-customer-order-id]").forEach((button) => {
+        button.addEventListener("click", () => copyCustomerOrderText(button.dataset.copyCustomerOrderId));
+      });
+      container.querySelectorAll("[data-copy-customer-order-details]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const order = customerOrders.find((item) => (item.id || item.reference) === button.dataset.copyCustomerOrderDetails);
+          if (order) copyCustomerOrderText(customerOrderShareText(order));
+        });
+      });
     }
     async function refreshCustomerOrderStatus(reference, button) {
       const order = customerOrders.find((item) => (item.id || item.reference) === reference);
@@ -868,12 +921,63 @@
         });
         if (error) throw error;
         order.status = data.status;
-        if (!storage.write("shanvi-customer-orders", customerOrders)) return;
+        if (!storage.write("shanvi-customer-orders", customerOrders)) {
+          button.disabled = false;
+          return;
+        }
         renderCustomerOrders();
       } catch (error) {
-        if (message) message.textContent = error.message || "Could not refresh order status.";
+        if (message) message.textContent = error.message || tr("orderStatusSyncFailed");
         button.disabled = false;
       }
+    }
+    async function refreshCustomerOrderStatuses() {
+      if (!db || customerStatusRefreshInProgress || document.visibilityState !== "visible") return;
+      const ordersToCheck = customerOrders.filter((order) =>
+        order.customerStatusToken
+        && !["Completed", "Rejected"].includes(order.status)
+      );
+      if (!ordersToCheck.length) return;
+      customerStatusRefreshInProgress = true;
+      let changed = false;
+      let failed = false;
+      try {
+        await Promise.all(ordersToCheck.map(async (order) => {
+          try {
+            const { data, error } = await db.functions.invoke("get-customer-order", {
+              body: { reference: order.id || order.reference, token: order.customerStatusToken }
+            });
+            if (error) throw error;
+            if (order.status !== data.status) {
+              order.status = data.status;
+              changed = true;
+            }
+          } catch (error) {
+            failed = true;
+            console.warn(`Could not sync order ${order.id || order.reference}`, error);
+          }
+        }));
+        if (changed) {
+          if (storage.write("shanvi-customer-orders", customerOrders)) renderCustomerOrders();
+          else failed = true;
+        }
+        $("profile-sync-status").textContent = failed ? tr("orderStatusSyncFailed") : tr("orderStatusSynced");
+      } catch (error) {
+        console.warn("Could not sync customer order status", error);
+        $("profile-sync-status").textContent = tr("orderStatusSyncFailed");
+      } finally {
+        customerStatusRefreshInProgress = false;
+      }
+    }
+    function startCustomerStatusRefresh() {
+      stopCustomerStatusRefresh();
+      void refreshCustomerOrderStatuses();
+      customerStatusRefreshTimer = window.setInterval(refreshCustomerOrderStatuses, 12000);
+    }
+    function stopCustomerStatusRefresh() {
+      if (!customerStatusRefreshTimer) return;
+      window.clearInterval(customerStatusRefreshTimer);
+      customerStatusRefreshTimer = null;
     }
     function renderCustomerHelp() {
       $("customer-help-contact").innerHTML = storeHelpPhone
@@ -1840,9 +1944,11 @@
       checkoutDraft = null;
       storage.write("shanvi-cart", cart);
       deliveryFee = null;
-      $("cart-content").innerHTML = `<div class="drawer-head"><h2>${tr("orderPlaced")}</h2><button class="close" id="done-close" aria-label="${language === "hi" ? "बंद करें" : "Close"}">×</button></div><div class="payment-box"><strong>${tr("thankYou")}, ${escapeHtml(order.name)}!</strong><br>${tr("reference")}: <strong>${escapeHtml(order.id)}</strong><br>${tr("total")}: <strong>${money(order.total)}</strong><br>${tr("payment")}: <strong>${paymentLabels[order.paymentMethod]}</strong><br>${db ? tr("approvalPending") : tr("savedOrder")}</div>${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}<button class="btn btn-primary full" id="done-shopping">${tr("continueShopping")}</button>`;
+      $("cart-content").innerHTML = `<div class="drawer-head"><h2>${tr("orderPlaced")}</h2><button class="close" id="done-close" aria-label="${language === "hi" ? "बंद करें" : "Close"}">×</button></div><div class="payment-box"><strong>${tr("thankYou")}, ${escapeHtml(order.name)}!</strong><br>${tr("reference")}: <strong>${escapeHtml(order.id)}</strong><br>${tr("total")}: <strong>${money(order.total)}</strong><br>${tr("payment")}: <strong>${paymentLabels[order.paymentMethod]}</strong><br>${db ? tr("approvalPending") : tr("savedOrder")}</div><div class="customer-order-actions"><button class="btn btn-soft" id="copy-confirmed-order-id" type="button">${tr("copyOrderId")}</button><button class="btn btn-soft" id="copy-confirmed-order-details" type="button">${tr("copyOrderDetails")}</button><a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a></div>${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}<button class="btn btn-primary full" id="done-shopping">${tr("continueShopping")}</button>`;
       $("done-close").onclick = closeCart;
       $("done-shopping").onclick = closeCart;
+      $("copy-confirmed-order-id").onclick = () => copyCustomerOrderText(order.id);
+      $("copy-confirmed-order-details").onclick = () => copyCustomerOrderText(customerOrderShareText(order));
       const customerNotifyButton = $("customer-approval-notify");
       if (customerNotifyButton) customerNotifyButton.onclick = () => registerCustomerOrderPush(order);
       $("cart-count").textContent = "0";
@@ -2062,10 +2168,17 @@
     $("profile-open").onclick = () => {
       renderCustomerOrders();
       $("profile-overlay").classList.add("open");
+      startCustomerStatusRefresh();
     };
-    $("profile-close").onclick = () => $("profile-overlay").classList.remove("open");
+    $("profile-close").onclick = () => {
+      $("profile-overlay").classList.remove("open");
+      stopCustomerStatusRefresh();
+    };
     $("profile-overlay").addEventListener("click", (event) => {
-      if (event.target === $("profile-overlay")) $("profile-overlay").classList.remove("open");
+      if (event.target === $("profile-overlay")) {
+        $("profile-overlay").classList.remove("open");
+        stopCustomerStatusRefresh();
+      }
     });
     $("help-open").onclick = () => {
       renderCustomerHelp();
@@ -2231,6 +2344,9 @@
       onLocalOrdersChanged(event);
     });
     document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && $("profile-overlay").classList.contains("open")) {
+        void refreshCustomerOrderStatuses();
+      }
       if (
         document.visibilityState === "visible"
         && isAuthorizedManager

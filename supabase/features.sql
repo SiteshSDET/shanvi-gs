@@ -76,8 +76,8 @@ declare
 begin
   if tg_op = 'INSERT' then
     event_name := 'new';
-  elsif old.status is distinct from new.status and new.status = 'Approved' then
-    event_name := 'approved';
+  elsif old.status is distinct from new.status and new.status in ('Approved', 'Rejected') then
+    event_name := case when new.status = 'Rejected' then 'rejected' else 'approved' end;
   else
     return new;
   end if;
