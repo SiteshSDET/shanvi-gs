@@ -3,5 +3,5 @@
 window.STORE_CONFIG = {
   url: "https://zhrdeemyofcxxigqazgz.supabase.co",
   anonKey: "sb_publishable_SKy4iGYXoCyNLSl5vyMaXg_-h5k1h32",
-  pushPublicKey: "BNMV_XRekS6oHnG0ugxwUkmBrJiANRC3lBz_or8iagWJXxVLhSu5gf22AVY9skGWT51e4BGkUpPwZgl02lf9rzw"
+  pushPublicKey: "BFzFFUNhfLQsFcfkI3GNSNl3LevIPUUc68NuD3baOnqR0-axcYPkrvFe1jMj7EsEsY4E7u7IWC10t-ChVPaijvg"
 };

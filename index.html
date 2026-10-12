@@ -1055,6 +1055,25 @@
       const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
       return Uint8Array.from(atob(padded), (character) => character.charCodeAt(0));
     }
+    async function ensurePushSubscription(registration, publicKey) {
+      const applicationServerKey = decodeApplicationServerKey(publicKey);
+      let subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        const currentKey = subscription.options.applicationServerKey;
+        const currentBytes = currentKey ? new Uint8Array(currentKey) : null;
+        const matchesCurrentKey = currentBytes
+          && currentBytes.length === applicationServerKey.length
+          && currentBytes.every((byte, index) => byte === applicationServerKey[index]);
+        if (!matchesCurrentKey) {
+          await subscription.unsubscribe();
+          subscription = null;
+        }
+      }
+      return subscription || registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey
+      });
+    }
     async function enableOrderNotifications() {
       const button = $("enable-order-notifications");
       const status = $("notification-status");
@@ -1092,13 +1111,7 @@
           if (db && supabaseConfig.pushPublicKey) {
             const code = $("push-enrollment-code").value.trim();
             if (code) {
-              let subscription = await registration.pushManager.getSubscription();
-              if (!subscription) {
-                subscription = await registration.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: decodeApplicationServerKey(supabaseConfig.pushPublicKey)
-                });
-              }
+              const subscription = await ensurePushSubscription(registration, supabaseConfig.pushPublicKey);
               const { error } = await db.functions.invoke("register-manager-push", {
                 body: { code, subscription: subscription.toJSON() }
               });
@@ -1141,13 +1154,7 @@
           return;
         }
         const registration = await navigator.serviceWorker.register("./sw.js");
-        let subscription = await registration.pushManager.getSubscription();
-        if (!subscription) {
-          subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: decodeApplicationServerKey(supabaseConfig.pushPublicKey)
-          });
-        }
+        const subscription = await ensurePushSubscription(registration, supabaseConfig.pushPublicKey);
         const { data, error } = await db.functions.invoke("register-customer-push", {
           body: {
             reference: order.id,
