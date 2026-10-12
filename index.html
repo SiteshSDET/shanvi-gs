@@ -1023,7 +1023,11 @@
       return labels[status] || tr("orderStatusPending");
     }
     function customerOrderDisplayStatus(order) {
-      return verifiedCustomerOrderStatuses.get(order.id || order.reference) || "Awaiting manager approval";
+      const reference = order.id || order.reference;
+      const verifiedStatus = verifiedCustomerOrderStatuses.get(reference);
+      if (verifiedStatus) return verifiedStatus;
+      if (order.status === "Completed" || order.status === "Rejected") return order.status;
+      return "Awaiting manager approval";
     }
     function customerOrderShareText(order) {
       const reference = order.id || order.reference;
