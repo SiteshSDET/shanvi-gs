@@ -363,8 +363,10 @@
       </div>
       <div class="admin-card">
         <h3>Order notifications</h3>
-        <p class="small-note" id="notification-instructions">Sign in on your manager phone, tap Enable browser alerts, and allow notifications. Keep this page open and signed in to receive alerts for new orders. Background push when the page is closed needs Web Push setup.</p>
-        <details class="notification-help"><summary>How to turn on order alerts</summary><ol><li>On the manager phone, open this HTTPS site, sign in, tap <strong>Enable browser alerts</strong>, and choose <strong>Allow</strong>.</li><li>Keep this Manager page open and signed in. The live Supabase order connection will show a notification for customer orders. Tap <strong>Test sound and notification</strong> to check your phone's permission and alert.</li><li>For iPhone/iPad, add the site to the Home Screen and open it there if Safari requires it for notifications. Browser or operating-system settings may still mute alerts.</li><li>To get alerts while this page is closed, Web Push still needs VAPID keys, server secrets, and deployed Supabase functions as described in SUPABASE_SETUP.md.</li></ol></details>
+        <p class="small-note" id="notification-instructions">Free option: enable browser alerts on the manager's phone below and keep this page open. Entering a phone number alone cannot send an SMS or call; those need an external messaging provider and may cost money.</p>
+        <div class="field"><label for="manager-alert-phone">Manager phone number (for SMS setup)</label><input id="manager-alert-phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit mobile number"><small class="small-note">Saved only in this browser as a reminder. This does not send SMS/calls. Browser alerts go to the phone where you enable them.</small></div>
+        <button class="btn btn-soft" id="save-manager-alert-phone" type="button">Save manager number</button>
+        <details class="notification-help"><summary>How to turn on free order alerts</summary><ol><li>On the manager phone, open this HTTPS site, sign in, tap <strong>Enable browser alerts</strong>, and choose <strong>Allow</strong>.</li><li>Keep this Manager page open and signed in. The live Supabase order connection will show a notification for customer orders. Tap <strong>Test sound and notification</strong> to check your phone's permission and alert.</li><li>For iPhone/iPad, add the site to the Home Screen and open it there if Safari requires it for notifications. Browser or operating-system settings may still mute alerts.</li><li>Alerts while the page is closed need the additional Web Push setup in SUPABASE_SETUP.md. SMS or phone calls need a separately configured messaging provider; a phone number by itself cannot receive website notifications.</li></ol></details>
         <div class="field" id="push-enrollment-field" hidden><label for="push-enrollment-code">Manager notification setup code (Supabase)</label><input id="push-enrollment-code" type="password" autocomplete="off" placeholder="Enter the code configured in Supabase"></div>
         <button class="btn btn-primary" id="enable-order-notifications" type="button">Enable browser alerts</button>
         <button class="btn btn-soft" id="test-order-notification" type="button">Test sound and notification</button>
@@ -631,6 +633,7 @@
     let language = storage.read("shanvi-language", "en") === "hi" ? "hi" : "en";
     let cart = storage.read("shanvi-cart", {});
     let localNotificationsEnabled = storage.read("shanvi-local-notifications", false) === true;
+    let managerAlertPhone = storage.read("shanvi-manager-alert-phone", "");
     let brandLogo = storage.read("shanvi-brand-logo", "");
     let brandLogoDraft = brandLogo;
     let offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...storage.read("shanvi-offer", {}) };
@@ -1791,6 +1794,7 @@
       $("notification-status").textContent = localNotificationsEnabled
         ? "Browser alerts are enabled on this device."
         : "Alerts are not enabled yet. Tap Enable browser alerts and allow the browser permission prompt.";
+      $("manager-alert-phone").value = managerAlertPhone;
       $("upi-id").value = settings.upi || "";
       $("cod-enabled").checked = settings.cod_enabled !== false;
       brandLogoDraft = brandLogo;
@@ -1991,6 +1995,22 @@
     });
     $("refresh-orders").onclick = loadManagerOrders;
     $("load-more-orders").onclick = () => loadManagerOrders({ append: true });
+    $("manager-alert-phone").addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+    $("save-manager-alert-phone").onclick = () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const phone = $("manager-alert-phone").value.trim();
+      if (phone && !/^[0-9]{10}$/.test(phone)) {
+        $("manager-alert-phone").reportValidity();
+        return;
+      }
+      if (!storage.write("shanvi-manager-alert-phone", phone)) return;
+      managerAlertPhone = phone;
+      showManagerSaved(phone
+        ? "Manager number saved in this browser. It does not enable SMS or calls."
+        : "Manager number cleared from this browser.");
+    };
     $("test-order-notification").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       try {

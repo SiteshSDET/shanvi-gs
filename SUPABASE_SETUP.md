@@ -59,6 +59,8 @@ The public site requires Supabase for checkout and manager sign-in; orders are n
 
 The Supabase project URL and publishable key are already configured on the live site. For immediate browser alerts, open the live site on the manager's phone, sign in, go to **Manager → Order notifications**, tap **Enable browser alerts**, and allow notifications. Keep the Manager page open and signed in; its Supabase Realtime subscription can notify the phone about orders placed on another device. Use **Test sound and notification** to check device permission. Mobile browsers may suspend a background page, so this does not guarantee an alert if the tab is closed or suspended.
 
+The optional manager phone field is stored in that browser only as a contact/setup reminder. It does not send SMS or calls: those require a separately configured messaging provider and credentials. Browser alerts are sent to the device that granted permission; entering a number does not enroll another phone.
+
 For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID keys, and server secrets below still need setup:
 
 1. Generate Web Push keys (free) on a computer with Node.js:
