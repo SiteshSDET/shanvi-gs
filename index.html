@@ -442,7 +442,6 @@
   <div class="overlay" id="profile-overlay" role="dialog" aria-modal="true" aria-label="Customer profile">
     <aside class="drawer">
       <div class="drawer-head"><h2 id="profile-heading">My profile & orders</h2><button class="close" id="profile-close" aria-label="Close profile">×</button></div>
-      <p class="small-note" id="profile-note">Your orders are saved in this browser. Keep this device/browser to check their latest status.</p>
       <div class="profile-toolbar"><p class="small-note" id="profile-sync-status" role="status" aria-live="polite"></p><button class="btn btn-primary" id="refresh-customer-orders" type="button">↻ Refresh orders</button></div>
       <div id="customer-orders" aria-live="polite"></div>
     </aside>
@@ -496,19 +495,22 @@
         <button class="btn btn-soft" id="use-store-location" type="button">Use this device’s location</button>
         <button class="btn btn-primary" id="save-delivery-settings" type="button">Save store location</button>
       </div>
-      <div class="admin-card">
-        <h3>Checkout address fields</h3>
-        <p class="small-note">Choose which address fields customers must provide. At least one field must stay enabled. Changes are shared with all customers.</p>
-        <div id="checkout-address-field-options">
-          <label class="payment-choice"><input type="checkbox" data-address-field="landmark" checked><span><strong>Landmark (required)</strong></span></label>
-          <label class="payment-choice"><input type="checkbox" data-address-field="locality" checked><span><strong>Village / locality (required)</strong></span></label>
-          <label class="payment-choice"><input type="checkbox" data-address-field="postOffice" checked><span><strong>Post office (optional)</strong></span></label>
-          <label class="payment-choice"><input type="checkbox" data-address-field="district" checked><span><strong>District (optional)</strong></span></label>
-          <label class="payment-choice"><input type="checkbox" data-address-field="state" checked><span><strong>State (required)</strong></span></label>
-          <label class="payment-choice"><input type="checkbox" data-address-field="pin" checked><span><strong>PIN code (required)</strong></span></label>
+      <details class="admin-card manager-accordion" id="checkout-address-settings" open>
+        <summary>Checkout address fields</summary>
+        <div class="manager-accordion-content">
+          <p class="small-note">Choose which address fields customers must provide. Turn off State or PIN code if you do not need them. At least one address field must stay enabled. Changes are shared with all customers.</p>
+          <p class="small-note" id="checkout-address-settings-status" role="status" aria-live="polite">Loading saved address field settings…</p>
+          <div id="checkout-address-field-options">
+            <label class="payment-choice"><input type="checkbox" data-address-field="landmark" checked><span><strong>Landmark (required)</strong></span></label>
+            <label class="payment-choice"><input type="checkbox" data-address-field="locality" checked><span><strong>Village / locality (required)</strong></span></label>
+            <label class="payment-choice"><input type="checkbox" data-address-field="postOffice" checked><span><strong>Post office (optional)</strong></span></label>
+            <label class="payment-choice"><input type="checkbox" data-address-field="district" checked><span><strong>District (optional)</strong></span></label>
+            <label class="payment-choice"><input type="checkbox" data-address-field="state" checked><span><strong>State (required)</strong></span></label>
+            <label class="payment-choice"><input type="checkbox" data-address-field="pin" checked><span><strong>PIN code (required)</strong></span></label>
+          </div>
+          <button class="btn btn-primary" id="save-checkout-address-fields" type="button">Save address fields</button>
         </div>
-        <button class="btn btn-primary" id="save-checkout-address-fields" type="button">Save address fields</button>
-      </div>
+      </details>
       <div class="admin-card">
         <h3>Order notifications</h3>
         <p class="small-note" id="notification-instructions">To receive new-order alerts while the store is closed, allow notifications, enter the manager push enrollment code, and tap Enable browser alerts until the page confirms push registration. The in-page test alert alone does not verify background push. The manager phone number is only a reminder; it does not send SMS or calls.</p>
@@ -627,9 +629,12 @@
         puja: "Puja", household: "Gharelu Samaan", electronics: "Electronics",
         search: "Search products",
         cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
-        profile: "Profile", help: "Help", profileTitle: "My profile & orders", profileNote: "Order history is private to this browser. Keep this device to follow order updates; customer sign-in is not enabled.",
+        profile: "Profile", help: "Help", profileTitle: "My profile & orders",
         refreshOrders: "Refresh orders", refreshingOrders: "Refreshing orders…", profileOffline: "You appear to be offline. Reconnect and refresh again.",
-        noTrackedOrders: "No online-tracked orders are available to refresh in this browser.",
+        noTrackedOrders: "No online-tracked orders are saved in this browser. Orders from another device cannot be refreshed here without customer sign-in.",
+        orderRefreshUpdated: "Checked {checked} orders; updated {updated} status(es).",
+        orderRefreshCurrent: "Checked {checked} orders; all statuses are current.",
+        orderRefreshPartial: "Refreshed {checked} orders; {failed} could not be checked.",
         orderGroupInProgress: "In Progress", orderGroupPendingRejected: "Pending / Rejected", orderGroupCompleted: "Completed",
         enableOrderPush: "Enable order notifications", orderPushEnabled: "Order notifications enabled on this device.",
         orderStepPlaced: "Placed", orderStepAccepted: "Accepted", orderStepDelivered: "Delivered", orderStepCompleted: "Complete",
@@ -641,7 +646,6 @@
         whatsappOrder: "💬 WhatsApp store", orderWhatsAppIntro: "Hello Shanvi General Store, I am contacting you about my order.",
         orderIdLabel: "Order ID", orderStatusLabel: "Status", orderItemsLabel: "Items", orderTotalLabel: "Total",
         orderStatusSyncFailed: "Could not refresh order status. Please try again.",
-        orderStatusSynced: "Order statuses are up to date.",
         noProducts: "No products found. Try another search or section.",
         picked: "Picked with care", pickedSub: "Useful little things, all in one place",
         local: "Local and friendly", localSub: "Your neighborhood store is here to help",
@@ -713,9 +717,12 @@
         puja: "पूजा सामग्री", household: "घरेलू सामान", electronics: "इलेक्ट्रॉनिक्स",
         search: "सामान खोजें",
         cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
-        profile: "प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर", profileNote: "ऑर्डर की जानकारी इसी ब्राउज़र में सुरक्षित है। अपडेट देखने के लिए इसी डिवाइस का उपयोग करें; ग्राहक लॉगिन चालू नहीं है।",
+        profile: "प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर",
         refreshOrders: "ऑर्डर अपडेट करें", refreshingOrders: "ऑर्डर अपडेट हो रहे हैं…", profileOffline: "इंटरनेट उपलब्ध नहीं है। कनेक्ट करके फिर अपडेट करें।",
-        noTrackedOrders: "इस ब्राउज़र में अपडेट करने योग्य ऑनलाइन ऑर्डर नहीं हैं।",
+        noTrackedOrders: "इस ब्राउज़र में ऑनलाइन ट्रैक किए गए ऑर्डर सेव नहीं हैं। ग्राहक लॉगिन के बिना दूसरे डिवाइस के ऑर्डर अपडेट नहीं हो सकते।",
+        orderRefreshUpdated: "{checked} ऑर्डर जाँचे; {updated} की स्थिति अपडेट हुई।",
+        orderRefreshCurrent: "{checked} ऑर्डर जाँचे; सभी की स्थिति नवीनतम है।",
+        orderRefreshPartial: "{checked} ऑर्डर अपडेट हुए; {failed} की स्थिति नहीं जाँची जा सकी।",
         orderGroupInProgress: "जारी ऑर्डर", orderGroupPendingRejected: "लंबित / अस्वीकार", orderGroupCompleted: "पूरे हुए",
         enableOrderPush: "ऑर्डर सूचना चालू करें", orderPushEnabled: "इस डिवाइस पर ऑर्डर सूचनाएँ चालू हैं।",
         orderStepPlaced: "ऑर्डर मिला", orderStepAccepted: "स्वीकार", orderStepDelivered: "डिलीवर", orderStepCompleted: "पूरा",
@@ -727,7 +734,6 @@
         whatsappOrder: "💬 WhatsApp पर भेजें", orderWhatsAppIntro: "नमस्ते Shanvi General Store, मैं अपने ऑर्डर के बारे में पूछ रहा/रही हूँ।",
         orderIdLabel: "ऑर्डर ID", orderStatusLabel: "स्थिति", orderItemsLabel: "सामान", orderTotalLabel: "कुल",
         orderStatusSyncFailed: "ऑर्डर की स्थिति अपडेट नहीं हो पाई। फिर कोशिश करें।",
-        orderStatusSynced: "ऑर्डर की स्थिति अपडेट है।",
         noProducts: "कोई सामान नहीं मिला। दूसरी खोज या श्रेणी चुनें।",
         picked: "ध्यान से चुना गया", pickedSub: "घर की ज़रूरत की चीज़ें, एक ही जगह",
         local: "आपकी अपनी दुकान", localSub: "आपकी आस-पड़ोस की दुकान मदद के लिए यहाँ है",
@@ -831,6 +837,7 @@
     const defaultCheckoutAddressFields = { landmark: true, locality: true, postOffice: true, district: true, state: true, pin: true };
     let checkoutAddressFields = { ...defaultCheckoutAddressFields };
     let checkoutAddressSettingsReady = !db;
+    let checkoutAddressSettingsError = false;
     let deliveryFee = null;
     const demoPaymentSettings = { upi: "9876543219@upi", qr: "sample-upi-qr.png", cod_enabled: true };
     let settings = { upi: "", qr: "", cod_enabled: true, ...storage.read("shanvi-settings", {}) };
@@ -891,6 +898,10 @@
     initializeManagerAccordions();
     const money = (amount) => `₹${Number(amount).toLocaleString("en-IN")}`;
     const tr = (key) => translations[language][key] ?? translations.en[key] ?? key;
+    const formatTranslation = (key, values) => Object.entries(values).reduce(
+      (message, [name, value]) => message.replaceAll(`{${name}}`, String(value)),
+      tr(key)
+    );
     const categoryTranslationKey = {
       "All items": "allItems", "Kids": "kids", "Gifts": "gifts", "Stationery": "stationery",
       "Puja": "puja", "Gharelu Samaan": "household", "Electronics": "electronics"
@@ -915,7 +926,6 @@
       $("help-open").textContent = tr("help");
       $("profile-heading").textContent = tr("profileTitle");
       $("help-heading").textContent = tr("helpTitle");
-      $("profile-note").textContent = tr("profileNote");
       $("refresh-customer-orders").textContent = `↻ ${tr("refreshOrders")}`;
       $("profile-overlay").setAttribute("aria-label", tr("profileTitle"));
       $("help-overlay").setAttribute("aria-label", tr("helpTitle"));
@@ -1099,7 +1109,6 @@
         return;
       }
       if (customerStatusRefreshInProgress) return;
-      if (document.visibilityState !== "visible" && $("profile-overlay").classList.contains("open")) return;
       const ordersToCheck = customerOrders.filter((order) =>
         order.customerStatusToken
         && (includeTerminal || !["Completed", "Rejected"].includes(order.status))
@@ -1115,8 +1124,9 @@
       refreshButton.disabled = true;
       refreshButton.textContent = tr("refreshingOrders");
       $("profile-sync-status").textContent = "";
-      let changed = false;
-      let failed = false;
+      let updated = 0;
+      let failed = 0;
+      const previousStatuses = new Map(ordersToCheck.map((order) => [order, order.status]));
       try {
         await Promise.all(ordersToCheck.map(async (order) => {
           try {
@@ -1124,22 +1134,34 @@
               body: { reference: order.id || order.reference, token: order.customerStatusToken }
             });
             if (error) throw error;
+            if (
+              data?.reference !== (order.id || order.reference)
+              || !["Awaiting manager approval", "Approved", "Delivered", "Completed", "Rejected"].includes(data.status)
+            ) {
+              throw new Error("The order status response was invalid.");
+            }
             if (order.status !== data.status) {
               order.status = data.status;
-              changed = true;
+              updated += 1;
             }
           } catch (error) {
-            failed = true;
+            failed += 1;
             console.warn(`Could not sync order ${order.id || order.reference}`, error);
           }
         }));
-        if (changed) {
-          if (storage.write("shanvi-customer-orders", customerOrders)) renderCustomerOrders();
-          else failed = true;
+        if (updated && !storage.write("shanvi-customer-orders", customerOrders)) {
+          previousStatuses.forEach((status, order) => { order.status = status; });
+          updated = 0;
+          failed = ordersToCheck.length;
         }
+        if (updated) renderCustomerOrders();
         $("profile-sync-status").textContent = failed
-          ? (navigator.onLine ? tr("orderStatusSyncFailed") : tr("profileOffline"))
-          : tr("orderStatusSynced");
+          ? (navigator.onLine
+            ? formatTranslation("orderRefreshPartial", { checked: ordersToCheck.length - failed, failed })
+            : tr("profileOffline"))
+          : updated
+            ? formatTranslation("orderRefreshUpdated", { checked: ordersToCheck.length, updated })
+            : formatTranslation("orderRefreshCurrent", { checked: ordersToCheck.length });
       } catch (error) {
         console.warn("Could not sync customer order status", error);
         $("profile-sync-status").textContent = tr("orderStatusSyncFailed");
@@ -1159,15 +1181,25 @@
       const { data, error } = await db.from("store_settings").select("value").eq("key", "checkout_address").maybeSingle();
       if (error) {
         console.warn("Could not load checkout address settings", error.message);
-      } else if (data?.value && typeof data.value === "object") {
+        checkoutAddressSettingsReady = false;
+        checkoutAddressSettingsError = true;
+        $("checkout-address-settings-status").textContent = "Could not load the saved address settings. Reopen checkout to retry before changing these options.";
+        renderCart();
+        return;
+      }
+      if (data?.value && typeof data.value === "object") {
         checkoutAddressFields = Object.fromEntries(
           Object.keys(defaultCheckoutAddressFields).map((key) => [
             key,
             typeof data.value[key] === "boolean" ? data.value[key] : defaultCheckoutAddressFields[key]
           ])
         );
+      } else {
+        checkoutAddressFields = { ...defaultCheckoutAddressFields };
       }
       checkoutAddressSettingsReady = true;
+      checkoutAddressSettingsError = false;
+      $("checkout-address-settings-status").textContent = "Saved address fields are loaded and shared with customers.";
       $("checkout-address-field-options").querySelectorAll("[data-address-field]").forEach((input) => {
         input.checked = checkoutAddressFields[input.dataset.addressField] !== false;
       });
@@ -1415,7 +1447,9 @@
           <button class="btn btn-primary full" id="place-order" type="submit">${tr("continuePayment")} · ${money(total)}</button>
         </form>` : `
           <p class="payment-box">${db
-            ? orderBackendReady
+            ? orderBackendReady && checkoutAddressSettingsError
+              ? "Could not load checkout address settings. Close and reopen the basket to retry."
+              : orderBackendReady
               ? "Loading the store's checkout address settings…"
               : "The secure order database is still being set up. Online ordering will be enabled after setup is complete."
             : "This public catalog is currently browse-only. Online orders will be enabled after the store connects its secure order service."}</p>
@@ -2521,6 +2555,10 @@
         showToast("A connected Supabase project is required to share checkout fields with customers.");
         return;
       }
+      if (!checkoutAddressSettingsReady || checkoutAddressSettingsError) {
+        showToast("Load the saved checkout address settings before changing them.");
+        return;
+      }
       const button = $("save-checkout-address-fields");
       button.disabled = true;
       try {
@@ -2530,6 +2568,7 @@
         });
         if (error) throw error;
         checkoutAddressFields = { ...defaultCheckoutAddressFields, ...nextFields };
+        $("checkout-address-settings-status").textContent = "Saved address fields are now active for customers.";
         renderCart();
         showManagerSaved("Checkout address fields saved for all customers.");
       } catch (error) {
