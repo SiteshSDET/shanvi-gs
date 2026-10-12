@@ -1,10 +1,31 @@
 # Store manager and local preview
 
-Without Supabase configured, manager sign-in and shared order management are disabled. A browser-only password is not safe on a public website because visitors can inspect the JavaScript and bypass it. When Supabase is configured, manager sign-in uses Supabase Auth and only users listed in `public.store_managers` can access manager tools and orders. Logo, product, offer, and delivery settings remain browser-local.
+The live site uses Supabase project `kwnhoberdxqtzujwhudn`. The public URL and publishable key are configured in `supabase-config.js`. The order form remains disabled until the required database schema is installed. Manager access requires a Supabase Auth account whose user ID is listed in `public.store_managers`. Logo, product, offer, and delivery settings remain browser-local.
 
 ## Security limitation
 
-Static credentials in a browser application are not secret: a visitor who inspects or downloads the page can find and bypass the check. The app therefore disables manager sign-in until Supabase is configured. Do not publish this build as an active store until the backend and real payment details have been configured.
+Static credentials in a browser application are not secret: a visitor who inspects or downloads the page can find and bypass the check. The live build does not include a static manager password. Never put the service-role key, database password, or VAPID private key in frontend files.
+
+## Finish connecting the existing Supabase project
+
+The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. To activate shared order storage and Manager sign-in:
+
+1. Sign in to Supabase and open project `kwnhoberdxqtzujwhudn`: `https://supabase.com/dashboard/project/kwnhoberdxqtzujwhudn`.
+2. Open **SQL Editor → New query**. Copy the full contents of `supabase-setup.sql` from the GitHub repository into the editor and click **Run**.
+3. Run `supabase-order-payment-update.sql` the same way.
+4. Run `supabase/features.sql` last. The storefront checks for the order columns in these migrations and keeps customer checkout disabled until they exist.
+5. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
+6. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
+
+   ```sql
+   insert into public.store_managers (user_id)
+   values ('PASTE_MANAGER_USER_UUID')
+   on conflict (user_id) do nothing;
+   ```
+
+7. Reload the live site. Sign in via **Manager** using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
+
+The publishable key in `supabase-config.js` is designed to be public; the database row-level security policies enforce access. Never share or publish your Supabase database password or service-role key. The order database works without push notifications; enabling phone push alerts requires the separate VAPID/Edge Function steps below.
 
 ## Managing the catalog
 
@@ -30,40 +51,31 @@ The Manager order list is at the bottom of the manager tools. Its **Pending**, *
 
 Push alerts need an online Supabase project and an HTTPS deployment; they cannot be delivered by browser-local storage alone. Only orders successfully inserted into Supabase can trigger push. Supabase and the Web Push protocol have free/open-source options, but free tiers and mobile browser policies can change. iPhone web push generally requires the manager site to be installed to the Home Screen and notification permission granted.
 
-HTML, CSS, and browser JavaScript can run the storefront and save demo orders on one browser, but cannot securely synchronize customer orders between different phones or deliver push notifications while the manager page is closed. That requires an online backend. The app already includes a Supabase integration that can use its free tier; project creation, keys, and deployment still require the store owner to configure them.
+HTML, CSS, and browser JavaScript cannot securely synchronize customer orders between different phones or deliver push notifications while the manager page is closed. That requires an online backend.
 
-For a **same-browser, same-device test without Supabase**, sign in to Manager, open **Order notifications**, and tap **Enable browser alerts**, then allow the browser prompt. Open the storefront in another tab in that same browser and place a local/demo order. Keep the manager page open; the browser storage event will show the order, play a short beep, and show a system alert if notifications are supported. Use **Test sound and notification** first to confirm permission and sound. This local method cannot alert another device and does not work when the manager page is closed.
+The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback.
 
 ### Cross-device manager push setup
 
-This is needed for orders from customers on other devices and for push alerts while the manager tab is closed. The project is **not connected to Supabase yet**: `supabase-config.js` currently has blank values. Follow these steps in order:
+The Supabase project URL and publishable key are already configured on the live site. Push alerts while the manager tab is closed need additional setup. Follow these steps after the database and manager account steps above:
 
-1. Create a Supabase project at `https://supabase.com/` and keep its project URL, project reference ID, anon/publishable key, and service-role key available. In the SQL editor, run the root-level files `supabase-setup.sql` and `supabase-order-payment-update.sql`.
-2. Create the manager account in Dashboard → Authentication → Users. Use its email/password to sign in to Manager after setup. Copy the user's UUID and authorize it by running:
-
-   ```sql
-   insert into public.store_managers (user_id)
-   values ('MANAGER_AUTH_USER_UUID')
-   on conflict (user_id) do nothing;
-   ```
-
-3. Generate Web Push keys (free) on a computer with Node.js:
+1. Generate Web Push keys (free) on a computer with Node.js:
 
    ```sh
    npx web-push generate-vapid-keys
    ```
 
    Save both generated keys privately. The public key goes in `supabase-config.js`; never put the VAPID private key or Supabase service-role key in frontend code.
-4. Install/use the free Supabase CLI, sign in, and link this project from a terminal opened in the project folder:
+2. Install/use the free Supabase CLI, sign in, and link this project from a terminal opened in the project folder:
 
    ```sh
    npx supabase login
-   npx supabase link --project-ref YOUR_PROJECT_REF
+   npx supabase link --project-ref kwnhoberdxqtzujwhudn
    npx supabase functions deploy register-manager-push --no-verify-jwt
    npx supabase functions deploy register-customer-push --no-verify-jwt
    npx supabase functions deploy notify-order
    ```
-5. Add the server-only push secrets (replace the example values):
+3. Add the server-only push secrets (replace the example values):
 
    ```sh
    npx supabase secrets set \
@@ -73,26 +85,24 @@ This is needed for orders from customers on other devices and for push alerts wh
      VAPID_SUBJECT="mailto:you@example.com"
    ```
 
-6. In the Supabase SQL editor, save the project URL and **service-role key** in Supabase Vault for the database trigger. Replace placeholders; never paste these secrets into `index.html` or `supabase-config.js`:
+4. In the Supabase SQL editor, save the project URL and **service-role key** in Supabase Vault for the database trigger. Replace placeholders; never paste these secrets into `index.html` or `supabase-config.js`:
 
    ```sql
-   select vault.create_secret('https://YOUR_PROJECT_REF.supabase.co', 'shanvi_supabase_url');
+   select vault.create_secret('https://kwnhoberdxqtzujwhudn.supabase.co', 'shanvi_supabase_url');
    select vault.create_secret('YOUR_SERVICE_ROLE_KEY', 'shanvi_service_role_key');
    ```
 
-7. Run `supabase/features.sql` in the Supabase SQL editor. It adds order fields and push tables, enables Realtime, and creates the triggers that send manager/customer push events. Keep the Vault secrets from step 6 in place.
-8. Edit `supabase-config.js` and fill only the project URL, anon/publishable key, and VAPID **public** key:
+5. Add the VAPID **public** key generated in step 1 to `supabase-config.js` and publish the change:
 
    ```js
    window.STORE_CONFIG = {
-     url: "https://YOUR_PROJECT_REF.supabase.co",
-     anonKey: "YOUR_ANON_OR_PUBLISHABLE_KEY",
+     url: "https://kwnhoberdxqtzujwhudn.supabase.co",
+     anonKey: "YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY",
      pushPublicKey: "YOUR_VAPID_PUBLIC_KEY"
    };
    ```
 
-9. Deploy the whole site folder to an HTTPS static host (for example, GitHub Pages, Cloudflare Pages, or Netlify). Do not use `file://` or a plain local HTTP address on a phone; push and browser location require HTTPS. Use the deployed URL for both manager and customer devices.
-10. Open the deployed site on the manager's phone, open **Manager**, and sign in with the Supabase Auth email/password from step 2. In **Order notifications**, enter the `MANAGER_ENROLLMENT_CODE` from step 5, tap **Enable browser alerts**, and allow the notification prompt. Tap **Test sound and notification**. On iPhone/iPad, add the site to the Home Screen first if the browser requires it for push notifications.
-11. Test with a customer device/browser: add products, enter customer details, choose a payment method, and confirm the order. The order should appear in Manager → **Customer orders**, which auto-refreshes every 15 seconds and also listens to Realtime. The manager phone receives a browser push if registered. The manager can review customer name, phone, address, items, and totals, then tap **Approve order**. The customer must tap **Notify me when the store approves this order** on the order-success screen and allow notifications to receive the approval push.
+6. Open the deployed site on the manager's phone. In **Order notifications**, enter the `MANAGER_ENROLLMENT_CODE` from step 3, tap **Enable browser alerts**, and allow the notification prompt. Tap **Test sound and notification**. On iPhone/iPad, add the site to the Home Screen first if the browser requires it for push notifications.
+7. Test with a customer device/browser. Orders should appear in Manager → **Customer orders**, which refreshes every 15 seconds and listens to Realtime. The customer must opt in on the order-success screen to receive approval notifications.
 
 Hosted Supabase and static hosts offer free tiers with usage limits; this is not a guarantee of unlimited or permanently free hosting. Browser push itself has no per-message fee, but needs supported browsers, HTTPS, and permission; notification sound/vibration follows phone settings. SMS/calls to a phone number are not included. Static product/logo/offer/delivery settings remain in browser storage and do not sync to customers' devices in this version.

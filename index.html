@@ -626,6 +626,7 @@
     const supabaseConfig = window.STORE_CONFIG || {};
     const backendReady = Boolean(supabaseConfig.url && supabaseConfig.anonKey && window.supabase?.createClient);
     const db = backendReady ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey) : null;
+    let orderBackendReady = false;
     let products = storage.read("shanvi-products", defaultProducts);
     let language = storage.read("shanvi-language", "en") === "hi" ? "hi" : "en";
     let cart = storage.read("shanvi-cart", {});
@@ -968,7 +969,7 @@
           <div class="summary-row"><span>${tr("delivery")}</span><strong>${deliveryFee === null ? tr("calculatedAtCheckout") : money(deliveryFee)}</strong></div>
           <div class="summary-row total"><span>${tr("total")}</span><span>${money(total)}</span></div>
         </div>
-        ${db ? `
+        ${db && orderBackendReady ? `
         <h3 style="font-size:15px;margin:20px 0 8px">${tr("deliveryDetails")}</h3>
         <div class="field"><label for="customer-name">${tr("fullName")}</label><input id="customer-name" autocomplete="name" placeholder="${tr("startLetter")}" required maxlength="100" pattern="[\\p{L}][\\p{L}\\p{M} .'-]{0,99}" title="${tr("nameTitle")}"></div>
         <div class="field"><label for="customer-phone">${tr("mobile")}</label><input id="customer-phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="${tr("mobile")}" required minlength="10" maxlength="10" pattern="[0-9]{10}" title="${language === "hi" ? "केवल 10 अंक लिखें।" : "Enter exactly 10 digits."}"></div>
@@ -985,7 +986,9 @@
         </div>
         ${hasFreeGift ? `<p class="small-note">${tr("freeGiftAdded")}</p>` : ""}
           <button class="btn btn-primary full" id="place-order">${tr("continuePayment")} · ${money(total)}</button>` : `
-          <p class="payment-box">This public catalog is currently browse-only. Online orders will be enabled after the store connects its secure order service.</p>
+          <p class="payment-box">${db
+            ? "The secure order database is still being set up. Online ordering will be enabled after setup is complete."
+            : "This public catalog is currently browse-only. Online orders will be enabled after the store connects its secure order service."}</p>
           <button class="btn btn-primary full" id="place-order" disabled>Online ordering unavailable</button>`}`;
       $("cart-content").querySelectorAll("[data-qty]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.qty, Number(button.dataset.step))));
       $("cart-content").querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.remove, -(cart[button.dataset.remove] || 0))));
@@ -1003,6 +1006,18 @@
       const a = Math.sin(latitudeDelta / 2) ** 2
         + Math.cos(radians(from.latitude)) * Math.cos(radians(to.latitude)) * Math.sin(longitudeDelta / 2) ** 2;
       return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+    async function checkOrderBackend() {
+      if (!db) return;
+      const { error } = await db.from("orders")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, status, customer_status_token_hash")
+        .limit(0);
+      if (error) {
+        console.warn("Shared ordering is not ready yet", error.message);
+        return;
+      }
+      orderBackendReady = true;
+      renderCart();
     }
     function calculateDeliveryFee() {
       if (!String(deliverySettings.latitude).trim() || !String(deliverySettings.longitude).trim()) return Promise.resolve(20);
@@ -1455,7 +1470,7 @@
         .subscribe();
     }
     async function continueToPayment() {
-      if (!db) {
+      if (!db || !orderBackendReady) {
         showToast("Online ordering is unavailable until the store backend is configured.");
         return;
       }
@@ -1550,6 +1565,10 @@
     }
     async function saveOrder() {
       if (!checkoutDraft) return;
+      if (!db || !orderBackendReady) {
+        showToast("Online ordering is unavailable until the store backend is configured.");
+        return;
+      }
       if (!db) {
         showToast("Online ordering is unavailable until the store backend is configured.");
         return;
@@ -2181,7 +2200,10 @@
     if ("ResizeObserver" in window) new ResizeObserver(syncHeaderSpacer).observe($("store-header"));
     else window.addEventListener("resize", syncHeaderSpacer);
     document.fonts?.ready.then(syncHeaderSpacer);
-    if (db) restoreManagerSession();
+    if (db) {
+      checkOrderBackend();
+      restoreManagerSession();
+    }
   </script>
 </body>
 </html>
