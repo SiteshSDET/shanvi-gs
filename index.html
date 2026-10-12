@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#f8f7f3">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Shanvi Store">
+  <link rel="apple-touch-icon" href="./store-icon-192.png">
   <link rel="manifest" href="./manifest.webmanifest">
   <title>Shanvi General Store</title>
   <style>
@@ -371,6 +372,7 @@
         <button class="btn btn-soft" id="profile-open" type="button">Profile</button>
         <button class="btn btn-soft" id="help-open" type="button">Help</button>
         <button class="btn btn-soft cart-btn" id="cart-open" aria-label="Cart">🛒 <span id="cart-label">Cart</span> <span class="cart-count" id="cart-count">0</span></button>
+        <button class="btn btn-soft" id="install-app" type="button" hidden>Install app</button>
         <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch language">हिन्दी</button>
       </div>
     </nav>
@@ -807,6 +809,7 @@
     let managerOrdersPage = 0;
     let managerOrders = [];
     let managerOrderFilter = "pending";
+    let deferredInstallPrompt = null;
     const managerOpenProductSections = new Set();
     const $ = (id) => document.getElementById(id);
     function initializeManagerAccordions() {
@@ -2622,6 +2625,31 @@
     if ("ResizeObserver" in window) new ResizeObserver(syncHeaderSpacer).observe($("store-header"));
     else window.addEventListener("resize", syncHeaderSpacer);
     document.fonts?.ready.then(syncHeaderSpacer);
+    window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    $("install-app").hidden = false;
+    });
+    window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    $("install-app").hidden = true;
+    showToast("Shanvi Store installed");
+    });
+    $("install-app").addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      showToast("In Chrome, open ⋮ and choose Install app or Add to Home screen.");
+      return;
+    }
+    await deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    $("install-app").hidden = true;
+    });
+    if (window.isSecureContext && "serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch((error) => {
+      console.warn("Could not register the store service worker", error);
+    });
+    }
     if (db) {
       checkOrderBackend();
       loadStoreHelpContact();

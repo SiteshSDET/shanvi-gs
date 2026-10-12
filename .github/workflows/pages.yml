@@ -28,7 +28,7 @@ jobs:
       - name: Prepare public site files
         run: |
           mkdir _site
-          cp index.html manifest.webmanifest sample-upi-qr.png store-icon.svg supabase-config.js sw.js _site/
+          cp index.html manifest.webmanifest sample-upi-qr.png store-icon.svg store-icon-192.png store-icon-512.png supabase-config.js sw.js _site/
           touch _site/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
