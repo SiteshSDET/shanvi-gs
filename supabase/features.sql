@@ -9,6 +9,12 @@ alter table public.orders
 alter table public.orders
   add column if not exists customer_status_token_hash text;
 
+alter table public.orders
+  add column if not exists payment_confirmed boolean not null default false;
+
+comment on column public.orders.payment_confirmed is
+  'Customer attestation that an external UPI/QR payment was sent; not gateway-verified.';
+
 drop policy if exists "Customers can place orders" on public.orders;
 create policy "Customers can place orders"
   on public.orders for insert to anon, authenticated
@@ -24,6 +30,10 @@ create policy "Customers can place orders"
     and (
       (payment_method = 'upi_id' and payer_upi_id ~ '^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$')
       or (payment_method in ('upi_qr', 'cod') and payer_upi_id is null)
+    )
+    and (
+      (payment_method = 'cod' and payment_confirmed = false)
+      or (payment_method in ('upi_id', 'upi_qr') and payment_confirmed = true)
     )
     and (
       payment_method in ('upi_id', 'upi_qr')

@@ -31,9 +31,13 @@ create table if not exists public.orders (
   total integer not null check (total >= 0),
   payment_method text not null default 'upi_id' check (payment_method in ('upi_id', 'upi_qr', 'cod')),
   payer_upi_id text check (payer_upi_id is null or payer_upi_id ~ '^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$'),
+  payment_confirmed boolean not null default false,
   status text not null default 'Awaiting store confirmation',
   created_at timestamptz not null default now()
 );
+
+comment on column public.orders.payment_confirmed is
+  'Customer attestation that an external UPI/QR payment was sent; not gateway-verified.';
 
 alter table public.store_managers enable row level security;
 alter table public.products enable row level security;
@@ -71,6 +75,10 @@ create policy "Customers can place orders"
     and (
       (payment_method = 'upi_id' and payer_upi_id ~ '^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$')
       or (payment_method in ('upi_qr', 'cod') and payer_upi_id is null)
+    )
+    and (
+      (payment_method = 'cod' and payment_confirmed = false)
+      or (payment_method in ('upi_id', 'upi_qr') and payment_confirmed = true)
     )
     and (
       payment_method in ('upi_id', 'upi_qr')

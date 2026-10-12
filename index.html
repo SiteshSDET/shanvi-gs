@@ -690,7 +690,10 @@
         qrNotConfigured: "QR payment is not configured.",
         cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
         codUnavailable: "Currently unavailable; the store manager has disabled COD.",
-        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "After confirming your order, the store will verify your UPI payment. This website does not automatically verify payments.",
+        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "After paying, mark payment complete to enable order confirmation. The store will verify payment; this website cannot verify UPI automatically.", paidConfirmation: "I’ve paid the full amount to the store",
+        paymentNotVerified: "Your payment is not verified automatically. The store will verify it before accepting the order.",
+        paymentCustomerMarkedPaid: "Customer marked paid — verify receipt in the payment account.",
+        paymentCustomerNotMarkedPaid: "Customer has not marked payment as paid.",
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
         itemsEach: "each", invalidCoupon: "That coupon code is not valid", couponApplied: "WELCOME10 applied",
@@ -780,7 +783,10 @@
         qrNotConfigured: "QR भुगतान अभी सेट नहीं है।",
         cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
-        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "ऑर्डर के बाद दुकान UPI भुगतान की पुष्टि करेगी। वेबसाइट भुगतान की पुष्टि अपने आप नहीं करती।",
+        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "भुगतान करने के बाद ऑर्डर की पुष्टि चालू करने के लिए भुगतान पूरा चुनें। दुकान भुगतान की जाँच करेगी; वेबसाइट UPI की अपने आप पुष्टि नहीं कर सकती।", paidConfirmation: "मैंने दुकान को पूरी राशि का भुगतान कर दिया है",
+        paymentNotVerified: "भुगतान की अपने आप पुष्टि नहीं होती। ऑर्डर स्वीकार करने से पहले दुकान इसकी जाँच करेगी।",
+        paymentCustomerMarkedPaid: "ग्राहक ने भुगतान पूरा बताया है — भुगतान खाते में जाँचें।",
+        paymentCustomerNotMarkedPaid: "ग्राहक ने भुगतान पूरा होने की पुष्टि नहीं की है।",
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
         itemsEach: "प्रति सामान", invalidCoupon: "यह कूपन कोड मान्य नहीं है", couponApplied: "WELCOME10 लागू हुआ",
@@ -1554,7 +1560,7 @@
     async function checkOrderBackend() {
       if (!db) return;
       const { error } = await db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, status, customer_status_token_hash")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, status, customer_status_token_hash")
         .limit(0);
       if (error) {
         console.warn("Shared ordering is not ready yet", error.message);
@@ -1798,7 +1804,7 @@
       }
       $("load-more-orders").hidden = true;
       const { data, error } = await db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, status, created_at")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, status, created_at")
         .order("created_at", { ascending: false })
         .range(managerOrdersPage * 100, managerOrdersPage * 100 + 99);
       if (error) {
@@ -1883,6 +1889,11 @@
       const createdAt = order.created_at || order.createdAt;
       const payerUpi = order.payer_upi_id || order.payerUpiId || "";
       const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
+      const paymentConfirmation = paymentMethod === "cod"
+        ? ""
+        : order.payment_confirmed === true
+          ? tr("paymentCustomerMarkedPaid")
+          : tr("paymentCustomerNotMarkedPaid");
       return `<article class="order-card">
         <h4>${escapeHtml(reference)} · ${escapeHtml(status)}</h4>
         <p class="small-note">${createdAt ? escapeHtml(new Date(createdAt).toLocaleString()) : ""}</p>
@@ -1898,6 +1909,7 @@
           <div class="order-line"><span>Delivery</span><span>${money(delivery)}</span></div>
           <div class="order-line"><strong>Total</strong><strong>${money(total)}</strong></div>
           <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer UPI ID: ${escapeHtml(payerUpi)}` : ""}</p>
+          ${paymentConfirmation ? `<p class="small-note"><strong>${escapeHtml(paymentConfirmation)}</strong></p>` : ""}
         </section>
         <button class="btn btn-soft manager-order-print" type="button" data-print-order="${escapeAttr(reference)}">Generate / print bill</button>
         <div class="order-status-actions">
@@ -2171,6 +2183,7 @@
         : selectedPayment === "upi_id" ? canPayUpiId && /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(checkoutDraft.payerUpiId || "")
         : selectedPayment === "upi_qr" ? canPayQr
         : false;
+      const paymentConfirmationRequired = selectedPayment === "upi_id" || selectedPayment === "upi_qr";
       const upiLink = settings.upi
         ? `upi://pay?${new URLSearchParams({pa:settings.upi,pn:"Shanvi General Store",am:checkoutDraft.total.toFixed(2),cu:"INR",tn:checkoutDraft.id})}`
         : "";
@@ -2185,19 +2198,32 @@
         </div>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""}><span><strong>${tr("qr")}</strong><small>${canPayQr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
         ${selectedPayment === "upi_qr" ? `<div class="payment-box">${canPayQr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}. ${tr("verifyPayment")}</p>` : tr("qrNotConfigured")}</div>` : ""}
+        ${paymentConfirmationRequired ? `<label class="payment-choice payment-paid-choice"><input id="payment-confirmed" type="checkbox" ${checkoutDraft.paymentConfirmed ? "checked" : ""}><span><strong>${tr("paidConfirmation")}</strong><small>${tr("paymentNotVerified")}</small></span></label>` : ""}
         <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
-        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentReady ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
-        ${selectedPayment !== "cod" ? `<p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentReady && (!paymentConfirmationRequired || checkoutDraft.paymentConfirmed) ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
+        ${paymentConfirmationRequired ? `<p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
       $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => radio.addEventListener("change", () => {
         selectedPayment = radio.value;
+        checkoutDraft.paymentConfirmed = false;
         renderPaymentPage();
       }));
       const payerUpiInput = $("customer-upi-id");
       if (payerUpiInput) payerUpiInput.addEventListener("input", () => {
-        checkoutDraft.payerUpiId = payerUpiInput.value.trim();
-        $("confirm-payment").disabled = !paymentReadyForUpiId();
+        const payerUpiId = payerUpiInput.value.trim();
+        if (payerUpiId !== checkoutDraft.payerUpiId) {
+          checkoutDraft.paymentConfirmed = false;
+          $("payment-confirmed").checked = false;
+        }
+        checkoutDraft.payerUpiId = payerUpiId;
+        $("confirm-payment").disabled = !paymentReadyForUpiId() || !checkoutDraft.paymentConfirmed;
+      });
+      const paymentConfirmedInput = $("payment-confirmed");
+      if (paymentConfirmedInput) paymentConfirmedInput.addEventListener("change", () => {
+        checkoutDraft.paymentConfirmed = paymentConfirmedInput.checked;
+        const detailsReady = selectedPayment === "upi_id" ? paymentReadyForUpiId() : Boolean(settings.qr);
+        $("confirm-payment").disabled = !detailsReady || !checkoutDraft.paymentConfirmed;
       });
       const copyButton = $("copy-upi");
       if (copyButton) copyButton.onclick = async () => {
@@ -2238,13 +2264,18 @@
         renderPaymentPage();
         return;
       }
+      if ((selectedPayment === "upi_id" || selectedPayment === "upi_qr") && checkoutDraft.paymentConfirmed !== true) {
+        showToast(tr("paidConfirmation"));
+        renderPaymentPage();
+        return;
+      }
       const draft = checkoutDraft;
       const paymentLabels = {
         cod: language === "hi" ? "कैश ऑन डिलीवरी" : "Cash on delivery",
         upi_id: "UPI ID",
         upi_qr: language === "hi" ? "UPI QR कोड" : "UPI QR code"
       };
-      const order = { ...draft, paymentMethod: selectedPayment, status: db ? "Awaiting manager approval" : (selectedPayment === "cod" ? "COD order placed" : "Awaiting UPI payment verification") };
+      const order = { ...draft, paymentMethod: selectedPayment, paymentConfirmed: selectedPayment !== "cod" && draft.paymentConfirmed === true, status: db ? "Awaiting manager approval" : (selectedPayment === "cod" ? "COD order placed" : "Awaiting UPI payment verification") };
       const button = $("confirm-payment");
       button.disabled = true;
       const previousProducts = products;
@@ -2298,6 +2329,7 @@
             discount: order.discount,
             payment_method: order.paymentMethod,
             payer_upi_id: order.paymentMethod === "upi_id" ? order.payerUpiId : null,
+            payment_confirmed: order.paymentConfirmed,
             status: order.status,
             customer_status_token_hash: order.customerStatusTokenHash
           });
