@@ -195,6 +195,7 @@
     .customer-order-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
     .customer-order-actions .btn { font-size: 12px; }
     .customer-help-contact { display: block; margin: 14px 0; font-size: 20px; font-weight: 750; color: var(--green-dark); }
+    .customer-help-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
     .order-filters, .order-status-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
     .order-filters button { border: 1px solid var(--line); border-radius: 999px; background: #f6f7f3; color: var(--ink); padding: 9px 14px; font-weight: 700; cursor: pointer; }
     .order-filters button[aria-pressed="true"] { border-color: var(--green-dark); background: var(--green-dark); color: white; }
@@ -640,7 +641,7 @@
         orderGroupInProgress: "In Progress", orderGroupPendingRejected: "Pending / Rejected", orderGroupCompleted: "Completed",
         enableOrderPush: "Enable order notifications", orderPushEnabled: "Order notifications enabled on this device.",
         orderStepPlaced: "Placed", orderStepAccepted: "Accepted", orderStepDelivered: "Delivered", orderStepCompleted: "Complete",
-        helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.",
+        helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.", callStore: "Call store", chatWhatsApp: "Chat on WhatsApp",
         noCustomerOrders: "Your placed orders will appear here.", orderItems: "Items",
         orderAddress: "Delivery address", orderStatusPending: "Waiting for store confirmation", orderStatusApproved: "Accepted by store",
         viewOrderDetails: "Tap to view details",
@@ -729,7 +730,7 @@
         orderGroupInProgress: "जारी ऑर्डर", orderGroupPendingRejected: "लंबित / अस्वीकार", orderGroupCompleted: "पूरे हुए",
         enableOrderPush: "ऑर्डर सूचना चालू करें", orderPushEnabled: "इस डिवाइस पर ऑर्डर सूचनाएँ चालू हैं।",
         orderStepPlaced: "ऑर्डर मिला", orderStepAccepted: "स्वीकार", orderStepDelivered: "डिलीवर", orderStepCompleted: "पूरा",
-        helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।",
+        helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।", callStore: "दुकान पर कॉल करें", chatWhatsApp: "WhatsApp पर चैट करें",
         noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", orderItems: "सामान",
         orderAddress: "डिलीवरी का पता", orderStatusPending: "दुकान की पुष्टि बाकी", orderStatusApproved: "दुकान ने स्वीकार किया",
         viewOrderDetails: "विवरण देखने के लिए दबाएँ",
@@ -1189,9 +1190,12 @@
       }
     }
     function renderCustomerHelp() {
-      $("customer-help-contact").innerHTML = storeHelpPhone
-        ? `${tr("helpIntro")}<a class="customer-help-contact" href="tel:${escapeAttr(storeHelpPhone)}">${escapeHtml(storeHelpPhone)}</a>`
-        : tr("helpMissing");
+      if (!storeHelpPhone) {
+        $("customer-help-contact").textContent = tr("helpMissing");
+        return;
+      }
+      const whatsappPhone = `91${storeHelpPhone}`;
+      $("customer-help-contact").innerHTML = `${tr("helpIntro")}<a class="customer-help-contact" href="tel:${escapeAttr(storeHelpPhone)}">${escapeHtml(storeHelpPhone)}</a><div class="customer-help-actions"><a class="btn btn-primary" href="tel:${escapeAttr(storeHelpPhone)}">${tr("callStore")}</a><a class="btn btn-soft" href="https://wa.me/${escapeAttr(whatsappPhone)}" target="_blank" rel="noopener noreferrer">${tr("chatWhatsApp")}</a></div>`;
     }
     async function loadCheckoutAddressFields() {
       if (!db) return;
