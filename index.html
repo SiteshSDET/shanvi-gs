@@ -833,6 +833,7 @@
     if (!Array.isArray(customerOrders)) customerOrders = [];
     const expandedCustomerOrderGroups = new Set();
     const expandedCustomerOrderDetails = new Set();
+    const verifiedCustomerOrderStatuses = new Map();
     let customerStatusRefreshInProgress = false;
     let brandLogo = storage.read("shanvi-brand-logo", "");
     let brandLogoDraft = brandLogo;
@@ -998,13 +999,16 @@
       };
       return labels[status] || tr("orderStatusPending");
     }
+    function customerOrderDisplayStatus(order) {
+      return verifiedCustomerOrderStatuses.get(order.id || order.reference) || "Awaiting manager approval";
+    }
     function customerOrderShareText(order) {
       const reference = order.id || order.reference;
       const items = Array.isArray(order.items) ? order.items : [];
       return [
         tr("orderWhatsAppIntro"),
         `${tr("orderIdLabel")}: ${reference}`,
-        `${tr("orderStatusLabel")}: ${customerOrderStatusLabel(order.status)}`,
+        `${tr("orderStatusLabel")}: ${customerOrderStatusLabel(customerOrderDisplayStatus(order))}`,
         `${tr("orderItemsLabel")}:`,
         ...items.map((item) => `- ${item.name} x${Number(item.quantity) || 1} (${money(Number(item.price) || 0)})`),
         `${tr("orderTotalLabel")}: ${money(Number(order.total) || 0)}`
@@ -1022,8 +1026,9 @@
       }
     }
     function customerOrderGroup(order) {
-      if (order.status === "Completed") return "completed";
-      if (order.status === "Approved" || order.status === "Delivered") return "in-progress";
+      const status = customerOrderDisplayStatus(order);
+      if (status === "Completed") return "completed";
+      if (status === "Approved" || status === "Delivered") return "in-progress";
       return "pending-rejected";
     }
     function renderCustomerOrders() {
@@ -1048,19 +1053,20 @@
           <div class="profile-order-group-content">${orders.slice().reverse().map((order) => {
         const reference = order.id || order.reference;
         const items = Array.isArray(order.items) ? order.items : [];
-        const rejected = order.status === "Rejected";
+        const status = customerOrderDisplayStatus(order);
+        const rejected = status === "Rejected";
         const progress = rejected ? -1 : ({
           "Approved": 1,
           "Delivered": 2,
           "Completed": 3
-        }[order.status] ?? 0);
+        }[status] ?? 0);
         const paymentMethod = order.paymentMethod === "cod" ? tr("cod")
           : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
         return `<details class="customer-order-details" data-customer-order-id="${escapeAttr(reference)}" ${expandedCustomerOrderDetails.has(reference) ? "open" : ""}>
-          <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(order.status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${rejected ? "rejected" : "active"}">${escapeHtml(customerOrderStatusLabel(order.status))}</span></summary>
+          <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${rejected ? "rejected" : "active"}">${escapeHtml(customerOrderStatusLabel(status))}</span></summary>
           <div class="customer-order-details-content">
             <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
-            <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(order.status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
+            <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
             <div class="customer-order-actions">
               <button class="btn btn-soft" type="button" data-copy-customer-order-id="${escapeAttr(reference)}">${tr("copyOrderId")}</button>
               <button class="btn btn-soft" type="button" data-copy-customer-order-details="${escapeAttr(reference)}">${tr("copyOrderDetails")}</button>
@@ -1134,6 +1140,7 @@
       $("profile-sync-status").textContent = "";
       let updated = 0;
       let failed = 0;
+      let verified = 0;
       const previousStatuses = new Map(ordersToCheck.map((order) => [order, order.status]));
       try {
         await Promise.all(ordersToCheck.map(async (order) => {
@@ -1152,6 +1159,8 @@
               order.status = data.status;
               updated += 1;
             }
+            verifiedCustomerOrderStatuses.set(order.id || order.reference, data.status);
+            verified += 1;
           } catch (error) {
             failed += 1;
             console.warn(`Could not sync order ${order.id || order.reference}`, error);
@@ -1162,7 +1171,7 @@
           updated = 0;
           failed = ordersToCheck.length;
         }
-        if (updated) renderCustomerOrders();
+        if (verified) renderCustomerOrders();
         $("profile-sync-status").textContent = failed
           ? (navigator.onLine
             ? formatTranslation("orderRefreshPartial", { checked: ordersToCheck.length - failed, failed })
@@ -1863,7 +1872,7 @@
       const itemRows = items.map((item) => {
         const quantity = Math.max(0, Number(item.quantity) || 0);
         const price = Math.max(0, Number(item.price) || 0);
-        return `<tr><td>${escapeHtml(item.name || "Item")}</td><td class="number">${quantity}</td><td class="number">${money(price)}</td><td class="number">${money(price * quantity)}</td></tr>`;
+        return `<tr><td data-label="Item">${escapeHtml(item.name || "Item")}</td><td class="number" data-label="Qty">${quantity}</td><td class="number" data-label="Price">${money(price)}</td><td class="number" data-label="Amount">${money(price * quantity)}</td></tr>`;
       }).join("");
       const printWindow = window.open("", "_blank", "width=800,height=900");
       if (!printWindow) {
@@ -1873,21 +1882,25 @@
       printWindow.opener = null;
       printWindow.document.open();
       printWindow.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order bill ${escapeHtml(reference)}</title><style>
-        *{box-sizing:border-box}body{font:14px Arial,sans-serif;color:#202820;max-width:760px;margin:32px auto;padding:0 22px}
-        h1{font-size:24px;margin:0 0 5px;color:#205b35}h2{font-size:17px;margin:26px 0 8px}
-        .muted{color:#626d64;font-size:12px;line-height:1.6}.head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #205b35;padding-bottom:15px}
-        .meta{text-align:right}.customer{margin-top:20px;padding:13px;background:#f4f7f2;border-radius:8px;line-height:1.6}
-        table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:9px 6px;border-bottom:1px solid #dfe4dd;text-align:left}th{font-size:12px;color:#526055}
-        .number{text-align:right;white-space:nowrap}.totals{width:min(100%,330px);margin:15px 0 0 auto}.totals div{display:flex;justify-content:space-between;padding:5px 0}
-        .grand{border-top:1px solid #89978a;margin-top:5px;padding-top:10px!important;font-size:17px;font-weight:bold}.footer{margin-top:30px;text-align:center}
-        @media print{body{margin:0 auto;padding:0 10px}@page{margin:16mm}}
+        *{box-sizing:border-box}body{font:14px Arial,sans-serif;color:#202820;width:min(100%,760px);margin:0 auto;padding:20px 16px 90px}
+        h1{font-size:23px;margin:0 0 5px;color:#205b35}h2{font-size:17px;margin:24px 0 8px}
+        .muted{color:#626d64;font-size:12px;line-height:1.6}.head{display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid #205b35;padding-bottom:14px}
+        .meta{text-align:right;overflow-wrap:anywhere}.customer{margin-top:16px;padding:12px;background:#f4f7f2;border-radius:8px;line-height:1.6;overflow-wrap:anywhere}
+        table{width:100%;border-collapse:collapse;margin-top:8px}th,td{padding:8px 5px;border-bottom:1px solid #dfe4dd;text-align:left}th{font-size:12px;color:#526055}
+        .number{text-align:right;white-space:nowrap}.totals{width:min(100%,330px);margin:14px 0 0 auto}.totals div{display:flex;justify-content:space-between;gap:12px;padding:5px 0}
+        .grand{border-top:1px solid #89978a;margin-top:5px;padding-top:10px!important;font-size:17px;font-weight:bold}.footer{margin-top:26px;text-align:center}
+        .actions{position:fixed;z-index:2;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #dfe4dd}
+        button{min-height:44px;padding:0 16px;border:0;border-radius:9px;background:#205b35;color:#fff;font-size:14px;font-weight:700}
+        button.secondary{background:#eff4ed;color:#205b35}
+        @media(max-width:560px){body{padding:14px 12px 86px;font-size:13px}h1{font-size:20px}.head{gap:8px}.meta{max-width:45%;font-size:12px}.customer{padding:10px}table,tbody,tr,td{display:block;width:100%}thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}tbody tr{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:9px 0;border-bottom:1px solid #dfe4dd}tbody td{padding:0;border:0;text-align:left}tbody td:first-child{grid-column:1/-1;font-weight:700}tbody td[data-label="Qty"]::before{content:"Qty ";color:#626d64}tbody td[data-label="Price"]::before{content:"Price ";color:#626d64}tbody td[data-label="Amount"]::before{content:"Amount ";color:#626d64}tbody td[data-label="Amount"]{text-align:right}}
+        @media print{body{width:auto;margin:0;padding:0;font-size:11px}.actions{display:none}.head,.customer,tr{break-inside:avoid}h2{margin-top:18px}.customer{background:#f4f7f2!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4;margin:14mm}}
       </style></head><body>
+        <nav class="actions"><button type="button" onclick="window.print()">Save as PDF</button><button class="secondary" type="button" onclick="window.print()">Print bill</button></nav>
         <header class="head"><div><h1>Shanvi General Store</h1><div class="muted">Order bill</div></div><div class="meta"><strong>Order ${escapeHtml(reference)}</strong><div class="muted">${escapeHtml(dateLabel)}</div><div class="muted">${escapeHtml(status)}</div></div></header>
         <section class="customer"><strong>Customer</strong><br>${escapeHtml(name || "Name not provided")}<br>${escapeHtml(phone || "Phone not provided")}<br>${escapeHtml(address || "No delivery address saved.")}</section>
         <h2>Items</h2><table><thead><tr><th>Item</th><th class="number">Qty</th><th class="number">Price</th><th class="number">Amount</th></tr></thead><tbody>${itemRows || '<tr><td colspan="4">No item details were saved.</td></tr>'}</tbody></table>
         <section class="totals"><div><span>Items subtotal</span><span>${money(subtotal)}</span></div>${discount ? `<div><span>Discount</span><span>−${money(discount)}</span></div>` : ""}<div><span>Delivery</span><span>${money(delivery)}</span></div><div class="grand"><span>Total</span><span>${money(total)}</span></div></section>
         <p class="muted">Payment method: ${escapeHtml(paymentMethod)}</p><p class="muted footer">Thank you for shopping with Shanvi General Store.</p>
-        <script>window.addEventListener("load",()=>{window.focus();window.print()});<\/script>
       </body></html>`);
       printWindow.document.close();
     }
