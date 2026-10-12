@@ -1,0 +1,6 @@
+.venv/
+venv/
+node_modules/
+.idea/
+.DS_Store
+supabase/.temp/

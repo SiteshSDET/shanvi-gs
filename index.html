@@ -1,0 +1,2176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Shanvi Store">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <title>Shanvi General Store</title>
+  <style>
+    :root {
+      --ink: #19251e;
+      --muted: #718078;
+      --green: #236b4a;
+      --green-dark: #174c35;
+      --cream: #f8f7f3;
+      --line: #e8e9e3;
+      --orange: #e88a4b;
+      --white: #fff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--cream);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; overflow: hidden; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .language-toggle { background: transparent; border: 1px solid #bdd0c0; border-radius: 9px; padding: 10px 12px; font-size: 12px; font-weight: 700; color: var(--green-dark); }
+    .language-toggle:hover { background: #edf3ed; }
+    header { background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); position: fixed; inset: 0 0 auto; z-index: 5; backdrop-filter: blur(12px); box-shadow: 0 5px 20px #173a240b; }
+    #customer-scroll { position: fixed; inset: 74px 0 0; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; }
+    .nav { max-width: 1200px; margin: auto; padding: 16px 24px; display: flex; align-items: center; gap: 24px; }
+    .brand { color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; min-width: 225px; }
+    .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; background: #e9f2e9; border-radius: 14px; font-size: 22px; }
+    .brand-mark img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+    .brand strong { display: block; font-family: Georgia, serif; font-size: 19px; letter-spacing: -.03em; }
+    .brand-name { color: transparent; background: linear-gradient(100deg,#ef6c35 0%,#bd348f 34%,#563cb6 64%,#168c69 100%); background-clip: text; -webkit-background-clip: text; font-weight: 800; }
+    .brand small { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .search-wrap { flex: 1; position: relative; }
+    .search-wrap input { width: 100%; padding: 13px 16px 13px 43px; border: 1px solid var(--line); border-radius: 12px; outline: none; background: #f8f8f5; }
+    .search-wrap input:focus { border-color: #9bb8a2; box-shadow: 0 0 0 3px #236b4a12; }
+    .search-icon { position: absolute; left: 15px; top: 12px; color: var(--muted); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .btn { border: 0; border-radius: 10px; padding: 11px 16px; font-weight: 650; transition: .15s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-soft { background: #edf3ed; color: var(--green-dark); }
+    .btn-quiet { color: var(--muted); background: transparent; }
+    .cart-btn { position: relative; }
+    .cart-count { display: inline-grid; place-items: center; background: var(--orange); color: white; width: 20px; height: 20px; border-radius: 99px; font-size: 11px; margin-left: 5px; }
+    main { max-width: 1200px; margin: auto; padding: 26px 24px 70px; }
+    .hero { min-height: 330px; padding: 48px 52px; border-radius: 24px; overflow: hidden; position: relative; background: #e7efe3; display: flex; align-items: center; }
+    .hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity .8s ease; }
+    .hero-photo.loaded { opacity: 1; animation: festival-drift 13s ease-in-out infinite alternate; }
+    .hero-shade { display: none; position: absolute; inset: 0; z-index: 1; background: linear-gradient(110deg, rgba(12,24,17,.77), rgba(12,24,17,.12) 70%, rgba(111,44,13,.22)); background-size: 180% 180%; }
+    .hero.has-photo .hero-shade { animation: festival-glow 7s ease-in-out infinite alternate; }
+    .festival-sparkles { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+    .festival-sparkles span { position: absolute; color: #fff2a8; font-size: clamp(24px, 4vw, 48px); opacity: 0; filter: drop-shadow(0 0 8px #ffbd38) drop-shadow(0 0 18px #ff7628); animation: festival-firefly 2.4s ease-in-out infinite paused; }
+    .festival-sparkles span:nth-child(1) { top: 13%; right: 12%; animation-delay: 0s; }
+    .festival-sparkles span:nth-child(2) { top: 32%; right: 36%; font-size: 27px; animation-delay: .35s; }
+    .festival-sparkles span:nth-child(3) { top: 68%; right: 20%; animation-delay: .7s; }
+    .festival-sparkles span:nth-child(4) { top: 19%; right: 55%; font-size: 23px; animation-delay: 1.05s; }
+    .festival-sparkles span:nth-child(5) { top: 75%; right: 46%; font-size: 34px; animation-delay: 1.4s; }
+    .festival-sparkles span:nth-child(6) { top: 50%; right: 6%; font-size: 27px; animation-delay: 1.75s; }
+    .festival-sparkles span:nth-child(7) { top: 45%; right: 24%; color: #ffd1a1; animation-delay: .2s; }
+    .festival-sparkles span:nth-child(8) { top: 9%; right: 42%; color: #ffc6d4; font-size: 28px; animation-delay: .9s; }
+    .festival-sparkles span:nth-child(9) { top: 80%; right: 9%; color: #d8ffd7; font-size: 32px; animation-delay: 1.6s; }
+    .festival-sparkles span:nth-child(10) { top: 59%; right: 57%; font-size: 25px; animation-delay: 1.2s; }
+    .festival-sparkles span:nth-child(11) { top: 28%; right: 75%; color: #ffd1a1; font-size: 30px; animation-delay: .55s; }
+    .festival-sparkles span:nth-child(12) { top: 72%; right: 72%; color: #d8ffd7; font-size: 23px; animation-delay: 1.9s; }
+    .hero.has-photo .festival-sparkles span { animation-play-state: running; }
+    .hero.has-photo .hero-copy { animation: festival-arrive .85s cubic-bezier(.2,.8,.2,1) both; }
+    .hero.has-photo .hero-shade { display: block; }
+    .hero.has-photo:before, .hero.has-photo:after { display: none; }
+    .hero.has-photo .hero-copy h1, .hero.has-photo .hero-copy p, .hero.has-photo .hero-copy .eyebrow { color: white; text-shadow: 0 2px 12px #0005; }
+    .hero.has-photo .hero-copy .eyebrow { color: #e1f0df; }
+    @keyframes festival-drift { from { transform: scale(1.02) translate(-1.5%, -.5%); } to { transform: scale(1.16) translate(1.5%, .8%); } }
+    @keyframes festival-glow { from { background-position: 0% 50%; filter: saturate(1); } to { background-position: 100% 50%; filter: saturate(1.35); } }
+    @keyframes festival-firefly { 0%, 100% { opacity: 0; transform: translateY(18px) scale(.4) rotate(-25deg); } 35%, 65% { opacity: .98; transform: translateY(-8px) scale(1.2) rotate(24deg); } }
+    @keyframes festival-arrive { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    .hero:after { content: ""; position: absolute; right: 4%; top: -95px; width: 410px; height: 410px; border-radius: 50%; background: #d5e3d1; }
+    .hero:before { content: "🧺"; z-index: 1; position: absolute; right: 11%; bottom: 28px; font-size: clamp(100px, 18vw, 205px); filter: drop-shadow(0 14px 18px #324e3130); }
+    .hero-copy { max-width: 530px; position: relative; z-index: 2; }
+    .eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(38px, 5vw, 58px); letter-spacing: -.045em; line-height: 1.02; margin: 13px 0; white-space: pre-line; }
+    .hero p { color: #58695d; font-size: 16px; line-height: 1.65; margin: 0 0 23px; max-width: 410px; }
+    .hero .btn { padding: 13px 19px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; margin: 40px 0 17px; }
+    .section-heading h2 { font: 28px Georgia, serif; margin: 0 0 5px; letter-spacing: -.03em; }
+    .section-heading p { margin: 0; font-size: 13px; color: var(--muted); }
+    .categories { display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: thin; }
+    .category-chip { flex: 0 0 auto; background: white; border: 1px solid var(--line); color: #53635a; border-radius: 999px; padding: 10px 15px; font-size: 13px; }
+    .category-chip.active, .category-chip:hover { background: var(--green); border-color: var(--green); color: white; }
+    .products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+    .product { background: white; border: 1px solid #eeefe9; border-radius: 16px; overflow: hidden; transition: .18s ease; }
+    .product:hover { transform: translateY(-3px); box-shadow: 0 12px 30px #173a2410; }
+    .product-image { aspect-ratio: 4 / 3; background: #eef0e9; position: relative; overflow: hidden; }
+    .product-image img { width: 100%; height: 100%; display: block; }
+    .discount { position: absolute; top: 12px; left: 12px; background: #fff4e9; color: #a95120; padding: 6px 9px; font-size: 11px; border-radius: 7px; font-weight: 750; }
+    .product-info { padding: 15px; }
+    .product-category { color: var(--green); font-size: 10px; letter-spacing: .11em; text-transform: uppercase; font-weight: 750; }
+    .product h3 { margin: 6px 0 12px; font-size: 15px; }
+    .product-bottom { display: flex; justify-content: space-between; align-items: center; gap: 7px; }
+    .price { font-weight: 750; font-size: 16px; }
+    .mrp { color: #9aa29d; text-decoration: line-through; font-size: 12px; font-weight: 450; margin-left: 5px; }
+    .add-btn { border: 1px solid #bdd0c0; background: white; color: var(--green); padding: 8px 13px; border-radius: 9px; font-size: 12px; font-weight: 700; }
+    .add-btn:hover { color: white; background: var(--green); border-color: var(--green); }
+    .empty { grid-column: 1/-1; padding: 55px 20px; color: var(--muted); text-align: center; background: white; border-radius: 16px; }
+    .trust-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 42px; }
+    .trust { display: flex; align-items: center; gap: 12px; background: #eff3ec; border-radius: 14px; padding: 17px; }
+    .trust-icon { font-size: 22px; }
+    .trust strong { display: block; font-size: 13px; }
+    .trust span { color: var(--muted); font-size: 11px; }
+    footer { background: #183d2d; color: #e8f1e9; padding: 28px 24px; text-align: center; font-size: 12px; }
+    footer span { color: #b6c9b8; }
+    .overlay { display: none; position: fixed; inset: 0; z-index: 10; background: #13221888; }
+    .overlay.open { display: block; }
+    .drawer { position: absolute; top: 0; right: 0; height: 100%; width: min(480px, 100%); overflow-y: auto; background: var(--cream); padding: 25px; box-shadow: -12px 0 38px #0002; }
+    .drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .drawer-head h2 { font: 28px Georgia, serif; margin: 0; }
+    .close { border: 0; background: #e9eee8; border-radius: 50%; width: 36px; height: 36px; font-size: 20px; }
+    .cart-line { background: white; border-radius: 12px; padding: 11px; display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; margin-bottom: 10px; }
+    .cart-line img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+    .cart-line strong { font-size: 13px; }
+    .cart-line small { display: block; color: var(--muted); margin-top: 4px; }
+    .quantity { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+    .quantity button { width: 24px; height: 24px; background: #eff3ec; border: 0; border-radius: 6px; }
+    .remove { color: #a24f3c; border: 0; background: transparent; font-size: 11px; margin-top: 3px; }
+    .summary { margin-top: 17px; padding: 18px; border-radius: 14px; background: white; }
+    .summary-row { display: flex; justify-content: space-between; color: #68766e; font-size: 13px; margin: 9px 0; }
+    .summary-row.total { color: var(--ink); border-top: 1px solid var(--line); padding-top: 13px; font-weight: 800; font-size: 17px; }
+    .coupon { display: flex; gap: 7px; margin-top: 14px; }
+    .field { margin: 13px 0; }
+    .field label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #536158; }
+    .field input, .field select { width: 100%; border: 1px solid #dfe4dd; border-radius: 9px; padding: 11px 12px; background: white; outline: none; }
+    .field input:focus, .field select:focus { border-color: #8cab94; }
+    .payment-box { background: #eff4ed; border-radius: 12px; padding: 14px; font-size: 13px; line-height: 1.6; margin: 14px 0; }
+    .payment-box img { display: block; max-width: 180px; max-height: 180px; object-fit: contain; margin: 12px auto 0; border-radius: 8px; }
+    .payment-choice { display: flex; align-items: flex-start; gap: 10px; padding: 13px; background: white; border: 1px solid var(--line); border-radius: 11px; margin: 9px 0; cursor: pointer; }
+    .payment-choice:has(input:checked) { border-color: var(--green); box-shadow: 0 0 0 2px #236b4a15; }
+    .payment-choice input { margin-top: 3px; accent-color: var(--green); }
+    .payment-choice strong { display: block; font-size: 13px; }
+    .payment-choice small { display: block; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+    .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+    .payment-actions { display: flex; gap: 9px; margin-top: 14px; }
+    .full { width: 100%; }
+    .small-note { font-size: 11px; color: var(--muted); line-height: 1.5; }
+    .admin { display: none; position: fixed; inset: 0; z-index: 20; background: #f8f7f3; overflow-y: auto; }
+    .admin.open { display: block; }
+    .admin-shell { max-width: 1000px; margin: auto; padding: 28px 22px 65px; }
+    .admin-top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; margin: -28px -22px 25px; padding: 14px 22px; background: #f8f7f3f2; backdrop-filter: blur(12px); border-bottom: 1px solid #e4e7df; }
+    .admin-top h2 { font: 30px Georgia, serif; margin: 0; }
+    .manager-save-status { display: none; position: sticky; top: 0; z-index: 4; margin: -12px 0 16px; padding: 12px 15px; border: 1px solid #9bc9a5; border-radius: 11px; background: #eaf6eb; color: #205b35; font-size: 13px; font-weight: 750; box-shadow: 0 5px 15px #173a2415; }
+    .manager-save-status.visible { display: block; }
+    .order-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; margin: 12px 0; padding: 16px; }
+    .order-card h4 { margin: 0 0 9px; font-size: 15px; }
+    .order-card-section { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+    .order-card-section > strong { display: block; margin-bottom: 7px; font-size: 12px; color: var(--green-dark); }
+    .order-line { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 12px; }
+    .order-contact-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
+    .order-filters, .order-status-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .order-filters button { border: 1px solid var(--line); border-radius: 999px; background: #f6f7f3; color: var(--ink); padding: 9px 14px; font-weight: 700; cursor: pointer; }
+    .order-filters button[aria-pressed="true"] { border-color: var(--green-dark); background: var(--green-dark); color: white; }
+    .order-status-actions .btn { min-width: 105px; }
+    .order-status-actions .btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.3); }
+    .admin-card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 22px; margin: 15px 0; }
+    .admin-card h3 { margin: 0 0 15px; font-size: 16px; }
+    .manager-accordion { padding: 0; overflow: hidden; }
+    .manager-accordion > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 22px; list-style: none; cursor: pointer; color: var(--green-dark); font-size: 16px; font-weight: 800; }
+    .manager-accordion > summary::-webkit-details-marker { display: none; }
+    .manager-accordion > summary::after { content: "+"; display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; background: #eaf2e8; color: var(--green-dark); font-size: 22px; line-height: 1; }
+    .manager-accordion[open] > summary::after { content: "−"; }
+    .manager-accordion[open] > summary { border-bottom: 1px solid var(--line); }
+    .manager-accordion-content { padding: 4px 22px 20px; }
+    .products-manager-panel { padding: 0; overflow: hidden; }
+    .manager-category-accordion > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; list-style: none; cursor: pointer; }
+    .manager-category-accordion > summary::-webkit-details-marker { display: none; }
+    .manager-category-accordion > summary::after { content: "+"; display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; background: #eaf2e8; color: var(--green-dark); font-size: 22px; line-height: 1; }
+    .manager-category-accordion[open] > summary::after { content: "−"; }
+    .products-manager-content { padding: 4px 22px 20px; }
+    .manager-category-accordion { margin: 10px 0; border: 1px solid #e5e9e2; border-radius: 12px; overflow: hidden; background: #fff; }
+    .manager-category-accordion > summary { padding: 12px 14px; background: #f5f8f3; }
+    .manager-category-title { color: var(--green-dark); font-size: 14px; font-weight: 800; }
+    .manager-category-count { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .manager-category-products { padding: 2px 12px 8px; }
+    .notification-help { margin: 14px 0; padding: 12px 14px; border-radius: 11px; background: #f4f7f2; color: #43574a; font-size: 12px; }
+    .notification-help summary { cursor: pointer; font-weight: 750; color: var(--green-dark); }
+    .notification-help ol { padding-left: 20px; line-height: 1.6; }
+    .notification-help li + li { margin-top: 7px; }
+    .brand-logo-preview { display: grid; place-items: center; position: relative; width: 100px; height: 100px; border-radius: 16px; background: #e9f2e9; margin: 10px 0 15px; color: var(--muted); font-size: 12px; }
+    .brand-logo-preview img { display: none; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+    .brand-logo-preview.has-image img { display: block; }
+    .brand-logo-preview.has-image span { display: none; }
+    .offer-banner { position: relative; display: grid; grid-template-columns: 58px 1fr auto; align-items: center; gap: 15px; margin: 27px 0 -10px; padding: 19px 24px; border: 1px solid #edc763; border-radius: 20px; overflow: hidden; background: linear-gradient(105deg,#fff0bc 0%,#fff9e8 45%,#ffedcc 100%); color: #70430c; box-shadow: 0 12px 28px #b66d221a; }
+    .offer-banner:after { content: ""; position: absolute; width: 210px; height: 210px; top: -145px; right: 12%; border-radius: 50%; background: #ffffff80; animation: offer-shine 4s ease-in-out infinite alternate; pointer-events: none; }
+    .offer-gift-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 17px; background: linear-gradient(145deg,#ffb33c,#f77744); font-size: 30px; box-shadow: 0 7px 16px #c85d3240; }
+    .offer-copy { position: relative; z-index: 1; }
+    .offer-kicker { display: block; color: #a34c20; font-size: 10px; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
+    .offer-title { display: block; margin-top: 3px; color: #57320e; font: 700 clamp(17px,2.3vw,24px) Georgia,serif; }
+    .offer-description { display: block; margin-top: 4px; color: #765627; font-size: 12px; }
+    .offer-badge { position: relative; z-index: 1; padding: 9px 13px; border: 1px solid #eb9c46; border-radius: 999px; background: #fffaf0; color: #a34c20; font-size: 11px; font-weight: 850; white-space: nowrap; }
+    @keyframes offer-shine { from { transform: translateX(-15px) scale(.8); opacity: .25; } to { transform: translateX(30px) scale(1.1); opacity: .75; } }
+    .offer-banner[hidden] { display: none; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+    .admin-products { display: grid; gap: 8px; }
+    .admin-product { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px; background: #f8f8f5; border-radius: 9px; font-size: 13px; }
+    .admin-group { margin: 12px 0 5px; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .admin-product-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .product-photo-preview { position: relative; width: min(100%, 420px); aspect-ratio: 4 / 3; overflow: hidden; background: #eef0e9; border-radius: 12px; margin: 4px 0 8px; }
+    .product-photo-preview img { width: 100%; height: 100%; display: none; }
+    .product-photo-preview.has-image img { display: block; }
+    .product-photo-preview-empty { display: grid; position: absolute; inset: 0; place-items: center; padding: 20px; color: var(--muted); font-size: 12px; text-align: center; }
+    .product-photo-preview.has-image .product-photo-preview-empty { display: none; }
+    .photo-remove-button { display: grid; place-items: center; position: absolute; z-index: 2; top: 9px; right: 9px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #19251edb; color: white; font-size: 23px; line-height: 1; box-shadow: 0 2px 10px #0005; }
+    .photo-remove-button:hover { background: #9b352b; }
+    .photo-remove-button[hidden] { display: none; }
+    .image-adjustments { display: none; width: min(100%, 420px); padding: 12px 14px; background: #f5f6f1; border-radius: 10px; margin: 9px 0 13px; }
+    .image-adjustments.visible { display: block; }
+    .image-adjustments .field { margin: 8px 0; }
+    .image-adjustments input[type="range"] { padding: 0; accent-color: var(--green); }
+    .preview-caption { display: none; width: min(100%, 360px); color: var(--muted); font-size: 11px; margin-bottom: 7px; }
+    .preview-caption.visible { display: block; }
+    .hero-preview { position: relative; width: 100%; aspect-ratio: 16 / 6; border-radius: 12px; overflow: hidden; background: #e7efe3; margin: 10px 0 15px; }
+    .hero-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .hero-preview.has-image .hero-preview-empty { display: none; }
+    .hero-preview.has-image img { display: block; }
+    .hero-preview-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #102219bb, #10221914); }
+    .hero-preview-copy { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 16px 22px; color: white; text-shadow: 0 1px 6px #0008; pointer-events: none; }
+    .hero-preview-copy strong { font: 700 clamp(15px, 3vw, 25px) Georgia, serif; max-width: 55%; }
+    .hero-preview-copy small { margin-top: 6px; max-width: 52%; font-size: 10px; }
+    .hero-preview-empty { color: #718078; text-align: center; padding: 42px 10px; font-size: 12px; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 30; background: #1c4934; color: white; padding: 12px 18px; border-radius: 10px; transition: .2s; font-size: 13px; box-shadow: 0 8px 25px #0002; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+    @media (max-width: 850px) {
+      .nav { flex-wrap: wrap; gap: 12px; padding: 13px 16px; }
+      .brand { min-width: 0; flex: 1; }
+      .search-wrap { order: 3; flex-basis: 100%; }
+      main { padding: 19px 16px 50px; }
+      .hero { min-height: 300px; padding: 35px 30px; }
+      .hero:before { right: 1%; opacity: .8; }
+      .hero:after { right: -20%; }
+      .products { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    }
+    @media (max-width: 520px) {
+      .brand strong { font-size: 17px; }
+      .language-toggle { padding: 8px; }
+      .brand-mark { width: 36px; height: 36px; }
+      .nav-actions { gap: 0; }
+      .nav-actions .btn-quiet { display: none; }
+      .hero { min-height: 290px; padding: 29px 22px; }
+      .hero:before { right: -14px; bottom: 0; font-size: 110px; opacity: .55; }
+      .hero:after { width: 260px; height: 260px; top: 55px; right: -120px; }
+      .hero p { font-size: 14px; max-width: 280px; }
+      .product-info { padding: 12px; }
+      .product-bottom { align-items: end; }
+      .offer-banner { grid-template-columns: 46px 1fr; gap: 11px; padding: 15px; border-radius: 16px; }
+      .offer-gift-icon { width: 46px; height: 46px; font-size: 25px; border-radius: 14px; }
+      .offer-badge { grid-column: 2; justify-self: start; margin-top: -3px; }
+      .price { font-size: 14px; }
+      .mrp { display: block; margin: 3px 0 0; }
+      .add-btn { padding: 7px 10px; }
+      .trust-row { grid-template-columns: 1fr; gap: 8px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header id="store-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="#" aria-label="Shanvi General Store home">
+        <span class="brand-mark">🛍️</span>
+        <span><strong class="brand-name">Shanvi General Store</strong><small id="brand-tagline">Your neighborhood, in one place</small></span>
+      </a>
+      <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" type="search" placeholder="Search products" aria-label="Search products"></div>
+      <div class="nav-actions">
+        <button class="btn btn-quiet" id="manager-open">Manager</button>
+        <button class="btn btn-soft cart-btn" id="cart-open">🛒 <span id="cart-label">Cart</span> <span class="cart-count" id="cart-count">0</span></button>
+        <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch language">हिन्दी</button>
+      </div>
+    </nav>
+  </header>
+  <div id="customer-scroll">
+  <main>
+    <section class="hero" id="festival-hero">
+      <img class="hero-photo" id="hero-photo" alt="">
+      <div class="hero-shade"></div>
+      <div class="festival-sparkles" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span></div>
+      <div class="hero-copy">
+        <div class="eyebrow" id="hero-eyebrow">A warm hello from your local store</div>
+        <h1 id="hero-title">Everyday finds.<br>Thoughtfully picked.</h1>
+        <p id="hero-description">From little gifts to everyday essentials, find a bit of everything for your home and family.</p>
+        <button class="btn btn-primary" id="hero-explore" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Explore the store &nbsp; →</button>
+      </div>
+    </section>
+    <section class="offer-banner" id="customer-offer" hidden aria-live="polite"></section>
+    <section id="shop">
+      <div class="section-heading">
+        <div><h2 id="shop-title">Browse the shelves</h2><p id="shop-subtitle">Good things for every corner of your home.</p></div>
+      </div>
+      <div class="categories" id="categories" aria-label="Product categories"></div>
+      <div class="products" id="products" aria-live="polite"></div>
+    </section>
+    <section class="trust-row" id="trust-row" aria-label="Store benefits">
+      <div class="trust"><span class="trust-icon">🌿</span><div><strong>Picked with care</strong><span>Useful little things, all in one place</span></div></div>
+      <div class="trust"><span class="trust-icon">🤝</span><div><strong>Local and friendly</strong><span>Your neighborhood store is here to help</span></div></div>
+      <div class="trust"><span class="trust-icon">📱</span><div><strong>Easy UPI payment</strong><span>Pay directly using your favorite UPI app</span></div></div>
+    </section>
+  </main>
+  <footer>Shanvi General Store <span id="footer-tagline">· Made for everyday needs</span></footer>
+  </div>
+
+  <div class="overlay" id="cart-overlay" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <aside class="drawer">
+      <div class="drawer-head"><h2 id="cart-heading">Your basket</h2><button class="close" id="cart-close" aria-label="Close cart">×</button></div>
+      <div id="cart-content"></div>
+    </aside>
+  </div>
+  <div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Manager panel">
+    <div class="admin-shell">
+      <div class="admin-top"><div><div class="eyebrow">Store tools</div><h2>Manager panel</h2></div><button class="btn btn-soft" id="manager-close">← Back to store</button></div>
+      <div class="manager-save-status" id="manager-save-status" role="status" aria-live="polite"></div>
+      <div class="admin-card" id="admin-login-card">
+        <h3>Manager sign in</h3>
+        <p class="small-note" id="manager-auth-note"></p>
+        <form id="manager-login">
+          <div class="form-grid">
+            <div class="field"><label for="manager-email">Username</label><input id="manager-email" type="text" autocomplete="username" required></div>
+            <div class="field"><label for="manager-password">Password</label><input id="manager-password" type="password" autocomplete="current-password" required></div>
+          </div>
+          <button class="btn btn-primary" type="submit" id="manager-login-button">Sign in</button>
+        </form>
+      </div>
+      <div id="manager-tools" hidden>
+      <div class="admin-card">
+        <h3>Store logo</h3>
+        <p class="small-note">Choose the logo shown beside Shanvi General Store in the customer header.</p>
+        <div class="field"><label for="brand-logo-input">Logo image</label><input id="brand-logo-input" type="file" accept="image/*"><small class="small-note">A square PNG or JPEG works best. Images are resized before saving.</small></div>
+        <div class="brand-logo-preview" id="brand-logo-preview"><img id="brand-logo-preview-image" alt="Store logo preview"><span id="brand-logo-empty">🛍️ Current default icon</span><button class="photo-remove-button" id="brand-logo-remove" type="button" aria-label="Remove store logo" title="Remove store logo" hidden>×</button></div>
+        <button class="btn btn-primary" id="save-brand-logo" type="button">Save store logo</button>
+      </div>
+      <div class="admin-card">
+        <h3>Free item offer</h3>
+        <label class="payment-choice"><input id="offer-enabled" type="checkbox"><span><strong>Enable offer</strong><small>Give one selected product free when the eligible basket reaches the threshold.</small></span></label>
+        <div class="form-grid">
+          <div class="field"><label for="offer-threshold">Minimum basket amount (₹)</label><input id="offer-threshold" type="number" min="1" step="1" value="100"></div>
+          <div class="field"><label for="offer-product">Free product</label><select id="offer-product"></select></div>
+        </div>
+        <p class="small-note">The threshold uses the discounted item subtotal (before delivery). The gift is added automatically and stock is reduced when the order is placed.</p>
+        <button class="btn btn-primary" id="save-offer" type="button">Save offer</button>
+      </div>
+      <div class="admin-card">
+        <h3>Delivery area</h3>
+        <p class="small-note">Within 2 km of the store is free. Outside 2 km, or if customer location is unavailable, delivery is ₹20. Distance is a straight-line estimate using browser location permission.</p>
+        <div class="form-grid">
+          <div class="field"><label for="store-latitude">Store latitude</label><input id="store-latitude" type="number" min="-90" max="90" step="any" placeholder="e.g. 28.6139"></div>
+          <div class="field"><label for="store-longitude">Store longitude</label><input id="store-longitude" type="number" min="-180" max="180" step="any" placeholder="e.g. 77.2090"></div>
+        </div>
+        <button class="btn btn-soft" id="use-store-location" type="button">Use this device’s location</button>
+        <button class="btn btn-primary" id="save-delivery-settings" type="button">Save store location</button>
+      </div>
+      <div class="admin-card">
+        <h3>Order notifications</h3>
+        <p class="small-note" id="notification-instructions">Same device: allow free browser notifications below and keep this page open. Different phone/device: connect Supabase and use HTTPS; full setup is in SUPABASE_SETUP.md.</p>
+        <details class="notification-help"><summary>How to turn on order alerts</summary><ol><li>Tap <strong>Enable browser alerts</strong> and choose <strong>Allow</strong> when asked.</li><li>Keep the manager page open in this browser to hear the in-page beep when a customer orders in another tab on this same browser.</li><li>For alerts while the page is closed or on another phone, deploy the free-tier Supabase push setup and HTTPS site from SUPABASE_SETUP.md. A browser phone alert uses your phone’s normal sound/vibration settings.</li></ol></details>
+        <div class="field" id="push-enrollment-field" hidden><label for="push-enrollment-code">Manager notification setup code (Supabase)</label><input id="push-enrollment-code" type="password" autocomplete="off" placeholder="Enter the code configured in Supabase"></div>
+        <button class="btn btn-primary" id="enable-order-notifications" type="button">Enable browser alerts</button>
+        <button class="btn btn-soft" id="test-order-notification" type="button">Test sound and notification</button>
+        <p class="small-note" id="notification-status" aria-live="polite"></p>
+      </div>
+      <div class="admin-card">
+        <h3>Festival banner</h3>
+        <p class="small-note">Change the festival title, message, and background photo. This preview matches how the banner crops on the customer storefront.</p>
+        <div class="field"><label for="hero-eyebrow-input">Small heading</label><input id="hero-eyebrow-input" maxlength="70" placeholder="e.g. Shubh Navratri"></div>
+        <div class="field"><label for="hero-title-input">Main heading</label><input id="hero-title-input" maxlength="100" placeholder="e.g. Celebrate the festival of lights"></div>
+        <div class="field"><label for="hero-description-input">Message</label><input id="hero-description-input" maxlength="180" placeholder="A short message for your customers"></div>
+        <div class="field"><label for="hero-image-input">Festival background photo (up to 2 MB)</label><input id="hero-image-input" type="file" accept="image/*"><small class="small-note">Best fit: wide landscape 16:6, ideally 1600 × 600 px. Other images are center-cropped to fill the banner.</small></div>
+        <div class="hero-preview" id="hero-preview">
+          <img id="hero-preview-image" alt="">
+          <div class="hero-preview-shade"></div>
+          <div class="hero-preview-copy"><strong id="hero-preview-title">Everyday finds. Thoughtfully picked.</strong><small id="hero-preview-description">From little gifts to everyday essentials</small></div>
+          <div class="hero-preview-empty" id="hero-preview-empty">Your banner preview will appear here</div>
+        </div>
+        <button class="btn btn-primary" id="save-hero" type="button">Save festival banner</button>
+        <button class="btn btn-soft" id="clear-hero-image" type="button">Remove background photo</button>
+      </div>
+      <div class="admin-card">
+        <h3>Add a product</h3>
+        <form id="product-form">
+          <div class="form-grid">
+            <div class="field"><label for="p-name">Product name</label><input id="p-name" required maxlength="70" placeholder="e.g. Color pencil set"></div>
+            <div class="field"><label for="p-category">Section</label><select id="p-category" required></select></div>
+            <div class="field"><label for="p-price">Selling price (₹)</label><input id="p-price" type="number" required min="1" step="1"></div>
+            <div class="field"><label for="p-mrp">MRP / original price (₹)</label><input id="p-mrp" type="number" required min="1" step="1"></div>
+            <div class="field"><label for="p-stock">Stock quantity</label><input id="p-stock" type="number" required min="0" step="1" value="1"></div>
+            <div class="field"><label for="p-size">Product size (optional)</label><input id="p-size" maxlength="60" placeholder="e.g. Small, 500 ml, Pack of 3"></div>
+            <div class="field"><label for="p-dimensions">Dimensions (optional)</label><input id="p-dimensions" maxlength="80" placeholder="e.g. 20 × 15 × 5 cm"></div>
+            <div class="field"><label for="p-image">Product photo (any dimensions, up to 2 MB)</label><input id="p-image" type="file" accept="image/*"><small class="small-note">Portrait or landscape photos are accepted. Use the live preview below to choose exactly how the customer sees it.</small></div>
+            <div class="field" style="grid-column:1/-1"><label for="p-description">Description / size / other details</label><input id="p-description" maxlength="300" placeholder="Short details customers should know"></div>
+          </div>
+            <div class="preview-caption" id="p-image-caption">Customer preview · adjust the image below; this frame matches the customer product card.</div>
+            <div class="product-photo-preview" id="product-photo-preview">
+              <img id="p-image-preview" alt="Product photo preview">
+              <span class="product-photo-preview-empty">Choose a product photo to preview it as customers will see it.</span>
+              <button class="photo-remove-button" id="p-image-remove" type="button" aria-label="Remove product photo" title="Remove product photo" hidden>×</button>
+            </div>
+            <div class="image-adjustments" id="image-adjustments">
+              <div class="field"><label for="p-image-fit">Image display</label><select id="p-image-fit"><option value="contain" selected>Show full image (fit inside frame)</option><option value="cover">Fill frame (crop edges)</option></select></div>
+              <div class="field"><label for="p-image-zoom">Zoom / zoom out: <span id="p-image-zoom-label">100%</span></label><input id="p-image-zoom" type="range" min="40" max="200" value="100"></div>
+              <div class="field"><label for="p-image-x">Horizontal position: <span id="p-image-x-label">50%</span></label><input id="p-image-x" type="range" min="0" max="100" value="50"></div>
+              <div class="field"><label for="p-image-y">Vertical position: <span id="p-image-y-label">50%</span></label><input id="p-image-y" type="range" min="0" max="100" value="50"></div>
+              <small class="small-note">The preview uses the exact same fit, zoom, and position as the customer listing.</small>
+            </div>
+          <input id="p-edit-id" type="hidden">
+          <button class="btn btn-primary" id="product-submit" type="submit">Add to storefront</button>
+          <button class="btn btn-soft" id="product-cancel-edit" type="button" hidden>Cancel edit</button>
+        </form>
+      </div>
+      <div class="admin-card">
+        <h3>Payment details</h3>
+        <div class="form-grid">
+          <div class="field"><label for="upi-id">Store UPI ID</label><input id="upi-id" placeholder="e.g. 9876543219@upi"></div>
+          <div class="field"><label for="qr-image">UPI QR code image</label><input id="qr-image" type="file" accept="image/*"></div>
+        </div>
+        <label class="payment-choice" style="max-width:320px"><input id="cod-enabled" type="checkbox"><span><strong>Allow cash on delivery</strong><small>Customers can choose COD at payment.</small></span></label>
+        <button class="btn btn-soft" id="save-payment">Save payment details</button>
+      </div>
+      <details class="admin-card manager-accordion products-manager-panel">
+        <summary>Products in your storefront</summary>
+        <div class="products-manager-content">
+          <div class="field"><label for="admin-category-filter">Filter by section</label><select id="admin-category-filter"></select></div>
+          <div class="admin-products" id="admin-products"></div>
+        </div>
+      </details>
+      <div class="admin-card">
+        <h3>Customer orders</h3>
+        <p class="small-note">New orders start in Pending. Accept an order, mark it delivered, then complete it; reject an order that cannot be fulfilled.</p>
+        <p class="small-note" id="orders-storage-note"></p>
+        <button class="btn btn-soft" id="refresh-orders" type="button">Refresh orders</button>
+        <button class="btn btn-soft" id="load-more-orders" type="button" hidden>Load more orders</button>
+        <div class="order-filters" role="group" aria-label="Filter customer orders">
+          <button type="button" data-order-filter="pending" aria-pressed="true">Pending <span id="pending-order-count">0</span></button>
+          <button type="button" data-order-filter="completed" aria-pressed="false">Completed <span id="completed-order-count">0</span></button>
+          <button type="button" data-order-filter="rejected" aria-pressed="false">Rejected <span id="rejected-order-count">0</span></button>
+          <button type="button" data-order-filter="all" aria-pressed="false">All <span id="all-order-count">0</span></button>
+        </div>
+        <div class="admin-products" id="admin-orders" aria-live="polite"></div>
+      </div>
+      <button class="btn btn-soft" id="manager-logout">Sign out</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const translations = {
+      en: {
+        tagline: "Your neighborhood, in one place",
+        heroEyebrow: "A warm hello from your local store",
+        heroTitle: "Everyday finds.\nThoughtfully picked.",
+        heroDescription: "From little gifts to everyday essentials, find a bit of everything for your home and family.",
+        explore: "Explore the store",
+        shopTitle: "Browse the shelves",
+        shopSubtitle: "Good things for every corner of your home.",
+        footer: "· Made for everyday needs",
+        allItems: "All items", kids: "Kids", gifts: "Gifts", stationery: "Stationery",
+        puja: "Puja", household: "Gharelu Samaan", electronics: "Electronics",
+        search: "Search products",
+        cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
+        noProducts: "No products found. Try another search or section.",
+        picked: "Picked with care", pickedSub: "Useful little things, all in one place",
+        local: "Local and friendly", localSub: "Your neighborhood store is here to help",
+        upiEasy: "Easy UPI payment", upiSub: "Pay directly using your favorite UPI app",
+        basket: "Your basket", emptyBasket: "Your basket is waiting for something lovely.",
+        continueShopping: "Continue shopping", remove: "Remove", coupon: "Coupon code",
+        apply: "Apply", couponHint: "Try coupon", couponDeal: "for 10% off (up to ₹100).",
+        subtotal: "Items subtotal", couponSavings: "Coupon savings", delivery: "Delivery",
+        deliveryArranged: "Arranged with store", total: "Total", deliveryDetails: "Delivery details",
+        fullName: "Full name", startLetter: "Start with a letter",
+        nameTitle: "Start with a letter; numbers are not allowed.",
+        mobile: "10-digit mobile number", near: "Near ...", landmark: "Landmark",
+        village: "Village / locality", postOffice: "Post office (optional)",
+        district: "District (optional)", state: "State / Union Territory",
+        selectState: "Select state / UT", pin: "PIN code", pinPlaceholder: "6 digits",
+        pinTitle: "Enter a 6-digit PIN code.", continuePayment: "Continue to payment",
+        payment: "Payment", backBasket: "Back to basket", order: "Order",
+        itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay by UPI ID",
+        enterYourUpi: "Enter the UPI ID you will pay from.", yourUpi: "Your UPI ID",
+        upiExample: "Example: 9876543210@upi", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
+        payStoreAt: "Pay the store at:", copyUpi: "Copy store UPI ID", openUpi: "Open UPI app",
+        storeUpiMissing: "Store UPI ID payment is not configured.",
+        qr: "Scan UPI QR code", scanQr: "Scan the store QR code with your UPI app.",
+        qrMissing: "Not configured yet; ask the store to add its QR code.",
+        sampleOnly: "Sample only — do not send real payment.",
+        scanToPay: "Scan to pay", verifyPayment: "The store will verify your payment.",
+        qrNotConfigured: "QR payment is not configured.",
+        cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
+        codUnavailable: "Currently unavailable; the store manager has disabled COD.",
+        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "After confirming your order, the store will verify your UPI payment. This website does not automatically verify payments.",
+        orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
+        awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
+        itemsEach: "each", invalidCoupon: "That coupon code is not valid", couponApplied: "WELCOME10 applied",
+        added: "Added to your basket", selectPayment: "Please select a payment method.",
+        freeGift: "Free gift", free: "FREE", freeGiftAdded: "Your qualifying order includes this free gift.",
+        calculatedAtCheckout: "Calculated at checkout", outOfStock: "That quantity is not in stock.",
+        stockLeft: "left",
+        paymentUnavailable: "UPI payment is not configured. Choose another method.",
+        invalidPayerUpi: "Enter a valid UPI ID and ensure the store UPI ID is configured.",
+        invalidQr: "QR payment is not configured. Choose another method.",
+        codDisabled: "Cash on delivery is currently unavailable.",
+        copyUnavailable: "Copy not available here. Please select the UPI ID.",
+        upiCopied: "UPI ID copied", orderSaved: "Order placed",
+        storageError: "Could not save in this browser. Try a smaller image.",
+        bannerLoadError: "Could not load the festival banner image.",
+        orderSaveError: "Order could not be saved",
+        notifyOnApproval: "Notify me when the store approves this order",
+        offerKicker: "A little extra from Shanvi",
+        freeOfferTitle: "A FREE gift is waiting!",
+        approvalPending: "Your order is waiting for store approval. Enable a notification below to be alerted.",
+        approvalAlreadyDone: "This order is already approved.",
+        approvalNotificationsOn: "This device will notify you when the store approves your order.",
+        approvalNotificationsEnabled: "Approval notifications enabled",
+        emptyOrder: "Your basket is empty.", stockOut: "Sold out",
+        states: {
+          "Andaman and Nicobar Islands":"Andaman and Nicobar Islands","Andhra Pradesh":"Andhra Pradesh","Arunachal Pradesh":"Arunachal Pradesh","Assam":"Assam","Bihar":"Bihar","Chandigarh":"Chandigarh","Chhattisgarh":"Chhattisgarh","Dadra and Nagar Haveli and Daman and Diu":"Dadra and Nagar Haveli and Daman and Diu","Delhi":"Delhi","Goa":"Goa","Gujarat":"Gujarat","Haryana":"Haryana","Himachal Pradesh":"Himachal Pradesh","Jammu and Kashmir":"Jammu and Kashmir","Jharkhand":"Jharkhand","Karnataka":"Karnataka","Kerala":"Kerala","Ladakh":"Ladakh","Lakshadweep":"Lakshadweep","Madhya Pradesh":"Madhya Pradesh","Maharashtra":"Maharashtra","Manipur":"Manipur","Meghalaya":"Meghalaya","Mizoram":"Mizoram","Nagaland":"Nagaland","Odisha":"Odisha","Puducherry":"Puducherry","Punjab":"Punjab","Rajasthan":"Rajasthan","Sikkim":"Sikkim","Tamil Nadu":"Tamil Nadu","Telangana":"Telangana","Tripura":"Tripura","Uttar Pradesh":"Uttar Pradesh","Uttarakhand":"Uttarakhand","West Bengal":"West Bengal"
+        }
+      },
+      hi: {
+        tagline: "आपकी आस-पड़ोस की दुकान, अब एक ही जगह",
+        heroEyebrow: "आपकी अपनी दुकान की ओर से नमस्ते",
+        heroTitle: "हर दिन की ज़रूरतें।\nप्यार से चुनी गईं।",
+        heroDescription: "छोटे उपहारों से लेकर रोज़मर्रा की ज़रूरतों तक, घर और परिवार के लिए सब कुछ यहाँ पाएँ।",
+        explore: "दुकान देखें",
+        shopTitle: "हमारे सामान देखें",
+        shopSubtitle: "आपके घर के हर कोने के लिए कुछ खास।",
+        footer: "· रोज़मर्रा की ज़रूरतों के लिए",
+        allItems: "सभी सामान", kids: "बच्चों के सामान", gifts: "उपहार", stationery: "स्टेशनरी",
+        puja: "पूजा सामग्री", household: "घरेलू सामान", electronics: "इलेक्ट्रॉनिक्स",
+        search: "सामान खोजें",
+        cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
+        noProducts: "कोई सामान नहीं मिला। दूसरी खोज या श्रेणी चुनें।",
+        picked: "ध्यान से चुना गया", pickedSub: "घर की ज़रूरत की चीज़ें, एक ही जगह",
+        local: "आपकी अपनी दुकान", localSub: "आपकी आस-पड़ोस की दुकान मदद के लिए यहाँ है",
+        upiEasy: "आसान UPI भुगतान", upiSub: "अपने पसंदीदा UPI ऐप से भुगतान करें",
+        basket: "आपका कार्ट", emptyBasket: "आपका कार्ट खाली है। इसमें कुछ सामान जोड़ें।",
+        continueShopping: "खरीदारी जारी रखें", remove: "हटाएँ", coupon: "कूपन कोड",
+        apply: "लागू करें", couponHint: "कूपन", couponDeal: "से 10% छूट पाएँ (₹100 तक)।",
+        subtotal: "सामान का कुल मूल्य", couponSavings: "कूपन की बचत", delivery: "डिलीवरी",
+        deliveryArranged: "दुकान से तय करें", total: "कुल", deliveryDetails: "डिलीवरी की जानकारी",
+        fullName: "पूरा नाम", startLetter: "नाम अक्षर से शुरू करें",
+        nameTitle: "नाम अक्षर से शुरू होना चाहिए; अंक न लिखें।",
+        mobile: "10 अंकों का मोबाइल नंबर", near: "नज़दीक ...", landmark: "पहचान का स्थान",
+        village: "गाँव / मोहल्ला", postOffice: "डाकघर (वैकल्पिक)",
+        district: "ज़िला (वैकल्पिक)", state: "राज्य / केंद्र शासित प्रदेश",
+        selectState: "राज्य / केंद्र शासित प्रदेश चुनें", pin: "पिन कोड", pinPlaceholder: "6 अंक",
+        pinTitle: "6 अंकों का पिन कोड लिखें।", continuePayment: "भुगतान पर जाएँ",
+        payment: "भुगतान", backBasket: "कार्ट पर वापस जाएँ", order: "ऑर्डर",
+        itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI ID से भुगतान",
+        enterYourUpi: "जिस UPI ID से भुगतान करेंगे, वह लिखें।", yourUpi: "आपकी UPI ID",
+        upiExample: "उदाहरण: 9876543210@upi", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
+        payStoreAt: "दुकान को यहाँ भुगतान करें:", copyUpi: "दुकान की UPI ID कॉपी करें", openUpi: "UPI ऐप खोलें",
+        storeUpiMissing: "दुकान की UPI ID अभी सेट नहीं है।",
+        qr: "UPI QR कोड स्कैन करें", scanQr: "अपने UPI ऐप से दुकान का QR कोड स्कैन करें।",
+        qrMissing: "अभी सेट नहीं है; दुकान से QR कोड जोड़ने को कहें।",
+        sampleOnly: "यह नमूना है — भुगतान न करें।",
+        scanToPay: "भुगतान के लिए स्कैन करें", verifyPayment: "दुकान आपके भुगतान की पुष्टि करेगी।",
+        qrNotConfigured: "QR भुगतान अभी सेट नहीं है।",
+        cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
+        codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
+        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "ऑर्डर के बाद दुकान UPI भुगतान की पुष्टि करेगी। वेबसाइट भुगतान की पुष्टि अपने आप नहीं करती।",
+        orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
+        awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
+        itemsEach: "प्रति सामान", invalidCoupon: "यह कूपन कोड मान्य नहीं है", couponApplied: "WELCOME10 लागू हुआ",
+        added: "कार्ट में जोड़ दिया", selectPayment: "कृपया भुगतान का तरीका चुनें।",
+        freeGift: "मुफ़्त उपहार", free: "मुफ़्त", freeGiftAdded: "आपके योग्य ऑर्डर में यह मुफ़्त उपहार शामिल है।",
+        calculatedAtCheckout: "चेकआउट पर तय होगा", outOfStock: "इतना स्टॉक उपलब्ध नहीं है।",
+        stockLeft: "बाकी",
+        paymentUnavailable: "UPI भुगतान सेट नहीं है। दूसरा तरीका चुनें।",
+        invalidPayerUpi: "सही UPI ID लिखें और दुकान की UPI ID सेट होने की पुष्टि करें।",
+        invalidQr: "QR भुगतान सेट नहीं है। दूसरा तरीका चुनें।",
+        codDisabled: "कैश ऑन डिलीवरी अभी उपलब्ध नहीं है।",
+        copyUnavailable: "कॉपी उपलब्ध नहीं है। कृपया UPI ID चुनकर कॉपी करें।",
+        upiCopied: "UPI ID कॉपी हो गई", orderSaved: "ऑर्डर हो गया",
+        storageError: "इस ब्राउज़र में सेव नहीं हो पाया। छोटी इमेज आज़माएँ।",
+        bannerLoadError: "त्योहार का बैनर लोड नहीं हो पाया।",
+        orderSaveError: "ऑर्डर सेव नहीं हो पाया",
+        notifyOnApproval: "दुकान से ऑर्डर मंज़ूर होने पर सूचना पाएँ",
+        offerKicker: "Shanvi की ओर से खास तोहफ़ा",
+        freeOfferTitle: "मुफ़्त तोहफ़ा आपका इंतज़ार कर रहा है!",
+        approvalPending: "आपका ऑर्डर दुकान की मंज़ूरी की प्रतीक्षा में है। सूचना पाने के लिए नीचे विकल्प चुनें।",
+        approvalAlreadyDone: "यह ऑर्डर पहले ही मंज़ूर हो चुका है।",
+        approvalNotificationsOn: "दुकान से ऑर्डर मंज़ूर होने पर इस डिवाइस पर सूचना मिलेगी।",
+        approvalNotificationsEnabled: "मंज़ूरी की सूचनाएँ चालू",
+        emptyOrder: "आपका कार्ट खाली है।", stockOut: "स्टॉक खत्म",
+        states: {
+          "Andaman and Nicobar Islands":"अंडमान और निकोबार द्वीपसमूह","Andhra Pradesh":"आंध्र प्रदेश","Arunachal Pradesh":"अरुणाचल प्रदेश","Assam":"असम","Bihar":"बिहार","Chandigarh":"चंडीगढ़","Chhattisgarh":"छत्तीसगढ़","Dadra and Nagar Haveli and Daman and Diu":"दादरा और नगर हवेली और दमन और दीव","Delhi":"दिल्ली","Goa":"गोवा","Gujarat":"गुजरात","Haryana":"हरियाणा","Himachal Pradesh":"हिमाचल प्रदेश","Jammu and Kashmir":"जम्मू और कश्मीर","Jharkhand":"झारखंड","Karnataka":"कर्नाटक","Kerala":"केरल","Ladakh":"लद्दाख","Lakshadweep":"लक्षद्वीप","Madhya Pradesh":"मध्य प्रदेश","Maharashtra":"महाराष्ट्र","Manipur":"मणिपुर","Meghalaya":"मेघालय","Mizoram":"मिज़ोरम","Nagaland":"नागालैंड","Odisha":"ओडिशा","Puducherry":"पुदुचेरी","Punjab":"पंजाब","Rajasthan":"राजस्थान","Sikkim":"सिक्किम","Tamil Nadu":"तमिलनाडु","Telangana":"तेलंगाना","Tripura":"त्रिपुरा","Uttar Pradesh":"उत्तर प्रदेश","Uttarakhand":"उत्तराखंड","West Bengal":"पश्चिम बंगाल"
+        }
+      }
+    };
+    const categories = ["All items", "Kids", "Gifts", "Stationery", "Puja", "Gharelu Samaan", "Electronics"];
+    const defaultProducts = [
+      { id: "p1", name: "Rainbow Art & Craft Kit", category: "Kids", price: 249, mrp: 299, image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=700&q=80" },
+      { id: "p2", name: "Little Moments Gift Box", category: "Gifts", price: 399, mrp: 499, image: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=700&q=80" },
+      { id: "p3", name: "Everyday Notebook Set", category: "Stationery", price: 120, mrp: 150, image: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=700&q=80" },
+      { id: "p4", name: "Brass Diya Pair", category: "Puja", price: 180, mrp: 220, image: "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=700&q=80" },
+      { id: "p5", name: "Handwoven Storage Basket", category: "Gharelu Samaan", price: 320, mrp: 399, image: "https://images.unsplash.com/photo-1593085260707-5377ba37f868?auto=format&fit=crop&w=700&q=80" },
+      { id: "p6", name: "Wooden Building Blocks", category: "Kids", price: 349, mrp: 399, image: "https://images.unsplash.com/photo-1599629954294-14df9ec8c5e9?auto=format&fit=crop&w=700&q=80" },
+      { id: "p7", name: "Floral Greeting Cards", category: "Gifts", price: 99, mrp: 120, image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?auto=format&fit=crop&w=700&q=80" },
+      { id: "p8", name: "Colorful Gel Pen Pack", category: "Stationery", price: 89, mrp: 99, image: "https://images.unsplash.com/photo-1455390582262-044cdaad277a?auto=format&fit=crop&w=700&q=80" },
+      { id: "p9", name: "Compact Bluetooth Speaker", category: "Electronics", price: 799, mrp: 999, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&q=80" }
+    ];
+    const storage = {
+      read(key, fallback) {
+        try { const value = localStorage.getItem(key); return value ? JSON.parse(value) : fallback; }
+        catch (error) { console.error(`Could not read ${key} from browser storage`, error); return fallback; }
+      },
+      write(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+        catch (error) { console.error(`Could not save ${key} to browser storage`, error); showToast(tr("storageError")); return false; }
+      }
+    };
+    const supabaseConfig = window.STORE_CONFIG || {};
+    const backendReady = Boolean(supabaseConfig.url && supabaseConfig.anonKey && window.supabase?.createClient);
+    const db = backendReady ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey) : null;
+    let products = storage.read("shanvi-products", defaultProducts);
+    let language = storage.read("shanvi-language", "en") === "hi" ? "hi" : "en";
+    let cart = storage.read("shanvi-cart", {});
+    let localNotificationsEnabled = storage.read("shanvi-local-notifications", false) === true;
+    let brandLogo = storage.read("shanvi-brand-logo", "");
+    let brandLogoDraft = brandLogo;
+    let offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...storage.read("shanvi-offer", {}) };
+    let deliverySettings = { latitude: "", longitude: "", ...storage.read("shanvi-delivery", {}) };
+    let deliveryFee = null;
+    const demoPaymentSettings = { upi: "9876543219@upi", qr: "sample-upi-qr.png", cod_enabled: true };
+    let settings = { upi: "", qr: "", cod_enabled: true, ...storage.read("shanvi-settings", {}) };
+    const defaultHero = {
+      eyebrow: "A warm hello from your local store",
+      title: "Everyday finds.\nThoughtfully picked.",
+      description: "From little gifts to everyday essentials, find a bit of everything for your home and family.",
+      image: ""
+    };
+    let heroSettings = { ...defaultHero, ...storage.read("shanvi-hero", {}) };
+    let heroDraftImage = heroSettings.image;
+    let productImageDraft = "";
+    let productImageFit = "contain";
+    let productImageZoom = 100;
+    let productImageX = 50;
+    let productImageY = 50;
+    if (!backendReady) {
+      if (!settings.upi) { settings.upi = demoPaymentSettings.upi; settings.demo_upi = true; }
+      if (!settings.qr) { settings.qr = demoPaymentSettings.qr; settings.demo_qr = true; }
+    }
+    let activeCategory = "All items";
+    let coupon = false;
+    let checkoutDraft = null;
+    let selectedPayment = "upi";
+    let isAuthorizedManager = false;
+    let managerRealtimeChannel = null;
+    let managerOrderRefreshTimer = null;
+    let managerAudioContext = null;
+    let managerOrdersPage = 0;
+    let managerOrders = [];
+    let managerOrderFilter = "pending";
+    const managerOpenProductSections = new Set();
+    const $ = (id) => document.getElementById(id);
+    function initializeManagerAccordions() {
+      const tools = $("manager-tools");
+      tools.querySelectorAll(":scope > .admin-card").forEach((card) => {
+        if (card instanceof HTMLDetailsElement) {
+          card.classList.add("manager-accordion");
+          return;
+        }
+        const heading = card.querySelector(":scope > h3");
+        if (!heading) return;
+        const accordion = document.createElement("details");
+        accordion.className = `${card.className} manager-accordion`;
+        if (card.id) accordion.id = card.id;
+        const summary = document.createElement("summary");
+        summary.textContent = heading.textContent.trim();
+        const content = document.createElement("div");
+        content.className = "manager-accordion-content";
+        for (const child of [...card.childNodes]) {
+          if (child !== heading) content.append(child);
+        }
+        accordion.append(summary, content);
+        card.replaceWith(accordion);
+      });
+    }
+    initializeManagerAccordions();
+    const money = (amount) => `₹${Number(amount).toLocaleString("en-IN")}`;
+    const tr = (key) => translations[language][key] ?? translations.en[key] ?? key;
+    const categoryTranslationKey = {
+      "All items": "allItems", "Kids": "kids", "Gifts": "gifts", "Stationery": "stationery",
+      "Puja": "puja", "Gharelu Samaan": "household", "Electronics": "electronics"
+    };
+    function translatedCategory(category) {
+      const key = categoryTranslationKey[category];
+      return key ? tr(key) : category;
+    }
+    function applyCustomerLanguage() {
+      document.documentElement.lang = language === "hi" ? "hi" : "en";
+      $("language-toggle").textContent = language === "hi" ? "English" : "हिन्दी";
+      $("language-toggle").setAttribute("aria-label", language === "hi" ? "Switch to English" : "हिंदी में बदलें");
+      $("brand-tagline").textContent = tr("tagline");
+      $("shop-title").textContent = tr("shopTitle");
+      $("shop-subtitle").textContent = tr("shopSubtitle");
+      $("hero-explore").innerHTML = `${tr("explore")} &nbsp; →`;
+      $("footer-tagline").textContent = tr("footer");
+      $("search").placeholder = tr("search");
+      $("search").setAttribute("aria-label", tr("search"));
+      $("cart-label").textContent = tr("cart");
+      $("manager-open").textContent = tr("manager");
+      updateBrandLogo();
+      $("cart-heading").textContent = tr("basket");
+      $("cart-overlay").setAttribute("aria-label", tr("basket"));
+      $("cart-close").setAttribute("aria-label", language === "hi" ? "कार्ट बंद करें" : "Close cart");
+      $("trust-row").children[0].querySelector("strong").textContent = tr("picked");
+      $("trust-row").children[0].querySelector("span:last-child").textContent = tr("pickedSub");
+      $("trust-row").children[1].querySelector("strong").textContent = tr("local");
+      $("trust-row").children[1].querySelector("span:last-child").textContent = tr("localSub");
+      $("trust-row").children[2].querySelector("strong").textContent = tr("upiEasy");
+      $("trust-row").children[2].querySelector("span:last-child").textContent = tr("upiSub");
+      if (heroSettings.eyebrow === defaultHero.eyebrow) $("hero-eyebrow").textContent = tr("heroEyebrow");
+      if (heroSettings.title === defaultHero.title) $("hero-title").textContent = tr("heroTitle");
+      if (heroSettings.description === defaultHero.description) $("hero-description").textContent = tr("heroDescription");
+      renderCategories();
+      renderProducts();
+      updateCustomerOffer();
+      if ($("cart-overlay").classList.contains("open")) {
+        const formValues = {};
+        $("cart-content").querySelectorAll("input, select").forEach((field) => {
+          if (field.id) formValues[field.id] = field.value;
+        });
+        if (checkoutDraft) renderPaymentPage();
+        else renderCart();
+        Object.entries(formValues).forEach(([id, value]) => {
+          const field = $(id);
+          if (field) field.value = value;
+        });
+        const payerInput = $("customer-upi-id");
+        if (payerInput && checkoutDraft) {
+          checkoutDraft.payerUpiId = payerInput.value.trim();
+          $("confirm-payment").disabled = !paymentReadyForUpiId();
+        }
+      }
+    }
+
+    function showToast(message) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+    function showManagerSaved(message) {
+      const status = $("manager-save-status");
+      status.textContent = message;
+      status.classList.add("visible");
+      showToast(message);
+    }
+    function randomToken() {
+      const bytes = new Uint8Array(32);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    }
+    async function sha256Hex(value) {
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+      return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+    }
+    function renderHero() {
+      $("hero-eyebrow").textContent = heroSettings.eyebrow === defaultHero.eyebrow ? tr("heroEyebrow") : heroSettings.eyebrow;
+      $("hero-title").textContent = heroSettings.title === defaultHero.title ? tr("heroTitle") : heroSettings.title;
+      $("hero-description").textContent = heroSettings.description === defaultHero.description ? tr("heroDescription") : heroSettings.description;
+      $("festival-hero").classList.toggle("has-photo", Boolean(heroSettings.image));
+      const image = $("hero-photo");
+      image.classList.remove("loaded");
+      if (heroSettings.image) {
+        image.src = heroSettings.image;
+        image.onload = () => image.classList.add("loaded");
+        image.onerror = () => showToast(tr("bannerLoadError"));
+      } else {
+        image.removeAttribute("src");
+      }
+    }
+    function updateHeroPreview(imageUrl) {
+      const src = imageUrl ?? $("hero-preview-image").src;
+      $("hero-preview-title").textContent = $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " ");
+      $("hero-preview-description").textContent = $("hero-description-input").value.trim() || defaultHero.description;
+      $("hero-preview").classList.toggle("has-image", Boolean(src));
+      $("hero-preview-empty").style.display = src ? "none" : "block";
+      if (src) $("hero-preview-image").src = src;
+      else $("hero-preview-image").removeAttribute("src");
+    }
+    function fillHeroForm() {
+      heroDraftImage = heroSettings.image;
+      $("hero-eyebrow-input").value = heroSettings.eyebrow;
+      $("hero-title-input").value = heroSettings.title.replace(/\n/g, " ");
+      $("hero-description-input").value = heroSettings.description;
+      updateHeroPreview(heroSettings.image);
+    }
+    function renderCategories() {
+      $("categories").innerHTML = categories.map((category) =>
+        `<button class="category-chip ${category === activeCategory ? "active" : ""}" data-category="${escapeAttr(category)}">${escapeHtml(translatedCategory(category))}</button>`
+      ).join("");
+      $("categories").querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
+        activeCategory = button.dataset.category;
+        renderCategories();
+        renderProducts();
+      }));
+      $("p-category").innerHTML = categories.slice(1).map((category) => `<option value="${category}">${category}</option>`).join("");
+      $("admin-category-filter").innerHTML = `<option value="All sections">All sections</option>${categories.slice(1).map((category) => `<option value="${category}">${category}</option>`).join("")}`;
+      const previousGift = $("offer-product").value || offerSettings.giftProductId;
+      $("offer-product").innerHTML = `<option value="">Select a product</option>${products.map((product) => `<option value="${escapeAttr(product.id)}">${escapeHtml(product.name)} · ${money(product.price)}</option>`).join("")}`;
+      if (products.some((product) => product.id === previousGift)) $("offer-product").value = previousGift;
+    }
+    function updateBrandLogo() {
+      const mark = document.querySelector(".brand-mark");
+      mark.innerHTML = brandLogo ? `<img src="${escapeAttr(brandLogo)}" alt="Shanvi General Store logo">` : "🛍️";
+      $("brand-logo-preview").classList.toggle("has-image", Boolean(brandLogoDraft));
+      if (brandLogoDraft) $("brand-logo-preview-image").src = brandLogoDraft;
+      else $("brand-logo-preview-image").removeAttribute("src");
+      $("brand-logo-remove").hidden = !brandLogoDraft;
+    }
+    function offerGiftProduct() {
+      return products.find((product) => product.id === offerSettings.giftProductId);
+    }
+    function merchandiseSubtotal(items) {
+      return items.filter((item) => !item.isFreeGift).reduce((sum, item) => sum + item.price * item.quantity, 0);
+    }
+    function currentDiscount(subtotal) {
+      return coupon ? Math.min(Math.round(subtotal * .1), 100) : 0;
+    }
+    function updateCustomerOffer() {
+      const offer = $("customer-offer");
+      const gift = offerGiftProduct();
+      const threshold = Number(offerSettings.threshold);
+      if (!offerSettings.enabled || !gift || !Number.isFinite(threshold) || threshold < 1) {
+        offer.hidden = true;
+        return;
+      }
+      const thresholdText = money(threshold);
+      offer.innerHTML = `<span class="offer-gift-icon" aria-hidden="true">🎁</span><span class="offer-copy"><span class="offer-kicker">${tr("offerKicker")}</span><strong class="offer-title">${tr("freeOfferTitle")}</strong><span class="offer-description">${language === "hi" ? `${thresholdText} या अधिक की खरीदारी पर ${escapeHtml(gift.name)} मुफ़्त पाएँ।` : `Spend ${thresholdText} or more and get ${escapeHtml(gift.name)} free.`}</span></span><span class="offer-badge">${language === "hi" ? `${thresholdText}+ की खरीदारी` : `SHOP ${thresholdText}+`}</span>`;
+      offer.hidden = false;
+    }
+    function renderProducts() {
+      const query = $("search").value.trim().toLowerCase();
+      const visible = products.filter((product) =>
+        (activeCategory === "All items" || product.category === activeCategory) &&
+        `${product.name} ${product.category}`.toLowerCase().includes(query)
+      );
+      $("products").innerHTML = visible.length ? visible.map((product) => {
+        const discount = product.mrp > product.price ? Math.round((1 - product.price / product.mrp) * 100) : 0;
+        return `<article class="product">
+          <div class="product-image"><img src="${escapeAttr(product.image || fallbackImage(product.category))}" alt="${escapeAttr(product.name)}" style="${escapeAttr(productImageStyle(product))}" loading="lazy">${discount ? `<span class="discount">${discount}% ${tr("off")}</span>` : ""}</div>
+          <div class="product-info"><span class="product-category">${escapeHtml(translatedCategory(product.category))}</span><h3>${escapeHtml(product.name)}</h3>
+            ${product.description ? `<p class="small-note">${escapeHtml(product.description)}</p>` : ""}
+            ${product.size || product.dimensions ? `<p class="small-note">${[product.size, product.dimensions].filter(Boolean).map(escapeHtml).join(" · ")}</p>` : ""}
+            <div class="product-bottom"><div><div class="price">${money(product.price)}${product.mrp > product.price ? `<span class="mrp">${money(product.mrp)}</span>` : ""}</div>${Number.isFinite(Number(product.stock)) ? `<small class="small-note">${Math.max(0, Number(product.stock))} ${tr("stockLeft")}</small>` : ""}</div><button class="add-btn" data-add="${escapeAttr(product.id)}" ${Number.isFinite(Number(product.stock)) && Number(product.stock) <= 0 ? "disabled" : ""}>${Number.isFinite(Number(product.stock)) && Number(product.stock) <= 0 ? tr("soldOut") : tr("add")}</button></div>
+          </div>
+        </article>`;
+      }).join("") : `<div class="empty">${tr("noProducts")}</div>`;
+      $("products").querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.add, 1)));
+      updateCustomerOffer();
+    }
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    }
+    function escapeAttr(value) { return escapeHtml(value); }
+    function boundedImageValue(value, fallback, min, max) {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback;
+    }
+    function productImageStyle(product) {
+      const fit = product.imageFit === "cover" ? "cover" : "contain";
+      const zoom = boundedImageValue(product.imageZoom, 100, 40, 200);
+      const x = boundedImageValue(product.imageX, 50, 0, 100);
+      const y = boundedImageValue(product.imageY, 50, 0, 100);
+      return `object-fit:${fit};object-position:${x}% ${y}%;transform:scale(${zoom / 100});transform-origin:${x}% ${y}%`;
+    }
+    function syncProductImagePreview() {
+      $("product-photo-preview").classList.toggle("has-image", Boolean(productImageDraft));
+      $("p-image-preview").style.objectFit = $("p-image-fit").value;
+      $("p-image-preview").style.objectPosition = `${$("p-image-x").value}% ${$("p-image-y").value}%`;
+      $("p-image-preview").style.transform = `scale(${Number($("p-image-zoom").value) / 100})`;
+      $("p-image-preview").style.transformOrigin = `${$("p-image-x").value}% ${$("p-image-y").value}%`;
+      $("p-image-fit").disabled = !productImageDraft;
+      $("p-image-zoom").disabled = !productImageDraft;
+      $("p-image-x").disabled = !productImageDraft;
+      $("p-image-y").disabled = !productImageDraft;
+      $("p-image-remove").hidden = !productImageDraft;
+      $("image-adjustments").classList.toggle("visible", Boolean(productImageDraft));
+      $("p-image-zoom-label").textContent = `${$("p-image-zoom").value}%`;
+      $("p-image-x-label").textContent = `${$("p-image-x").value}%`;
+      $("p-image-y-label").textContent = `${$("p-image-y").value}%`;
+    }
+    function mapProduct(row) {
+      return {
+        id: row.id,
+        name: row.name,
+        category: row.category,
+        price: Number(row.price),
+        mrp: Number(row.mrp),
+        image: row.image_url || "",
+        description: row.description || "",
+        stock: Number(row.stock ?? 0)
+      };
+    }
+    function fallbackImage(category) {
+      return `https://placehold.co/700x500/e9efe7/236b4a?text=${encodeURIComponent(category)}`;
+    }
+    function changeQuantity(id, amount) {
+      const product = products.find((item) => item.id === id);
+      const nextQuantity = Math.max(0, (cart[id] || 0) + amount);
+      if (product && Number.isFinite(Number(product.stock)) && nextQuantity > Number(product.stock)) {
+        showToast(tr("outOfStock"));
+        return;
+      }
+      cart[id] = nextQuantity;
+      if (!cart[id]) delete cart[id];
+      storage.write("shanvi-cart", cart);
+      renderCart();
+      renderProducts();
+      if (amount > 0) showToast(tr("added"));
+    }
+    function cartProducts() {
+      const items = Object.entries(cart).map(([id, quantity]) => {
+        const product = products.find((item) => item.id === id);
+        return product ? { ...product, quantity, cartKey: id, productId: product.id } : null;
+      }).filter(Boolean);
+      const subtotal = merchandiseSubtotal(items);
+      const gift = offerGiftProduct();
+      if (offerSettings.enabled && gift && subtotal - currentDiscount(subtotal) >= Number(offerSettings.threshold)) {
+        const giftCount = items.filter((item) => item.productId === gift.id).reduce((sum, item) => sum + item.quantity, 0);
+        if (!Number.isFinite(Number(gift.stock)) || giftCount < Number(gift.stock)) {
+          items.push({ ...gift, price: 0, quantity: 1, isFreeGift: true, cartKey: `offer-gift-${gift.id}`, productId: gift.id });
+        }
+      }
+      return items;
+    }
+    function renderCart() {
+      const items = cartProducts();
+      const count = items.reduce((sum, item) => sum + item.quantity, 0);
+      $("cart-count").textContent = count;
+      if (!items.length) {
+        $("cart-content").innerHTML = `<div class="empty">${tr("emptyBasket")}</div><button class="btn btn-primary full" id="continue-shopping">${tr("continueShopping")}</button>`;
+        $("continue-shopping").onclick = closeCart;
+        return;
+      }
+      const subtotal = merchandiseSubtotal(items);
+      const discount = currentDiscount(subtotal);
+      const total = subtotal - discount + (deliveryFee || 0);
+      const hasFreeGift = items.some((item) => item.isFreeGift);
+      $("cart-content").innerHTML = `
+        <div>${items.map((item) => `<div class="cart-line">
+          <img src="${escapeAttr(item.image || fallbackImage(item.category))}" alt="">
+          <div><strong>${escapeHtml(item.name)}</strong><small>${item.isFreeGift ? tr("freeGift") : `${money(item.price)} ${tr("itemsEach")}`}</small>${item.isFreeGift ? "" : `<div class="quantity"><button data-qty="${escapeAttr(item.id)}" data-step="-1" aria-label="${language === "hi" ? "मात्रा घटाएँ" : "Decrease quantity"}">−</button><span>${item.quantity}</span><button data-qty="${escapeAttr(item.id)}" data-step="1" aria-label="${language === "hi" ? "मात्रा बढ़ाएँ" : "Increase quantity"}" ${Number.isFinite(Number(item.stock)) && item.quantity >= Number(item.stock) ? "disabled" : ""}>+</button></div>`}</div>
+          <div><strong>${item.isFreeGift ? tr("free") : money(item.price * item.quantity)}</strong>${item.isFreeGift ? "" : `<button class="remove" data-remove="${escapeAttr(item.id)}">${tr("remove")}</button>`}</div>
+        </div>`).join("")}</div>
+        <div class="coupon"><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon">${tr("apply")}</button></div>
+        <div class="small-note" style="margin-top:6px">${tr("couponHint")} <strong>WELCOME10</strong> ${tr("couponDeal")}</div>
+        <div class="summary">
+          <div class="summary-row"><span>${tr("subtotal")}</span><strong>${money(subtotal)}</strong></div>
+          ${discount ? `<div class="summary-row"><span>${tr("couponSavings")}</span><strong>−${money(discount)}</strong></div>` : ""}
+          <div class="summary-row"><span>${tr("delivery")}</span><strong>${deliveryFee === null ? tr("calculatedAtCheckout") : money(deliveryFee)}</strong></div>
+          <div class="summary-row total"><span>${tr("total")}</span><span>${money(total)}</span></div>
+        </div>
+        <h3 style="font-size:15px;margin:20px 0 8px">${tr("deliveryDetails")}</h3>
+        <div class="field"><label for="customer-name">${tr("fullName")}</label><input id="customer-name" autocomplete="name" placeholder="${tr("startLetter")}" required maxlength="100" pattern="[\\p{L}][\\p{L}\\p{M} .'-]{0,99}" title="${tr("nameTitle")}"></div>
+        <div class="field"><label for="customer-phone">${tr("mobile")}</label><input id="customer-phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="${tr("mobile")}" required minlength="10" maxlength="10" pattern="[0-9]{10}" title="${language === "hi" ? "केवल 10 अंक लिखें।" : "Enter exactly 10 digits."}"></div>
+        <div class="address-grid">
+          <div class="field"><label for="address-landmark">${tr("landmark")}</label><input id="address-landmark" required maxlength="70" placeholder="${tr("near")}"></div>
+          <div class="field"><label for="address-village">${tr("village")}</label><input id="address-village" required maxlength="70"></div>
+          <div class="field"><label for="address-post">${tr("postOffice")}</label><input id="address-post" maxlength="70"></div>
+          <div class="field"><label for="address-district">${tr("district")}</label><input id="address-district" maxlength="70"></div>
+          <div class="field"><label for="address-state">${tr("state")}</label><select id="address-state" required>
+            <option value="">${tr("selectState")}</option>
+            ${Object.keys(translations.en.states).map((state) => `<option value="${escapeAttr(state)}">${escapeHtml(translations[language].states[state])}</option>`).join("")}
+          </select></div>
+          <div class="field"><label for="address-pin">${tr("pin")}</label><input id="address-pin" inputmode="numeric" autocomplete="postal-code" placeholder="${tr("pinPlaceholder")}" required minlength="6" maxlength="6" pattern="[0-9]{6}" title="${tr("pinTitle")}"></div>
+        </div>
+        ${hasFreeGift ? `<p class="small-note">${tr("freeGiftAdded")}</p>` : ""}
+        <button class="btn btn-primary full" id="place-order">${tr("continuePayment")} · ${money(total)}</button>`;
+      $("cart-content").querySelectorAll("[data-qty]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.qty, Number(button.dataset.step))));
+      $("cart-content").querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.remove, -(cart[button.dataset.remove] || 0))));
+      $("apply-coupon").onclick = () => {
+        coupon = $("coupon-code").value.trim().toUpperCase() === "WELCOME10";
+        showToast(coupon ? tr("couponApplied") : tr("invalidCoupon"));
+        renderCart();
+      };
+      $("place-order").onclick = continueToPayment;
+    }
+    function distanceInKm(from, to) {
+      const radians = (degrees) => degrees * Math.PI / 180;
+      const latitudeDelta = radians(to.latitude - from.latitude);
+      const longitudeDelta = radians(to.longitude - from.longitude);
+      const a = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(radians(from.latitude)) * Math.cos(radians(to.latitude)) * Math.sin(longitudeDelta / 2) ** 2;
+      return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+    function calculateDeliveryFee() {
+      if (!String(deliverySettings.latitude).trim() || !String(deliverySettings.longitude).trim()) return Promise.resolve(20);
+      const storeLat = Number(deliverySettings.latitude);
+      const storeLng = Number(deliverySettings.longitude);
+      if (!Number.isFinite(storeLat) || !Number.isFinite(storeLng)) return Promise.resolve(20);
+      if (!navigator.geolocation) return Promise.resolve(20);
+      return new Promise((resolve) => {
+        let settled = false;
+        const finish = (fee) => {
+          if (settled) return;
+          settled = true;
+          resolve(fee);
+        };
+        try {
+          navigator.geolocation.getCurrentPosition(
+            (position) => finish(distanceInKm(
+              { latitude: storeLat, longitude: storeLng },
+              { latitude: position.coords.latitude, longitude: position.coords.longitude }
+            ) > 2 ? 20 : 0),
+            () => finish(20),
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+          );
+        } catch {
+          finish(20);
+        }
+        window.setTimeout(() => finish(20), 8500);
+      });
+    }
+    function decodeApplicationServerKey(value) {
+      const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+      return Uint8Array.from(atob(padded), (character) => character.charCodeAt(0));
+    }
+    async function enableOrderNotifications() {
+      const button = $("enable-order-notifications");
+      const status = $("notification-status");
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!("Notification" in window)) {
+        status.textContent = "This browser does not support notifications. Keep the manager page open for the in-page beep.";
+        return;
+      }
+      button.disabled = true;
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          status.textContent = "Notification permission was not granted. Allow notifications for this site in your browser settings.";
+          return;
+        }
+        localNotificationsEnabled = true;
+        storage.write("shanvi-local-notifications", true);
+        try {
+          const AudioContextType = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextType) {
+            managerAudioContext ||= new AudioContextType();
+            if (managerAudioContext.state === "suspended") await managerAudioContext.resume();
+          }
+        } catch (error) {
+          console.warn("Could not enable in-page order alert audio", error);
+        }
+        playManagerAlert();
+        if (window.isSecureContext && "serviceWorker" in navigator && "PushManager" in window) {
+          const registration = await navigator.serviceWorker.register("./sw.js");
+          await registration.showNotification("Shanvi browser alerts enabled", {
+            body: "Test alert. Keep the manager page open for same-browser orders.",
+            icon: "./store-icon.svg",
+            vibrate: [200, 100, 200]
+          });
+          if (db && supabaseConfig.pushPublicKey) {
+            const code = $("push-enrollment-code").value.trim();
+            if (code) {
+              let subscription = await registration.pushManager.getSubscription();
+              if (!subscription) {
+                subscription = await registration.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: decodeApplicationServerKey(supabaseConfig.pushPublicKey)
+                });
+              }
+              const { error } = await db.functions.invoke("register-manager-push", {
+                body: { code, subscription: subscription.toJSON() }
+              });
+              if (error) throw error;
+              $("push-enrollment-code").value = "";
+              status.textContent = "Push is enabled. This device can get order alerts when the manager page is closed.";
+              showToast("Browser push enabled");
+              return;
+            }
+          }
+        } else {
+          new Notification("Shanvi browser alerts enabled", { body: "Test alert from Shanvi General Store." });
+        }
+        status.textContent = "Browser alert is enabled on this device. Keep the manager page open; it will beep when a customer orders in another tab of this browser. For another device, set up Supabase push below.";
+        showToast("Same-browser order alerts enabled");
+      } catch (error) {
+        status.textContent = error.message || "Could not enable push notifications.";
+      } finally {
+        button.disabled = false;
+      }
+    }
+    async function registerCustomerOrderPush(order) {
+      const button = $("customer-approval-notify");
+      const status = $("customer-notification-status");
+      if (!db || !supabaseConfig.pushPublicKey) {
+        status.textContent = "Order notifications need the Supabase push setup.";
+        return;
+      }
+      if (!window.isSecureContext || !("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+        status.textContent = "Push needs a supported browser and an HTTPS website.";
+        return;
+      }
+      button.disabled = true;
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          status.textContent = "Notification permission was not granted.";
+          return;
+        }
+        const registration = await navigator.serviceWorker.register("./sw.js");
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: decodeApplicationServerKey(supabaseConfig.pushPublicKey)
+          });
+        }
+        const { data, error } = await db.functions.invoke("register-customer-push", {
+          body: {
+            reference: order.id,
+            token: order.customerStatusToken,
+            language,
+            subscription: subscription.toJSON()
+          }
+        });
+        if (error) throw error;
+        if (data?.status === "Approved") {
+          status.textContent = tr("approvalAlreadyDone");
+          await registration.showNotification("Order approved", {
+            body: `Your order ${order.id} was approved by Shanvi General Store.`,
+            icon: "./store-icon.svg"
+          });
+        } else {
+          status.textContent = tr("approvalNotificationsOn");
+          button.textContent = tr("approvalNotificationsEnabled");
+        }
+      } catch (error) {
+        status.textContent = error.message || "Could not enable order notifications.";
+        button.disabled = false;
+      }
+    }
+    function playManagerAlert() {
+      try {
+        const AudioContextType = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextType) return;
+        managerAudioContext ||= new AudioContextType();
+        if (managerAudioContext.state === "suspended") managerAudioContext.resume().catch((error) => console.warn("Could not resume order alert audio", error));
+        const oscillator = managerAudioContext.createOscillator();
+        const gain = managerAudioContext.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001, managerAudioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.16, managerAudioContext.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, managerAudioContext.currentTime + 0.42);
+        oscillator.connect(gain);
+        gain.connect(managerAudioContext.destination);
+        oscillator.start();
+        oscillator.stop(managerAudioContext.currentTime + 0.45);
+      } catch (error) {
+        console.warn("Could not play the in-page order alert", error);
+      }
+    }
+    async function showManagerSystemAlert(title, body) {
+      if (!localNotificationsEnabled || !("Notification" in window) || Notification.permission !== "granted") return;
+      try {
+        if (window.isSecureContext && "serviceWorker" in navigator) {
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            await registration.showNotification(title, { body, icon: "./store-icon.svg", vibrate: [250, 120, 250] });
+            return;
+          }
+        }
+        new Notification(title, { body });
+      } catch (error) {
+        console.warn("Could not display the manager order notification", error);
+      }
+    }
+    function onLocalOrdersChanged(event) {
+      if (event.key !== "shanvi-orders" || !isAuthorizedManager || !event.newValue) return;
+      let previousOrders = [];
+      let currentOrders = [];
+      try {
+        previousOrders = event.oldValue ? JSON.parse(event.oldValue) : [];
+        currentOrders = JSON.parse(event.newValue);
+      } catch (error) {
+        console.warn("Could not read local order update", error);
+        return;
+      }
+      if (!Array.isArray(currentOrders)) return;
+      const previousIds = new Set(Array.isArray(previousOrders) ? previousOrders.map((order) => order.id) : []);
+      const addedOrders = currentOrders.filter((order) => order && !previousIds.has(order.id));
+      for (const order of addedOrders) {
+        if (!localNotificationsEnabled) continue;
+        const reference = order.id || "New order";
+        showToast(`New order received: ${reference}`);
+        playManagerAlert();
+        showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
+      }
+      loadManagerOrders();
+    }
+    function startManagerOrderRefresh() {
+      if (managerOrderRefreshTimer) return;
+      managerOrderRefreshTimer = window.setInterval(() => {
+        if (
+          isAuthorizedManager
+          && $("admin").classList.contains("open")
+          && document.visibilityState === "visible"
+        ) {
+          loadManagerOrders({ silent: true });
+        }
+      }, 15000);
+    }
+    function stopManagerOrderRefresh() {
+      if (!managerOrderRefreshTimer) return;
+      window.clearInterval(managerOrderRefreshTimer);
+      managerOrderRefreshTimer = null;
+    }
+    async function loadManagerOrders({ append = false, silent = false } = {}) {
+      const container = $("admin-orders");
+      if (!db) {
+        managerOrders = storage.read("shanvi-orders", []).slice().reverse();
+        managerOrdersPage = managerOrders.length ? 1 : 0;
+        renderManagerOrders();
+        return;
+      }
+      const retainedOrders = silent ? managerOrders.slice(100) : [];
+      const previousPageCount = managerOrdersPage;
+      if (!append) {
+        managerOrdersPage = 0;
+        if (!silent) {
+          managerOrders = [];
+          container.innerHTML = `<p class="small-note">Loading orders…</p>`;
+        }
+      }
+      if (!silent) $("load-more-orders").hidden = true;
+      const { data, error } = await db.from("orders")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, status, created_at")
+        .order("created_at", { ascending: false })
+        .range(managerOrdersPage * 100, managerOrdersPage * 100 + 99);
+      if (error) {
+        if (!append && !silent) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message)}</p>`;
+        return;
+      }
+      if (append) {
+        managerOrders = [...managerOrders, ...data];
+        managerOrdersPage += 1;
+      } else {
+        const latestReferences = new Set(data.map((order) => order.reference));
+        managerOrders = [...data, ...retainedOrders.filter((order) => !latestReferences.has(order.reference))];
+        managerOrdersPage = silent ? Math.max(previousPageCount, Math.ceil(managerOrders.length / 100)) : 1;
+      }
+      renderManagerOrders(data.length);
+    }
+    function orderStatusGroup(status) {
+      if (status === "Completed") return "completed";
+      if (status === "Rejected") return "rejected";
+      return "pending";
+    }
+    function renderManagerOrders(lastPageSize = 0) {
+      const container = $("admin-orders");
+      $("orders-storage-note").textContent = db
+        ? "Orders and status changes are stored in Supabase and shared across devices."
+        : "Local mode: orders and status changes are stored only in this browser. Cross-device orders need a hosted backend such as the free Supabase tier.";
+      const groups = {
+        pending: managerOrders.filter((order) => orderStatusGroup(order.status) === "pending"),
+        completed: managerOrders.filter((order) => orderStatusGroup(order.status) === "completed"),
+        rejected: managerOrders.filter((order) => orderStatusGroup(order.status) === "rejected")
+      };
+      $("pending-order-count").textContent = String(groups.pending.length);
+      $("completed-order-count").textContent = String(groups.completed.length);
+      $("rejected-order-count").textContent = String(groups.rejected.length);
+      $("all-order-count").textContent = String(managerOrders.length);
+      document.querySelectorAll("[data-order-filter]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.orderFilter === managerOrderFilter));
+      });
+      const visibleOrders = managerOrderFilter === "all" ? managerOrders : groups[managerOrderFilter];
+      if (!managerOrders.length) {
+        container.innerHTML = `<p class="small-note">No orders yet. Orders appear after a customer successfully places one.</p>`;
+        return;
+      }
+      container.innerHTML = visibleOrders.length
+        ? visibleOrders.map(renderManagerOrder).join("")
+        : `<p class="small-note">No ${managerOrderFilter} orders.</p>`;
+      container.querySelectorAll("[data-order-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const { orderAction, orderReference } = button.dataset;
+          if (orderAction === "approve") approveOrder(orderReference, button);
+          else setOrderStatus(orderReference, orderAction, button);
+        });
+      });
+      if (db) $("load-more-orders").hidden = lastPageSize < 100 && managerOrders.length <= 100;
+      else $("load-more-orders").hidden = true;
+    }
+    function renderManagerOrder(order) {
+      const reference = order.reference || order.id || "Order";
+      const items = Array.isArray(order.items) ? order.items : [];
+      const itemRows = items.map((item) => {
+        const quantity = Math.max(0, Number(item.quantity) || 0);
+        const price = Math.max(0, Number(item.price) || 0);
+        const detail = [item.category, item.size, item.dimensions].filter(Boolean).map(escapeHtml).join(" · ");
+        return `<div class="order-line"><span><strong>${escapeHtml(item.name || "Item")}</strong> × ${quantity}${item.is_free_gift || item.isFreeGift ? ` · ${language === "hi" ? "मुफ़्त" : "FREE"}` : ""}${detail ? `<br><small class="small-note">${detail}</small>` : ""}</span><strong>${money(price * quantity)}</strong></div>`;
+      }).join("");
+      const phone = order.customer_phone || order.phone || "";
+      const rawPhoneDigits = String(phone).replace(/\D/g, "");
+      const phoneDigits = rawPhoneDigits.length === 10 ? `91${rawPhoneDigits}` : rawPhoneDigits;
+      const address = order.delivery_note || order.address || "";
+      const name = order.customer_name || order.name || "";
+      const total = Number(order.total) || 0;
+      const delivery = Number(order.delivery_fee ?? order.deliveryFee) || 0;
+      const discount = Number(order.discount) || 0;
+      const subtotal = Number(order.subtotal) || Math.max(0, total - delivery + discount);
+      const status = order.status || "Pending";
+      const group = orderStatusGroup(status);
+      const isAccepted = status === "Approved";
+      const isDelivered = status === "Delivered";
+      const isOpen = group === "pending" && !isAccepted && !isDelivered;
+      const createdAt = order.created_at || order.createdAt;
+      const payerUpi = order.payer_upi_id || order.payerUpiId || "";
+      const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
+      return `<article class="order-card">
+        <h4>${escapeHtml(reference)} · ${escapeHtml(status)}</h4>
+        <p class="small-note">${createdAt ? escapeHtml(new Date(createdAt).toLocaleString()) : ""}</p>
+        <section class="order-card-section"><strong>Customer contact</strong>
+          <div><strong>${escapeHtml(name || "Name not provided")}</strong></div>
+          ${phone ? `<div>${escapeHtml(phone)}</div><div class="order-contact-actions"><a class="btn btn-soft" href="tel:${escapeAttr(phone)}">Call customer</a><a class="btn btn-soft" href="https://wa.me/${escapeAttr(phoneDigits)}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>` : `<p class="small-note">No mobile number was saved.</p>`}
+          <p class="small-note" style="overflow-wrap:anywhere">${escapeHtml(address || "No delivery address was saved.")}</p>
+        </section>
+        <section class="order-card-section"><strong>Items customer added (${items.length})</strong>${itemRows || `<p class="small-note">No item details were saved.</p>`}</section>
+        <section class="order-card-section"><strong>Order and payment</strong>
+          <div class="order-line"><span>Items subtotal</span><span>${money(subtotal)}</span></div>
+          ${discount ? `<div class="order-line"><span>Discount</span><span>−${money(discount)}</span></div>` : ""}
+          <div class="order-line"><span>Delivery</span><span>${money(delivery)}</span></div>
+          <div class="order-line"><strong>Total</strong><strong>${money(total)}</strong></div>
+          <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer UPI ID: ${escapeHtml(payerUpi)}` : ""}</p>
+        </section>
+        <div class="order-status-actions">
+          <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen ? "disabled" : ""}>Accept</button>
+          <button class="btn btn-soft" data-order-action="Delivered" data-order-reference="${escapeAttr(reference)}" ${!isAccepted ? "disabled" : ""}>Delivered</button>
+          <button class="btn btn-soft" data-order-action="Rejected" data-order-reference="${escapeAttr(reference)}" ${!isOpen && !isAccepted ? "disabled" : ""}>Reject</button>
+          <button class="btn btn-primary" data-order-action="Completed" data-order-reference="${escapeAttr(reference)}" ${!isDelivered ? "disabled" : ""}>Complete</button>
+        </div>
+      </article>`;
+    }
+    async function approveOrder(reference, button) {
+      if (!isAuthorizedManager) return;
+      button.disabled = true;
+      if (db) {
+        const { data, error } = await db.from("orders")
+          .update({ status: "Approved" })
+          .eq("reference", reference)
+          .eq("status", "Awaiting manager approval")
+          .select("reference")
+          .maybeSingle();
+        if (error) {
+          button.disabled = false;
+          showToast(`Could not approve order: ${error.message}`);
+          return;
+        }
+        if (!data) {
+          showToast("This order is no longer awaiting approval.");
+          await loadManagerOrders();
+          return;
+        }
+      } else {
+        if (!updateLocalOrderStatus(reference, "Approved")) {
+          button.disabled = false;
+          return;
+        }
+      }
+      showToast(db
+        ? `Order ${reference} approved; customer push will be sent if enabled.`
+        : `Order ${reference} approved on this browser.`);
+      await loadManagerOrders();
+    }
+    function updateLocalOrderStatus(reference, status) {
+      const orders = storage.read("shanvi-orders", []);
+      const updatedOrders = orders.map((order) =>
+        (order.id || order.reference) === reference ? { ...order, status } : order
+      );
+      if (updatedOrders.every((order, index) => order === orders[index])) {
+        showToast("This order could not be found in this browser.");
+        return false;
+      }
+      return storage.write("shanvi-orders", updatedOrders);
+    }
+    async function setOrderStatus(reference, status, button) {
+      if (!isAuthorizedManager) return;
+      button.disabled = true;
+      const allowedPreviousStatuses = {
+        Delivered: ["Approved"],
+        Rejected: ["Awaiting manager approval", "Approved", "COD order placed", "Awaiting UPI payment verification", "Pending"],
+        Completed: ["Delivered"]
+      }[status];
+      if (!allowedPreviousStatuses) {
+        button.disabled = false;
+        showToast("This order status change is not supported.");
+        return;
+      }
+      if (db) {
+        const { data, error } = await db.from("orders")
+          .update({ status })
+          .eq("reference", reference)
+          .in("status", allowedPreviousStatuses)
+          .select("reference")
+          .maybeSingle();
+        if (error) {
+          button.disabled = false;
+          showToast(`Could not update order: ${error.message}`);
+          return;
+        }
+        if (!data) {
+          showToast("This order is no longer in a status that allows that change.");
+          await loadManagerOrders();
+          return;
+        }
+      } else {
+        const order = managerOrders.find((item) => (item.id || item.reference) === reference);
+        if (!order || !allowedPreviousStatuses.includes(order.status || "")) {
+          button.disabled = false;
+          showToast("This order is no longer in a status that allows that change.");
+          return;
+        }
+        if (!updateLocalOrderStatus(reference, status)) {
+          button.disabled = false;
+          return;
+        }
+      }
+      showToast(`Order ${reference} moved to ${status === "Pending" ? "pending" : status.toLowerCase()}.`);
+      await loadManagerOrders();
+    }
+    function subscribeToManagerOrders() {
+      if (!db || managerRealtimeChannel) return;
+      managerRealtimeChannel = db.channel("manager-new-orders")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
+          const reference = payload.new.reference;
+          showToast(`New order received: ${reference}`);
+          playManagerAlert();
+          showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
+          loadManagerOrders({ silent: true });
+        })
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, () => loadManagerOrders({ silent: true }))
+        .subscribe();
+    }
+    async function continueToPayment() {
+      const fields = ["customer-name", "customer-phone", "address-landmark", "address-village", "address-state", "address-pin"].map($);
+      for (const field of fields) {
+        if (!field.value.trim() || !field.checkValidity()) {
+          field.reportValidity();
+          return;
+        }
+      }
+      const items = cartProducts();
+      if (!items.length) { showToast(tr("emptyOrder")); return; }
+      const subtotal = merchandiseSubtotal(items);
+      const discount = currentDiscount(subtotal);
+      const button = $("place-order");
+      button.disabled = true;
+      deliveryFee = await calculateDeliveryFee();
+      const total = subtotal - discount + deliveryFee;
+      const address = [
+        `${language === "hi" ? "पहचान का स्थान" : "Landmark"}: ${$("address-landmark").value.trim()}`,
+        `${language === "hi" ? "गाँव / मोहल्ला" : "Village/Locality"}: ${$("address-village").value.trim()}`,
+        $("address-post").value.trim() ? `${language === "hi" ? "डाकघर" : "Post office"}: ${$("address-post").value.trim()}` : "",
+        $("address-district").value.trim() ? `${language === "hi" ? "ज़िला" : "District"}: ${$("address-district").value.trim()}` : "",
+        `${language === "hi" ? "राज्य" : "State"}: ${translations[language].states[$("address-state").value] || $("address-state").value}`,
+        `${language === "hi" ? "पिन कोड" : "PIN"}: ${$("address-pin").value.trim()}`
+      ].filter(Boolean).join(", ");
+      const customerStatusToken = randomToken();
+      checkoutDraft = {
+        id: `SGS-${crypto.randomUUID().replace(/-/g, "").slice(0, 16).toUpperCase()}`,
+        name: $("customer-name").value.trim(),
+        phone: $("customer-phone").value.trim(),
+        address,
+        items,
+        subtotal,
+        total,
+        discount,
+        deliveryFee,
+        customerStatusToken,
+        customerStatusTokenHash: await sha256Hex(customerStatusToken),
+        createdAt: new Date().toISOString()
+      };
+      selectedPayment = "";
+      renderPaymentPage();
+    }
+    function renderPaymentPage() {
+      if (!checkoutDraft) { renderCart(); return; }
+      const codAvailable = settings.cod_enabled !== false;
+      const canPayUpiId = Boolean(settings.upi);
+      const canPayQr = Boolean(settings.qr);
+      if (selectedPayment === "upi") selectedPayment = "upi_id";
+      const paymentReady = selectedPayment === "cod" ? codAvailable
+        : selectedPayment === "upi_id" ? canPayUpiId && /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(checkoutDraft.payerUpiId || "")
+        : selectedPayment === "upi_qr" ? canPayQr
+        : false;
+      const upiLink = settings.upi
+        ? `upi://pay?${new URLSearchParams({pa:settings.upi,pn:"Shanvi General Store",am:checkoutDraft.total.toFixed(2),cu:"INR",tn:checkoutDraft.id})}`
+        : "";
+      $("cart-content").innerHTML = `
+        <div class="drawer-head"><h2>${tr("payment")}</h2><button class="close" id="payment-back" aria-label="${tr("backBasket")}">←</button></div>
+        <p class="small-note">${tr("order")} ${escapeHtml(checkoutDraft.id)} · ${checkoutDraft.items.length} ${tr("itemTypes")}</p>
+        <div class="summary"><div class="summary-row"><span>${tr("delivery")}</span><strong>${money(checkoutDraft.deliveryFee)}</strong></div><div class="summary-row"><span>${tr("total")}</span><strong>${money(checkoutDraft.total)}</strong></div><div class="summary-row"><span>${tr("deliverTo")}</span><span style="max-width:65%;text-align:right">${escapeHtml(checkoutDraft.address)}</span></div></div>
+        <label class="payment-choice"><input type="radio" name="payment-method" value="upi_id" ${selectedPayment === "upi_id" ? "checked" : ""}><span><strong>${tr("upiId")}</strong><small>${tr("enterYourUpi")}</small></span></label>
+        ${selectedPayment === "upi_id" ? `<div class="payment-box">
+          <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" placeholder="9876543210@upi" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" pattern="[A-Za-z0-9._-]+@[A-Za-z0-9.-]+" title="${language === "hi" ? "इस तरह UPI ID लिखें: 9876543210@upi" : "Enter a UPI ID such as 9876543210@upi"}" required><small class="small-note">${tr("upiExample")}</small></div>
+          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button><a class="btn btn-soft full" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="${escapeAttr(upiLink)}">${tr("openUpi")}</a>` : tr("storeUpiMissing")}
+        </div>` : ""}
+        <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""}><span><strong>${tr("qr")}</strong><small>${canPayQr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
+        ${selectedPayment === "upi_qr" ? `<div class="payment-box">${canPayQr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}. ${tr("verifyPayment")}</p>` : tr("qrNotConfigured")}</div>` : ""}
+        <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentReady ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
+        ${selectedPayment !== "cod" ? `<p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
+      $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
+      $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
+      $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => radio.addEventListener("change", () => {
+        selectedPayment = radio.value;
+        renderPaymentPage();
+      }));
+      const payerUpiInput = $("customer-upi-id");
+      if (payerUpiInput) payerUpiInput.addEventListener("input", () => {
+        checkoutDraft.payerUpiId = payerUpiInput.value.trim();
+        $("confirm-payment").disabled = !paymentReadyForUpiId();
+      });
+      const copyButton = $("copy-upi");
+      if (copyButton) copyButton.onclick = async () => {
+        try { await navigator.clipboard.writeText(settings.upi); showToast(tr("upiCopied")); }
+        catch (error) { showToast(tr("copyUnavailable")); }
+      };
+      $("confirm-payment").onclick = saveOrder;
+    }
+    function paymentReadyForUpiId() {
+      return Boolean(settings.upi && /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(checkoutDraft?.payerUpiId || ""));
+    }
+    async function saveOrder() {
+      if (!checkoutDraft) return;
+      if (!selectedPayment) {
+        showToast(tr("selectPayment"));
+        return;
+      }
+      if (selectedPayment === "cod" && settings.cod_enabled === false) {
+        showToast(tr("codDisabled"));
+        renderPaymentPage();
+        return;
+      }
+      if (selectedPayment === "upi_id" && !paymentReadyForUpiId()) {
+        showToast(tr("invalidPayerUpi"));
+        renderPaymentPage();
+        return;
+      }
+      if (selectedPayment === "upi_qr" && !settings.qr) {
+        showToast(tr("invalidQr"));
+        renderPaymentPage();
+        return;
+      }
+      const draft = checkoutDraft;
+      const paymentLabels = {
+        cod: language === "hi" ? "कैश ऑन डिलीवरी" : "Cash on delivery",
+        upi_id: "UPI ID",
+        upi_qr: language === "hi" ? "UPI QR कोड" : "UPI QR code"
+      };
+      const order = { ...draft, paymentMethod: selectedPayment, status: db ? "Awaiting manager approval" : (selectedPayment === "cod" ? "COD order placed" : "Awaiting UPI payment verification") };
+      const button = $("confirm-payment");
+      button.disabled = true;
+      const previousProducts = products;
+      const quantitiesByProduct = new Map();
+      order.items.forEach((item) => {
+        const productId = item.productId || item.id;
+        quantitiesByProduct.set(productId, (quantitiesByProduct.get(productId) || 0) + item.quantity);
+      });
+      const insufficientProduct = products.find((product) =>
+        Number.isFinite(Number(product.stock))
+        && (quantitiesByProduct.get(product.id) || 0) > Number(product.stock)
+      );
+      if (insufficientProduct) {
+        button.disabled = false;
+        showToast(`${tr("outOfStock")} ${insufficientProduct.name}`);
+        return;
+      }
+      const nextProducts = products.map((product) => Number.isFinite(Number(product.stock))
+        ? { ...product, stock: Number(product.stock) - (quantitiesByProduct.get(product.id) || 0) }
+        : product);
+      if (!storage.write("shanvi-products", nextProducts)) {
+        button.disabled = false;
+        return;
+      }
+      products = nextProducts;
+      const rollbackInventory = () => {
+        products = previousProducts;
+        storage.write("shanvi-products", previousProducts);
+        renderProducts();
+        renderAdminProducts();
+      };
+      if (db) {
+        try {
+          const { error } = await db.from("orders").insert({
+            reference: order.id,
+            customer_name: order.name,
+            customer_phone: order.phone,
+            delivery_note: order.address,
+            items: order.items.map(({ id, productId, name, category, size, dimensions, price, quantity, isFreeGift }) => ({
+              id: productId || id,
+              name,
+              category,
+              size,
+              dimensions,
+              price,
+              quantity,
+              is_free_gift: Boolean(isFreeGift)
+            })),
+            total: order.total,
+            delivery_fee: order.deliveryFee,
+            discount: order.discount,
+            payment_method: order.paymentMethod,
+            payer_upi_id: order.paymentMethod === "upi_id" ? order.payerUpiId : null,
+            status: order.status,
+            customer_status_token_hash: order.customerStatusTokenHash
+          });
+          if (error) throw error;
+        } catch (error) {
+          rollbackInventory();
+          button.disabled = false;
+          showToast(`${tr("orderSaveError")}: ${error.message || (language === "hi" ? "कृपया फिर कोशिश करें।" : "Please try again.")}`);
+          return;
+        }
+      } else {
+        const orders = storage.read("shanvi-orders", []);
+        if (!storage.write("shanvi-orders", [...orders, order])) { rollbackInventory(); button.disabled = false; return; }
+      }
+      renderProducts();
+      renderAdminProducts();
+      cart = {};
+      coupon = false;
+      checkoutDraft = null;
+      storage.write("shanvi-cart", cart);
+      deliveryFee = null;
+      $("cart-content").innerHTML = `<div class="drawer-head"><h2>${tr("orderPlaced")}</h2><button class="close" id="done-close" aria-label="${language === "hi" ? "बंद करें" : "Close"}">×</button></div><div class="payment-box"><strong>${tr("thankYou")}, ${escapeHtml(order.name)}!</strong><br>${tr("reference")}: <strong>${escapeHtml(order.id)}</strong><br>${tr("total")}: <strong>${money(order.total)}</strong><br>${tr("payment")}: <strong>${paymentLabels[order.paymentMethod]}</strong><br>${db ? tr("approvalPending") : tr("savedOrder")}</div>${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}<button class="btn btn-primary full" id="done-shopping">${tr("continueShopping")}</button>`;
+      $("done-close").onclick = closeCart;
+      $("done-shopping").onclick = closeCart;
+      const customerNotifyButton = $("customer-approval-notify");
+      if (customerNotifyButton) customerNotifyButton.onclick = () => registerCustomerOrderPush(order);
+      $("cart-count").textContent = "0";
+      showToast(`${tr("orderSaved")}: ${order.id}`);
+    }
+    function closeCart() { $("cart-overlay").classList.remove("open"); }
+    function renderAdminProducts() {
+      const filter = $("admin-category-filter").value || "All sections";
+      const matching = products.filter((product) => filter === "All sections" || product.category === filter);
+      $("admin-products").innerHTML = categories.slice(1)
+        .filter((category) => filter === "All sections" || category === filter)
+        .map((category) => {
+          const sectionProducts = matching.filter((product) => product.category === category);
+          return `<details class="manager-category-accordion" data-manager-category="${escapeAttr(category)}" ${managerOpenProductSections.has(category) ? "open" : ""}>
+            <summary><span class="manager-category-title">${escapeHtml(category)}</span><span class="manager-category-count">${sectionProducts.length} ${sectionProducts.length === 1 ? "product" : "products"}</span></summary>
+            <div class="manager-category-products">${sectionProducts.length ? sectionProducts.map((product) =>
+            `<div class="admin-product"><span><strong>${escapeHtml(product.name)}</strong><br>${money(product.price)} · ${product.stock ?? "—"} in stock${product.size || product.dimensions ? ` · ${escapeHtml([product.size, product.dimensions].filter(Boolean).join(" / "))}` : ""}</span><span class="admin-product-actions"><button class="btn btn-soft" data-edit="${escapeAttr(product.id)}">Edit</button><button class="remove" data-delete="${escapeAttr(product.id)}">Remove</button></span></div>`
+          ).join("") : `<p class="small-note">No products in this section yet.</p>`}</div>
+          </details>`;
+        }).join("");
+      $("admin-products").querySelectorAll("[data-manager-category]").forEach((section) => {
+        section.addEventListener("toggle", () => {
+          if (section.open) managerOpenProductSections.add(section.dataset.managerCategory);
+          else managerOpenProductSections.delete(section.dataset.managerCategory);
+        });
+      });
+      $("admin-products").querySelectorAll("[data-delete]").forEach((button) => button.addEventListener("click", () => {
+        deleteProduct(button.dataset.delete);
+      }));
+      $("admin-products").querySelectorAll("[data-edit]").forEach((button) => button.addEventListener("click", () => {
+        editProduct(button.dataset.edit);
+      }));
+    }
+    function editProduct(id) {
+      const product = products.find((item) => item.id === id);
+      if (!product) return;
+      $("p-edit-id").value = product.id;
+      $("p-name").value = product.name;
+      $("p-category").value = product.category;
+      $("p-price").value = product.price;
+      $("p-mrp").value = product.mrp;
+      $("p-stock").value = product.stock ?? 0;
+      $("p-size").value = product.size || "";
+      $("p-dimensions").value = product.dimensions || "";
+      $("p-description").value = product.description || "";
+      $("p-image").required = false;
+      productImageDraft = product.image || "";
+      productImageFit = product.imageFit === "cover" ? "cover" : "contain";
+      productImageZoom = boundedImageValue(product.imageZoom, 100, 40, 200);
+      productImageX = boundedImageValue(product.imageX, 50, 0, 100);
+      productImageY = boundedImageValue(product.imageY, 50, 0, 100);
+      $("p-image-fit").value = productImageFit;
+      $("p-image-zoom").value = productImageZoom;
+      $("p-image-x").value = productImageX;
+      $("p-image-y").value = productImageY;
+      $("p-image-preview").src = product.image || "";
+      $("p-image-caption").classList.add("visible");
+      syncProductImagePreview();
+      $("product-submit").textContent = "Save product changes";
+      $("product-cancel-edit").hidden = false;
+      $("product-form").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function resetProductForm() {
+      $("product-form").reset();
+      $("p-edit-id").value = "";
+      $("p-stock").value = 1;
+      $("p-image").required = true;
+      productImageDraft = "";
+      productImageFit = "contain";
+      productImageZoom = 100;
+      productImageX = 50;
+      productImageY = 50;
+      $("p-image-fit").value = productImageFit;
+      $("p-image-zoom").value = productImageZoom;
+      $("p-image-x").value = productImageX;
+      $("p-image-y").value = productImageY;
+      $("p-image-preview").removeAttribute("src");
+      $("p-image-caption").classList.remove("visible");
+      syncProductImagePreview();
+      $("product-submit").textContent = "Add to storefront";
+      $("product-cancel-edit").hidden = true;
+    }
+    function deleteProduct(id) {
+      if (!isAuthorizedManager) return;
+      products = products.filter((product) => product.id !== id);
+      delete cart[id];
+      if (!storage.write("shanvi-products", products)) return;
+      storage.write("shanvi-cart", cart);
+      if (offerSettings.giftProductId === id) {
+        offerSettings = { ...offerSettings, enabled: false, giftProductId: "" };
+        storage.write("shanvi-offer", offerSettings);
+      }
+      renderCategories(); renderAdminProducts(); renderProducts(); renderCart();
+      showManagerSaved("Product removed successfully.");
+    }
+    function openAdmin() {
+      $("admin").classList.add("open");
+      $("manager-auth-note").textContent = backendReady
+        ? "Sign in with the manager account configured in Supabase Auth."
+        : "Manager sign-in and shared customer orders are unavailable until Supabase is configured. See SUPABASE_SETUP.md.";
+      $("push-enrollment-field").hidden = !(db && supabaseConfig.pushPublicKey);
+      $("notification-status").textContent = localNotificationsEnabled
+        ? "Browser alerts are enabled on this device."
+        : "Alerts are not enabled yet. Tap Enable browser alerts and allow the browser permission prompt.";
+      $("upi-id").value = settings.upi || "";
+      $("cod-enabled").checked = settings.cod_enabled !== false;
+      brandLogoDraft = brandLogo;
+      updateBrandLogo();
+      $("offer-enabled").checked = Boolean(offerSettings.enabled);
+      $("offer-threshold").value = Number(offerSettings.threshold) || 100;
+      $("offer-product").value = offerSettings.giftProductId || "";
+      $("store-latitude").value = deliverySettings.latitude || "";
+      $("store-longitude").value = deliverySettings.longitude || "";
+      fillHeroForm();
+      $("admin-login-card").hidden = isAuthorizedManager;
+      $("manager-tools").hidden = !isAuthorizedManager;
+      if (isAuthorizedManager) {
+        renderAdminProducts();
+        loadManagerOrders();
+        subscribeToManagerOrders();
+        startManagerOrderRefresh();
+      }
+    }
+    async function signInManagerWithSupabase(email, password) {
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      const { data: manager, error: roleError } = await db.from("store_managers")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+      if (roleError) throw roleError;
+      if (!manager) {
+        await db.auth.signOut();
+        throw new Error("This account is not authorized as a store manager.");
+      }
+      isAuthorizedManager = true;
+      $("admin-login-card").hidden = true;
+      $("manager-tools").hidden = false;
+      $("manager-password").value = "";
+      renderAdminProducts();
+      loadManagerOrders();
+      subscribeToManagerOrders();
+      startManagerOrderRefresh();
+      showToast("Manager signed in");
+    }
+    async function restoreManagerSession() {
+      if (!db) return;
+      const { data, error } = await db.auth.getSession();
+      if (error) {
+        console.error("Could not restore manager session", error);
+        return;
+      }
+      if (!data.session) return;
+      const { data: manager, error: roleError } = await db.from("store_managers")
+        .select("user_id")
+        .eq("user_id", data.session.user.id)
+        .maybeSingle();
+      if (roleError) {
+        console.error("Could not verify restored manager session", roleError);
+        await db.auth.signOut();
+        return;
+      }
+      if (!manager) {
+        await db.auth.signOut();
+        return;
+      }
+      isAuthorizedManager = true;
+      $("admin-login-card").hidden = true;
+      $("manager-tools").hidden = false;
+      renderAdminProducts();
+      loadManagerOrders();
+      subscribeToManagerOrders();
+      if ($("admin").classList.contains("open")) startManagerOrderRefresh();
+    }
+    async function readImage(file) {
+      if (!file) return "";
+      if (!file.type.startsWith("image/")) throw new Error("Please select an image file.");
+      if (file.size > 2_000_000) throw new Error("Please use an image smaller than 2 MB.");
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("Could not read the selected image."));
+        reader.readAsDataURL(file);
+      });
+    }
+    async function optimizeImage(file, maxWidth, maxHeight) {
+      const source = await readImage(file);
+      const image = new Image();
+      image.src = source;
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(new Error("Could not open this image."));
+      });
+      const scale = Math.min(1, maxWidth / image.naturalWidth, maxHeight / image.naturalHeight);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", .82);
+    }
+    $("search").addEventListener("input", renderProducts);
+    $("cart-content").addEventListener("input", (event) => {
+      if (event.target.id === "customer-phone" || event.target.id === "address-pin") {
+        event.target.value = event.target.value.replace(/\D/g, "").slice(0, event.target.id === "customer-phone" ? 10 : 6);
+      }
+      if (event.target.id === "customer-name") {
+        event.target.value = event.target.value
+          .replace(/[^\p{L}\p{M} .'-]/gu, "")
+          .replace(/^[^\p{L}]+/u, "");
+      }
+    });
+    $("cart-open").onclick = () => { renderCart(); $("cart-overlay").classList.add("open"); };
+    $("cart-close").onclick = closeCart;
+    $("cart-overlay").addEventListener("click", (event) => { if (event.target === $("cart-overlay")) closeCart(); });
+    $("manager-open").onclick = openAdmin;
+    $("manager-close").onclick = () => {
+      $("admin").classList.remove("open");
+      stopManagerOrderRefresh();
+    };
+    $("admin").addEventListener("contextmenu", (event) => event.preventDefault());
+    $("enable-order-notifications").onclick = enableOrderNotifications;
+    $("manager-login").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        const AudioContextType = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextType) {
+          managerAudioContext ||= new AudioContextType();
+          if (managerAudioContext.state === "suspended") managerAudioContext.resume().catch((error) => console.warn("Could not resume order alert audio", error));
+        }
+      } catch (error) {
+        console.warn("Could not prepare the in-page order alert", error);
+      }
+      const username = $("manager-email").value.trim().toLowerCase();
+      const password = $("manager-password").value;
+      if (!backendReady) {
+        $("manager-password").value = "";
+        showToast("Manager access is unavailable until Supabase is configured.");
+        return;
+      }
+      try {
+        await signInManagerWithSupabase(username, password);
+      } catch (error) {
+        showToast(error.message || "Manager sign-in failed.");
+      }
+    });
+    $("manager-logout").onclick = async () => {
+      if (db) {
+        const { error } = await db.auth.signOut();
+        if (error) {
+          showToast(`Could not sign out: ${error.message}`);
+          return;
+        }
+      }
+      if (managerRealtimeChannel) {
+        await db.removeChannel(managerRealtimeChannel);
+        managerRealtimeChannel = null;
+      }
+      stopManagerOrderRefresh();
+      isAuthorizedManager = false;
+      $("manager-tools").hidden = true;
+      $("admin-login-card").hidden = false;
+      $("manager-login").reset();
+      showToast("Signed out");
+    };
+    ["hero-eyebrow-input", "hero-title-input", "hero-description-input"].forEach((id) => {
+      $(id).addEventListener("input", () => updateHeroPreview(heroDraftImage));
+    });
+    $("hero-image-input").addEventListener("change", async () => {
+      const file = $("hero-image-input").files[0];
+      if (!file) return;
+      try {
+        heroDraftImage = await optimizeImage(file, 1800, 1000);
+        updateHeroPreview(heroDraftImage);
+      } catch (error) {
+        $("hero-image-input").value = "";
+        showToast(error.message || "Could not preview festival photo.");
+      }
+    });
+    $("clear-hero-image").onclick = () => {
+      heroDraftImage = "";
+      $("hero-image-input").value = "";
+      updateHeroPreview("");
+    };
+    $("save-hero").onclick = () => {
+      const next = {
+        eyebrow: $("hero-eyebrow-input").value.trim() || defaultHero.eyebrow,
+        title: $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " "),
+        description: $("hero-description-input").value.trim() || defaultHero.description,
+        image: heroDraftImage
+      };
+      if (!storage.write("shanvi-hero", next)) return;
+      heroSettings = next;
+      renderHero();
+      showManagerSaved("Festival banner saved successfully on this device.");
+    };
+    $("admin-category-filter").addEventListener("change", renderAdminProducts);
+    document.querySelectorAll("[data-order-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        managerOrderFilter = button.dataset.orderFilter;
+        renderManagerOrders();
+      });
+    });
+    $("refresh-orders").onclick = loadManagerOrders;
+    $("load-more-orders").onclick = () => loadManagerOrders({ append: true });
+    $("test-order-notification").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      try {
+        const AudioContextType = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextType) {
+          managerAudioContext ||= new AudioContextType();
+          if (managerAudioContext.state === "suspended") await managerAudioContext.resume();
+          playManagerAlert();
+        }
+        if ("Notification" in window && Notification.permission === "granted") {
+          await showManagerSystemAlert("Shanvi test alert", "The manager order alert is working on this device.");
+          $("notification-status").textContent = "Test alert sent. Device sound and vibration follow your browser/phone notification settings.";
+        } else {
+          $("notification-status").textContent = "Test beep played in this page. Enable browser alerts to allow system notifications.";
+        }
+      } catch (error) {
+        $("notification-status").textContent = error.message || "Could not test this alert.";
+      }
+    };
+    window.addEventListener("storage", (event) => {
+      if (event.key === "shanvi-local-notifications") {
+        localNotificationsEnabled = event.newValue === "true";
+        return;
+      }
+      onLocalOrdersChanged(event);
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (
+        document.visibilityState === "visible"
+        && isAuthorizedManager
+        && $("admin").classList.contains("open")
+      ) {
+        loadManagerOrders({ silent: true });
+      }
+    });
+    $("p-image").addEventListener("change", async () => {
+      const file = $("p-image").files[0];
+      if (!file) return;
+      try {
+        const preview = await optimizeImage(file, 1200, 900);
+        productImageDraft = preview;
+        $("p-image-preview").src = preview;
+        syncProductImagePreview();
+        $("p-image-caption").classList.add("visible");
+      } catch (error) {
+        $("p-image").value = "";
+        showToast(error.message || "Could not preview image.");
+      }
+    });
+    $("brand-logo-input").addEventListener("change", async () => {
+      const file = $("brand-logo-input").files[0];
+      if (!file) return;
+      try {
+        brandLogoDraft = await optimizeImage(file, 600, 600);
+        updateBrandLogo();
+      } catch (error) {
+        $("brand-logo-input").value = "";
+        showToast(error.message || "Could not preview logo.");
+      }
+    });
+    $("brand-logo-remove").onclick = () => {
+      brandLogoDraft = "";
+      $("brand-logo-input").value = "";
+      updateBrandLogo();
+    };
+    $("save-brand-logo").onclick = () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!storage.write("shanvi-brand-logo", brandLogoDraft)) return;
+      brandLogo = brandLogoDraft;
+      updateBrandLogo();
+      showManagerSaved("Store logo saved successfully on this device.");
+    };
+    $("save-offer").onclick = () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const threshold = Number($("offer-threshold").value);
+      const giftProductId = $("offer-product").value;
+      if (!Number.isInteger(threshold) || threshold < 1 || ($("offer-enabled").checked && !products.some((product) => product.id === giftProductId))) {
+        showToast("Set a valid minimum amount and select a free product.");
+        return;
+      }
+      const nextOffer = { enabled: $("offer-enabled").checked, threshold, giftProductId };
+      if (!storage.write("shanvi-offer", nextOffer)) return;
+      offerSettings = nextOffer;
+      updateCustomerOffer();
+      renderCart();
+      showManagerSaved("Free-item offer saved successfully on this device.");
+    };
+    $("save-delivery-settings").onclick = () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const latitude = $("store-latitude").value.trim();
+      const longitude = $("store-longitude").value.trim();
+      const validLatitude = latitude === "" || (Number.isFinite(Number(latitude)) && Number(latitude) >= -90 && Number(latitude) <= 90);
+      const validLongitude = longitude === "" || (Number.isFinite(Number(longitude)) && Number(longitude) >= -180 && Number(longitude) <= 180);
+      if (!validLatitude || !validLongitude || Boolean(latitude) !== Boolean(longitude)) {
+        showToast("Enter both valid map coordinates, or leave both empty.");
+        return;
+      }
+      const nextLocation = { latitude, longitude };
+      if (!storage.write("shanvi-delivery", nextLocation)) return;
+      deliverySettings = nextLocation;
+      deliveryFee = null;
+      renderCart();
+      showManagerSaved("Store delivery location saved successfully on this device.");
+    };
+    $("use-store-location").onclick = () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!navigator.geolocation) {
+        showToast("Location is not supported by this browser.");
+        return;
+      }
+      const button = $("use-store-location");
+      button.disabled = true;
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          $("store-latitude").value = coords.latitude.toFixed(6);
+          $("store-longitude").value = coords.longitude.toFixed(6);
+          button.disabled = false;
+        },
+        () => {
+          button.disabled = false;
+          showToast("Could not read this device’s location. Check location permission.");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    };
+    $("p-image-remove").onclick = () => {
+      $("p-image").value = "";
+      productImageDraft = "";
+      $("p-image-preview").removeAttribute("src");
+      $("p-image-caption").classList.remove("visible");
+      syncProductImagePreview();
+      showToast("Product photo removed");
+    };
+    ["p-image-fit", "p-image-zoom", "p-image-x", "p-image-y"].forEach((id) => {
+      $(id).addEventListener("input", syncProductImagePreview);
+      $(id).addEventListener("change", syncProductImagePreview);
+    });
+    $("product-cancel-edit").onclick = resetProductForm;
+    $("product-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const button = event.submitter;
+      if (button) button.disabled = true;
+      const file = $("p-image").files[0];
+      try {
+        const image = file ? productImageDraft || await optimizeImage(file, 1200, 900) : productImageDraft;
+        const editId = $("p-edit-id").value;
+        const existing = editId ? products.find((item) => item.id === editId) : null;
+        const product = {
+          id: editId || `local-${Date.now()}`,
+          name: $("p-name").value.trim(),
+          category: $("p-category").value,
+          price: Number($("p-price").value),
+          mrp: Number($("p-mrp").value),
+          stock: Number($("p-stock").value),
+          size: $("p-size").value.trim(),
+          dimensions: $("p-dimensions").value.trim(),
+          description: $("p-description").value.trim(),
+          image: image || fallbackImage($("p-category").value),
+          imageFit: $("p-image-fit").value === "cover" ? "cover" : "contain",
+          imageZoom: Number($("p-image-zoom").value),
+          imageX: Number($("p-image-x").value),
+          imageY: Number($("p-image-y").value),
+          active: true
+        };
+        if (!product.name || product.price < 1 || product.mrp < product.price || product.stock < 0) {
+          showToast("Enter valid product details. MRP must be at least the selling price.");
+          return;
+        }
+        const nextProducts = existing
+          ? products.map((item) => item.id === editId ? product : item)
+          : [product, ...products];
+        if (!storage.write("shanvi-products", nextProducts)) return;
+        products = nextProducts;
+        resetProductForm();
+        renderCategories(); renderProducts(); renderAdminProducts();
+        showManagerSaved(existing ? "Product updated successfully on this device." : "Product added successfully on this device.");
+      } catch (error) {
+        showToast(error.message || "Could not add product.");
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+    $("save-payment").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      try {
+        const qrFile = $("qr-image").files[0];
+        const qr = qrFile ? await readImage(qrFile) : settings.qr;
+        const next = {
+          upi: $("upi-id").value.trim(),
+          qr,
+          cod_enabled: $("cod-enabled").checked,
+          demo_upi: !$("upi-id").value.trim(),
+          demo_qr: !qrFile && settings.demo_qr
+        };
+        if (!storage.write("shanvi-settings", next)) return;
+        settings = next;
+        renderCart();
+        showManagerSaved("Payment details saved successfully on this device.");
+      } catch (error) { showToast(error.message || "Could not save payment details."); }
+    };
+    $("language-toggle").onclick = () => {
+      language = language === "en" ? "hi" : "en";
+      storage.write("shanvi-language", language);
+      applyCustomerLanguage();
+    };
+    renderCategories();
+    $("admin-category-filter").value = "All sections";
+    syncProductImagePreview();
+    renderHero();
+    renderProducts();
+    renderCart();
+    applyCustomerLanguage();
+    const syncHeaderSpacer = () => {
+      $("customer-scroll").style.top = `${$("store-header").getBoundingClientRect().height}px`;
+    };
+    syncHeaderSpacer();
+    if ("ResizeObserver" in window) new ResizeObserver(syncHeaderSpacer).observe($("store-header"));
+    else window.addEventListener("resize", syncHeaderSpacer);
+    document.fonts?.ready.then(syncHeaderSpacer);
+    if (db) restoreManagerSession();
+  </script>
+</body>
+</html>

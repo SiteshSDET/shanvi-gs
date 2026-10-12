@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Shanvi General Store",
+  "short_name": "Shanvi Store",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f7f3",
+  "theme_color": "#236b4a",
+  "icons": [
+    {
+      "src": "./store-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
