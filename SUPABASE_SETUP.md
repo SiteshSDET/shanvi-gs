@@ -1,6 +1,6 @@
 # Store manager and local preview
 
-The live site uses Supabase project `kwnhoberdxqtzujwhudn`. The public URL and publishable key are configured in `supabase-config.js`. The order form remains disabled until the required database schema is installed. Manager access requires a Supabase Auth account whose user ID is listed in `public.store_managers`. Logo, product, offer, and delivery settings remain browser-local.
+The live site is configured for Supabase project `zhrdeemyofcxxigqazgz`. The URL and publishable key are public client settings in `supabase-config.js`. Checkout stays disabled until the required order schema is installed. Manager access requires a Supabase Auth account whose user ID is listed in `public.store_managers`. Logo, product, offer, and delivery settings remain browser-local.
 
 ## Security limitation
 
@@ -8,9 +8,9 @@ Static credentials in a browser application are not secret: a visitor who inspec
 
 ## Finish connecting the existing Supabase project
 
-The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. To activate shared order storage and Manager sign-in:
+The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses project `zhrdeemyofcxxigqazgz`. To activate shared order storage and Manager sign-in:
 
-1. Sign in to Supabase and open project `kwnhoberdxqtzujwhudn`: `https://supabase.com/dashboard/project/kwnhoberdxqtzujwhudn`.
+1. Sign in to Supabase and open project `zhrdeemyofcxxigqazgz`: `https://supabase.com/dashboard/project/zhrdeemyofcxxigqazgz`.
 2. Open **SQL Editor → New query**. Copy the full contents of `supabase-setup.sql` from the GitHub repository into the editor and click **Run**.
 3. Run `supabase-order-payment-update.sql` the same way.
 4. Run `supabase/features.sql` last. The storefront checks for the order columns in these migrations and keeps customer checkout disabled until they exist.
@@ -74,7 +74,7 @@ For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID
 
    ```sh
    npx supabase login
-   npx supabase link --project-ref kwnhoberdxqtzujwhudn
+   npx supabase link --project-ref zhrdeemyofcxxigqazgz
    npx supabase functions deploy register-manager-push --no-verify-jwt
    npx supabase functions deploy register-customer-push --no-verify-jwt
    npx supabase functions deploy notify-order
@@ -92,7 +92,7 @@ For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID
 4. In the Supabase SQL editor, save the project URL and **service-role key** in Supabase Vault for the database trigger. Replace placeholders; never paste these secrets into `index.html` or `supabase-config.js`:
 
    ```sql
-   select vault.create_secret('https://kwnhoberdxqtzujwhudn.supabase.co', 'shanvi_supabase_url');
+   select vault.create_secret('https://zhrdeemyofcxxigqazgz.supabase.co', 'shanvi_supabase_url');
    select vault.create_secret('YOUR_SERVICE_ROLE_KEY', 'shanvi_service_role_key');
    ```
 
@@ -100,7 +100,7 @@ For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID
 
    ```js
    window.STORE_CONFIG = {
-     url: "https://kwnhoberdxqtzujwhudn.supabase.co",
+     url: "https://zhrdeemyofcxxigqazgz.supabase.co",
      anonKey: "YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY",
      pushPublicKey: "YOUR_VAPID_PUBLIC_KEY"
    };
