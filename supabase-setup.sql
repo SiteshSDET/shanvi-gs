@@ -95,12 +95,15 @@ create policy "Only managers can update orders"
   on public.orders for update to authenticated
   using (exists (select 1 from public.store_managers m where m.user_id = (select auth.uid())))
   with check (exists (select 1 from public.store_managers m where m.user_id = (select auth.uid())));
+create policy "Only managers can delete orders"
+  on public.orders for delete to authenticated
+  using (exists (select 1 from public.store_managers m where m.user_id = (select auth.uid())));
 
 grant select on public.products, public.store_settings to anon, authenticated;
 grant insert, update, delete on public.products, public.store_settings to authenticated;
 grant select on public.store_managers to authenticated;
 grant insert on public.orders to anon, authenticated;
-grant select, update on public.orders to authenticated;
+grant select, update, delete on public.orders to authenticated;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('product-images', 'product-images', true, 2097152, array['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
