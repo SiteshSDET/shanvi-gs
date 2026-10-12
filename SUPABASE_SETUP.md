@@ -25,6 +25,8 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
 
 7. Reload the live site. Sign in via **Manager** using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
 
+Customers can open **Profile** to see their order details and refresh the current order status. Since customer sign-in is not enabled, the order reference token is kept in that browser only; order history is not shared across devices or browsers. The manager can save or change the customer-facing phone number in **Manager → Help & contact**, and customers can call it from **Help**. That contact is stored in the shared `store_settings` table; catalog, offer, logo, and delivery settings remain browser-local.
+
 The publishable key in `supabase-config.js` is designed to be public; the database row-level security policies enforce access. Never share or publish your Supabase database password or service-role key. The order database works without push notifications; enabling phone push alerts requires the separate VAPID/Edge Function steps below.
 
 ## Managing the catalog
@@ -77,6 +79,7 @@ For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID
    npx supabase link --project-ref zhrdeemyofcxxigqazgz
    npx supabase functions deploy register-manager-push --no-verify-jwt
    npx supabase functions deploy register-customer-push --no-verify-jwt
+   npx supabase functions deploy get-customer-order --no-verify-jwt
    npx supabase functions deploy notify-order
    ```
 3. Add the server-only push secrets (replace the example values):

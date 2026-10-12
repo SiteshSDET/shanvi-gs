@@ -160,6 +160,11 @@
     .order-card-section > strong { display: block; margin-bottom: 7px; font-size: 12px; color: var(--green-dark); }
     .order-line { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 12px; }
     .order-contact-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
+    .customer-order-card { background: white; border: 1px solid var(--line); border-radius: 13px; padding: 15px; margin: 12px 0; }
+    .customer-order-card h3 { margin: 0 0 6px; font-size: 15px; }
+    .customer-order-card ul { padding-left: 20px; font-size: 13px; line-height: 1.6; }
+    .customer-order-status { display: inline-block; margin: 6px 0; padding: 5px 9px; border-radius: 999px; background: #edf3ed; color: var(--green-dark); font-size: 12px; font-weight: 750; }
+    .customer-help-contact { display: block; margin: 14px 0; font-size: 20px; font-weight: 750; color: var(--green-dark); }
     .order-filters, .order-status-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
     .order-filters button { border: 1px solid var(--line); border-radius: 999px; background: #f6f7f3; color: var(--ink); padding: 9px 14px; font-weight: 700; cursor: pointer; }
     .order-filters button[aria-pressed="true"] { border-color: var(--green-dark); background: var(--green-dark); color: white; }
@@ -250,6 +255,7 @@
       .brand-mark { width: 36px; height: 36px; }
       .nav-actions { gap: 0; }
       .nav-actions .btn-quiet { display: none; }
+      .nav-actions .btn { padding: 9px 8px; font-size: 12px; }
       .hero { min-height: 290px; padding: 29px 22px; }
       .hero:before { right: -14px; bottom: 0; font-size: 110px; opacity: .55; }
       .hero:after { width: 260px; height: 260px; top: 55px; right: -120px; }
@@ -277,6 +283,8 @@
       <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" type="search" placeholder="Search products" aria-label="Search products"></div>
       <div class="nav-actions">
         <button class="btn btn-quiet" id="manager-open">Manager</button>
+        <button class="btn btn-soft" id="profile-open" type="button">Profile</button>
+        <button class="btn btn-soft" id="help-open" type="button">Help</button>
         <button class="btn btn-soft cart-btn" id="cart-open">🛒 <span id="cart-label">Cart</span> <span class="cart-count" id="cart-count">0</span></button>
         <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch language">हिन्दी</button>
       </div>
@@ -316,6 +324,19 @@
     <aside class="drawer">
       <div class="drawer-head"><h2 id="cart-heading">Your basket</h2><button class="close" id="cart-close" aria-label="Close cart">×</button></div>
       <div id="cart-content"></div>
+    </aside>
+  </div>
+  <div class="overlay" id="profile-overlay" role="dialog" aria-modal="true" aria-label="Customer profile">
+    <aside class="drawer">
+      <div class="drawer-head"><h2 id="profile-heading">My profile & orders</h2><button class="close" id="profile-close" aria-label="Close profile">×</button></div>
+      <p class="small-note" id="profile-note">Your orders are saved in this browser. Keep this device/browser to check their latest status.</p>
+      <div id="customer-orders" aria-live="polite"></div>
+    </aside>
+  </div>
+  <div class="overlay" id="help-overlay" role="dialog" aria-modal="true" aria-label="Store help">
+    <aside class="drawer">
+      <div class="drawer-head"><h2 id="help-heading">Help & contact</h2><button class="close" id="help-close" aria-label="Close help">×</button></div>
+      <div id="customer-help-contact" class="payment-box">The store has not added a contact number yet.</div>
     </aside>
   </div>
   <div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Manager panel">
@@ -429,6 +450,12 @@
         <label class="payment-choice" style="max-width:320px"><input id="cod-enabled" type="checkbox"><span><strong>Allow cash on delivery</strong><small>Customers can choose COD at payment.</small></span></label>
         <button class="btn btn-soft" id="save-payment">Save payment details</button>
       </div>
+      <div class="admin-card">
+        <h3>Help & contact</h3>
+        <p class="small-note">Customers can call this number from the Help section. Use a 10-digit mobile number.</p>
+        <div class="field"><label for="store-help-phone">Store contact number</label><input id="store-help-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit mobile number"></div>
+        <button class="btn btn-soft" id="save-help-phone" type="button">Save contact number</button>
+      </div>
       <details class="admin-card manager-accordion products-manager-panel">
         <summary>Products in your storefront</summary>
         <div class="products-manager-content">
@@ -473,6 +500,11 @@
         puja: "Puja", household: "Gharelu Samaan", electronics: "Electronics",
         search: "Search products",
         cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
+        profile: "Profile", help: "Help", profileTitle: "My profile & orders", profileNote: "Your orders are saved in this browser. Keep this device/browser to check their latest status.",
+        helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.",
+        noCustomerOrders: "Your placed orders will appear here.", refreshStatus: "Refresh status", orderItems: "Items",
+        orderAddress: "Delivery address", orderStatusPending: "Waiting for store confirmation", orderStatusApproved: "Accepted by store",
+        orderStatusDelivered: "Out for delivery", orderStatusCompleted: "Completed", orderStatusRejected: "Rejected",
         noProducts: "No products found. Try another search or section.",
         picked: "Picked with care", pickedSub: "Useful little things, all in one place",
         local: "Local and friendly", localSub: "Your neighborhood store is here to help",
@@ -544,6 +576,11 @@
         puja: "पूजा सामग्री", household: "घरेलू सामान", electronics: "इलेक्ट्रॉनिक्स",
         search: "सामान खोजें",
         cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
+        profile: "प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर", profileNote: "आपके ऑर्डर इसी ब्राउज़र में सुरक्षित हैं। नवीनतम स्थिति देखने के लिए इसी डिवाइस/ब्राउज़र का उपयोग करें।",
+        helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।",
+        noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", refreshStatus: "स्थिति अपडेट करें", orderItems: "सामान",
+        orderAddress: "डिलीवरी का पता", orderStatusPending: "दुकान की पुष्टि बाकी", orderStatusApproved: "दुकान ने स्वीकार किया",
+        orderStatusDelivered: "डिलीवरी के लिए निकल गया", orderStatusCompleted: "पूरा हुआ", orderStatusRejected: "ऑर्डर अस्वीकार हुआ",
         noProducts: "कोई सामान नहीं मिला। दूसरी खोज या श्रेणी चुनें।",
         picked: "ध्यान से चुना गया", pickedSub: "घर की ज़रूरत की चीज़ें, एक ही जगह",
         local: "आपकी अपनी दुकान", localSub: "आपकी आस-पड़ोस की दुकान मदद के लिए यहाँ है",
@@ -634,6 +671,9 @@
     let cart = storage.read("shanvi-cart", {});
     let localNotificationsEnabled = storage.read("shanvi-local-notifications", false) === true;
     let managerAlertPhone = storage.read("shanvi-manager-alert-phone", "");
+    let storeHelpPhone = "";
+    let customerOrders = storage.read("shanvi-customer-orders", []);
+    if (!Array.isArray(customerOrders)) customerOrders = [];
     let brandLogo = storage.read("shanvi-brand-logo", "");
     let brandLogoDraft = brandLogo;
     let offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...storage.read("shanvi-offer", {}) };
@@ -717,6 +757,15 @@
       $("search").placeholder = tr("search");
       $("search").setAttribute("aria-label", tr("search"));
       $("cart-label").textContent = tr("cart");
+      $("profile-open").textContent = tr("profile");
+      $("help-open").textContent = tr("help");
+      $("profile-heading").textContent = tr("profileTitle");
+      $("help-heading").textContent = tr("helpTitle");
+      $("profile-note").textContent = tr("profileNote");
+      $("profile-overlay").setAttribute("aria-label", tr("profileTitle"));
+      $("help-overlay").setAttribute("aria-label", tr("helpTitle"));
+      if ($("profile-overlay").classList.contains("open")) renderCustomerOrders();
+      renderCustomerHelp();
       $("manager-open").textContent = tr("manager");
       updateBrandLogo();
       $("cart-heading").textContent = tr("basket");
@@ -765,6 +814,83 @@
       status.textContent = message;
       status.classList.add("visible");
       showToast(message);
+    }
+    function customerOrderStatusLabel(status) {
+      const labels = {
+        "Awaiting manager approval": tr("orderStatusPending"),
+        Approved: tr("orderStatusApproved"),
+        Delivered: tr("orderStatusDelivered"),
+        Completed: tr("orderStatusCompleted"),
+        Rejected: tr("orderStatusRejected")
+      };
+      return labels[status] || status || tr("orderStatusPending");
+    }
+    function renderCustomerOrders() {
+      const container = $("customer-orders");
+      if (!customerOrders.length) {
+        container.innerHTML = `<p class="payment-box">${tr("noCustomerOrders")}</p>`;
+        return;
+      }
+      container.innerHTML = customerOrders.slice().reverse().map((order) => {
+        const reference = order.id || order.reference;
+        const items = Array.isArray(order.items) ? order.items : [];
+        const paymentMethod = order.paymentMethod === "cod" ? tr("cod")
+          : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
+        return `<article class="customer-order-card">
+          <h3>${tr("order")} ${escapeHtml(reference)}</h3>
+          <span class="customer-order-status">${escapeHtml(customerOrderStatusLabel(order.status))}</span>
+          <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
+          <strong>${tr("orderItems")}</strong>
+          <ul>${items.map((item) => `<li>${escapeHtml(item.name)} × ${Number(item.quantity) || 1} — ${money(Number(item.price) || 0)}</li>`).join("")}</ul>
+          <p class="small-note">${tr("orderAddress")}: ${escapeHtml(order.address || "")}</p>
+          <div class="summary-row"><span>${tr("subtotal")}</span><span>${money(Number(order.subtotal) || 0)}</span></div>
+          ${Number(order.discount) > 0 ? `<div class="summary-row"><span>${tr("couponSavings")}</span><span>−${money(Number(order.discount))}</span></div>` : ""}
+          <div class="summary-row"><span>${tr("delivery")}</span><span>${money(Number(order.deliveryFee) || 0)}</span></div>
+          <div class="summary-row"><span>${tr("total")}</span><strong>${money(Number(order.total) || 0)}</strong></div>
+          <p class="small-note">${tr("payment")}: ${escapeHtml(paymentMethod)}</p>
+          ${db && order.customerStatusToken ? `<button class="btn btn-soft" type="button" data-refresh-customer-order="${escapeAttr(reference)}">${tr("refreshStatus")}</button><p class="small-note" data-customer-order-message="${escapeAttr(reference)}"></p>` : ""}
+        </article>`;
+      }).join("");
+      container.querySelectorAll("[data-refresh-customer-order]").forEach((button) => {
+        button.addEventListener("click", () => refreshCustomerOrderStatus(button.dataset.refreshCustomerOrder, button));
+      });
+    }
+    async function refreshCustomerOrderStatus(reference, button) {
+      const order = customerOrders.find((item) => (item.id || item.reference) === reference);
+      if (!db || !order?.customerStatusToken) return;
+      button.disabled = true;
+      const message = [...$("customer-orders").querySelectorAll("[data-customer-order-message]")]
+        .find((element) => element.dataset.customerOrderMessage === reference);
+      if (message) message.textContent = "";
+      try {
+        const { data, error } = await db.functions.invoke("get-customer-order", {
+          body: { reference, token: order.customerStatusToken }
+        });
+        if (error) throw error;
+        order.status = data.status;
+        if (!storage.write("shanvi-customer-orders", customerOrders)) return;
+        renderCustomerOrders();
+      } catch (error) {
+        if (message) message.textContent = error.message || "Could not refresh order status.";
+        button.disabled = false;
+      }
+    }
+    function renderCustomerHelp() {
+      $("customer-help-contact").innerHTML = storeHelpPhone
+        ? `${tr("helpIntro")}<a class="customer-help-contact" href="tel:${escapeAttr(storeHelpPhone)}">${escapeHtml(storeHelpPhone)}</a>`
+        : tr("helpMissing");
+    }
+    async function loadStoreHelpContact() {
+      if (!db) return;
+      const { data, error } = await db.from("store_settings").select("value").eq("key", "help").maybeSingle();
+      if (error) {
+        console.warn("Could not load store help contact", error.message);
+        return;
+      }
+      const phone = data?.value?.phone;
+      storeHelpPhone = typeof phone === "string" && /^[0-9]{10}$/.test(phone) ? phone : "";
+      $("store-help-phone").value = storeHelpPhone;
+      renderCustomerHelp();
     }
     function randomToken() {
       const bytes = new Uint8Array(32);
@@ -1691,6 +1817,26 @@
       renderAdminProducts();
       cart = {};
       coupon = false;
+      const profileOrder = {
+        id: order.id,
+        status: order.status,
+        createdAt: order.createdAt,
+        items: order.items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        address: order.address,
+        subtotal: order.subtotal,
+        discount: order.discount,
+        deliveryFee: order.deliveryFee,
+        total: order.total,
+        paymentMethod: order.paymentMethod,
+        customerStatusToken: order.customerStatusToken
+      };
+      customerOrders = [...customerOrders.filter((item) => item.id !== order.id), profileOrder].slice(-30);
+      storage.write("shanvi-customer-orders", customerOrders);
+      if ($("profile-overlay").classList.contains("open")) renderCustomerOrders();
       checkoutDraft = null;
       storage.write("shanvi-cart", cart);
       deliveryFee = null;
@@ -1802,6 +1948,7 @@
         ? "Browser alerts are enabled on this device."
         : "Alerts are not enabled yet. Tap Enable browser alerts and allow the browser permission prompt.";
       $("manager-alert-phone").value = managerAlertPhone;
+      $("store-help-phone").value = storeHelpPhone;
       $("upi-id").value = settings.upi || "";
       $("cod-enabled").checked = settings.cod_enabled !== false;
       brandLogoDraft = brandLogo;
@@ -1912,6 +2059,22 @@
     $("cart-open").onclick = () => { renderCart(); $("cart-overlay").classList.add("open"); };
     $("cart-close").onclick = closeCart;
     $("cart-overlay").addEventListener("click", (event) => { if (event.target === $("cart-overlay")) closeCart(); });
+    $("profile-open").onclick = () => {
+      renderCustomerOrders();
+      $("profile-overlay").classList.add("open");
+    };
+    $("profile-close").onclick = () => $("profile-overlay").classList.remove("open");
+    $("profile-overlay").addEventListener("click", (event) => {
+      if (event.target === $("profile-overlay")) $("profile-overlay").classList.remove("open");
+    });
+    $("help-open").onclick = () => {
+      renderCustomerHelp();
+      $("help-overlay").classList.add("open");
+    };
+    $("help-close").onclick = () => $("help-overlay").classList.remove("open");
+    $("help-overlay").addEventListener("click", (event) => {
+      if (event.target === $("help-overlay")) $("help-overlay").classList.remove("open");
+    });
     $("manager-open").onclick = openAdmin;
     $("manager-close").onclick = () => {
       $("admin").classList.remove("open");
@@ -2005,6 +2168,9 @@
     $("manager-alert-phone").addEventListener("input", (event) => {
       event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
     });
+    $("store-help-phone").addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
+    });
     $("save-manager-alert-phone").onclick = () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       const phone = $("manager-alert-phone").value.trim();
@@ -2017,6 +2183,26 @@
       showManagerSaved(phone
         ? "Manager number saved in this browser. It does not enable SMS or calls."
         : "Manager number cleared from this browser.");
+    };
+    $("save-help-phone").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const phone = $("store-help-phone").value.trim();
+      if (phone && !/^[0-9]{10}$/.test(phone)) {
+        $("store-help-phone").reportValidity();
+        return;
+      }
+      if (!db) {
+        showToast("A connected Supabase project is required to share the Help contact with customers.");
+        return;
+      }
+      const { error } = await db.from("store_settings").upsert({ key: "help", value: { phone } });
+      if (error) {
+        showToast(`Could not save store contact: ${error.message}`);
+        return;
+      }
+      storeHelpPhone = phone;
+      renderCustomerHelp();
+      showManagerSaved(phone ? "Customer Help contact number saved." : "Customer Help contact number removed.");
     };
     $("test-order-notification").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
@@ -2240,8 +2426,10 @@
     document.fonts?.ready.then(syncHeaderSpacer);
     if (db) {
       checkOrderBackend();
+      loadStoreHelpContact();
       restoreManagerSession();
     }
+    renderCustomerHelp();
   </script>
 </body>
 </html>
