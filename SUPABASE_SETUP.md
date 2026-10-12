@@ -63,9 +63,11 @@ The Supabase project URL and publishable key are already configured on the live 
 
 The optional manager phone field is stored in that browser only as a contact/setup reminder. It does not send SMS or calls: those require a separately configured messaging provider and credentials. Browser alerts are sent to the device that granted permission; entering a number does not enroll another phone.
 
-For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID keys, and server secrets below still need setup:
+The Web Push functions, VAPID keypair, server secrets, and database Vault values are already configured for the live project. To enroll a manager phone, open the live HTTPS store, sign in as manager, and enter the current enrollment code under **Manager → Order notifications**. On Android use Chrome and allow notifications. On iPhone/iPad use Safari, choose **Share → Add to Home Screen**, open the installed store icon, then allow notifications. Tap **Enable browser alerts** and wait for the push-enabled confirmation; use **Test sound and notification** to check the device. OS notification settings, Focus/Do Not Disturb, battery policies, and browser support can still block alerts.
 
-1. Generate Web Push keys (free) on a computer with Node.js:
+The following steps are only needed to install the backend from scratch or rotate the VAPID keypair; they are not needed to enroll this phone. If you only need a replacement enrollment code, update `MANAGER_ENROLLMENT_CODE` in Supabase **Edge Functions → Secrets**. Do not put it in frontend files or publish it:
+
+1. Generate a new VAPID keypair only if rotating the existing one (free) on a computer with Node.js:
 
    ```sh
    npx web-push generate-vapid-keys
@@ -110,6 +112,6 @@ For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID
    ```
 
 6. Open the deployed site on the manager's phone. In **Order notifications**, enter the `MANAGER_ENROLLMENT_CODE` from step 3, tap **Enable browser alerts**, and allow the notification prompt. Tap **Test sound and notification**. On iPhone/iPad, add the site to the Home Screen first if the browser requires it for push notifications.
-7. Test with a customer device/browser. Orders should appear in Manager → **Customer orders**, which refreshes every 15 seconds and listens to Realtime. The customer must opt in on the order-success screen to receive approval notifications.
+7. Customers can opt in on the order-success screen to receive approval/rejection notifications. Customer order statuses in **Profile** refresh automatically while that panel is open.
 
 Hosted Supabase and static hosts offer free tiers with usage limits; this is not a guarantee of unlimited or permanently free hosting. Browser push itself has no per-message fee, but needs supported browsers, HTTPS, and permission; notification sound/vibration follows phone settings. SMS/calls to a phone number are not included. Static product/logo/offer/delivery settings remain in browser storage and do not sync to customers' devices in this version.
