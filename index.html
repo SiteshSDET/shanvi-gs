@@ -363,8 +363,8 @@
       </div>
       <div class="admin-card">
         <h3>Order notifications</h3>
-        <p class="small-note" id="notification-instructions">Same device: allow free browser notifications below and keep this page open. Different phone/device: connect Supabase and use HTTPS; full setup is in SUPABASE_SETUP.md.</p>
-        <details class="notification-help"><summary>How to turn on order alerts</summary><ol><li>Tap <strong>Enable browser alerts</strong> and choose <strong>Allow</strong> when asked.</li><li>Keep the manager page open in this browser to hear the in-page beep when a customer orders in another tab on this same browser.</li><li>For alerts while the page is closed or on another phone, deploy the free-tier Supabase push setup and HTTPS site from SUPABASE_SETUP.md. A browser phone alert uses your phone’s normal sound/vibration settings.</li></ol></details>
+        <p class="small-note" id="notification-instructions">On your manager phone, sign in here and enable browser alerts. Keep this page open; new Supabase orders can trigger a phone notification while the page is connected. Alerts after closing the page need the additional Web Push setup in SUPABASE_SETUP.md.</p>
+        <details class="notification-help"><summary>How to turn on order alerts</summary><ol><li>On the manager phone, open this HTTPS site, sign in, tap <strong>Enable browser alerts</strong>, and choose <strong>Allow</strong>.</li><li>Keep this Manager page open and signed in. It listens for orders from any customer's phone and shows a browser notification when one arrives. Use <strong>Test sound and notification</strong> to confirm phone permission.</li><li>To receive alerts when the Manager page is closed, the Supabase Web Push functions, VAPID keys, and server secrets must also be deployed; see SUPABASE_SETUP.md. Phone sound/vibration follows browser and system settings.</li></ol></details>
         <div class="field" id="push-enrollment-field" hidden><label for="push-enrollment-code">Manager notification setup code (Supabase)</label><input id="push-enrollment-code" type="password" autocomplete="off" placeholder="Enter the code configured in Supabase"></div>
         <button class="btn btn-primary" id="enable-order-notifications" type="button">Enable browser alerts</button>
         <button class="btn btn-soft" id="test-order-notification" type="button">Test sound and notification</button>
@@ -1109,8 +1109,10 @@
         } else {
           new Notification("Shanvi browser alerts enabled", { body: "Test alert from Shanvi General Store." });
         }
-        status.textContent = "Browser alert is enabled on this device. Keep the manager page open; it will beep when a customer orders in another tab of this browser. For another device, set up Supabase push below.";
-        showToast("Same-browser order alerts enabled");
+        status.textContent = db
+          ? "Browser alerts are enabled. Keep this Manager page open and signed in on this phone to receive notifications for customer orders. Alerts after closing the page need the additional Supabase Web Push setup."
+          : "Browser alerts are enabled for this browser only. Shared customer orders need Supabase.";
+        showToast("Browser order alerts enabled");
       } catch (error) {
         status.textContent = error.message || "Could not enable push notifications.";
       } finally {

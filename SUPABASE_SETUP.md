@@ -57,7 +57,9 @@ The public site requires Supabase for checkout and manager sign-in; orders are n
 
 ### Cross-device manager push setup
 
-The Supabase project URL and publishable key are already configured on the live site. Push alerts while the manager tab is closed need additional setup. Follow these steps after the database and manager account steps above:
+The Supabase project URL and publishable key are already configured on the live site. For immediate browser alerts, open the live site on the manager's phone, sign in, go to **Manager → Order notifications**, tap **Enable browser alerts**, and allow notifications. Keep the Manager page open and signed in; its Supabase Realtime subscription can notify the phone about orders placed on another device. Use **Test sound and notification** to check device permission. Mobile browsers may suspend a background page, so this does not guarantee an alert if the tab is closed or suspended.
+
+For reliable Web Push when the Manager page is closed, the Edge Functions, VAPID keys, and server secrets below still need setup:
 
 1. Generate Web Push keys (free) on a computer with Node.js:
 
