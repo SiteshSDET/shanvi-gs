@@ -363,8 +363,8 @@
       </div>
       <div class="admin-card">
         <h3>Order notifications</h3>
-        <p class="small-note" id="notification-instructions">On your manager phone, sign in here and enable browser alerts. Keep this page open; new Supabase orders can trigger a phone notification while the page is connected. Alerts after closing the page need the additional Web Push setup in SUPABASE_SETUP.md.</p>
-        <details class="notification-help"><summary>How to turn on order alerts</summary><ol><li>On the manager phone, open this HTTPS site, sign in, tap <strong>Enable browser alerts</strong>, and choose <strong>Allow</strong>.</li><li>Keep this Manager page open and signed in. It listens for orders from any customer's phone and shows a browser notification when one arrives. Use <strong>Test sound and notification</strong> to confirm phone permission.</li><li>To receive alerts when the Manager page is closed, the Supabase Web Push functions, VAPID keys, and server secrets must also be deployed; see SUPABASE_SETUP.md. Phone sound/vibration follows browser and system settings.</li></ol></details>
+        <p class="small-note" id="notification-instructions">Sign in on your manager phone, tap Enable browser alerts, and allow notifications. Keep this page open and signed in to receive alerts for new orders. Background push when the page is closed needs Web Push setup.</p>
+        <details class="notification-help"><summary>How to turn on order alerts</summary><ol><li>On the manager phone, open this HTTPS site, sign in, tap <strong>Enable browser alerts</strong>, and choose <strong>Allow</strong>.</li><li>Keep this Manager page open and signed in. The live Supabase order connection will show a notification for customer orders. Tap <strong>Test sound and notification</strong> to check your phone's permission and alert.</li><li>For iPhone/iPad, add the site to the Home Screen and open it there if Safari requires it for notifications. Browser or operating-system settings may still mute alerts.</li><li>To get alerts while this page is closed, Web Push still needs VAPID keys, server secrets, and deployed Supabase functions as described in SUPABASE_SETUP.md.</li></ol></details>
         <div class="field" id="push-enrollment-field" hidden><label for="push-enrollment-code">Manager notification setup code (Supabase)</label><input id="push-enrollment-code" type="password" autocomplete="off" placeholder="Enter the code configured in Supabase"></div>
         <button class="btn btn-primary" id="enable-order-notifications" type="button">Enable browser alerts</button>
         <button class="btn btn-soft" id="test-order-notification" type="button">Test sound and notification</button>
@@ -1469,7 +1469,16 @@
           loadManagerOrders({ silent: true });
         })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, () => loadManagerOrders({ silent: true }))
-        .subscribe();
+        .subscribe((status, error) => {
+          const notificationStatus = $("notification-status");
+          if (status === "SUBSCRIBED") {
+            notificationStatus.textContent = localNotificationsEnabled
+              ? "Live order connection is active. This page must stay open to receive browser alerts."
+              : "Live order connection is active. Tap Enable browser alerts and allow notifications on this phone.";
+          } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+            notificationStatus.textContent = `Live order connection: ${status}${error?.message ? ` — ${error.message}` : ""}. Keep this page open and refresh if it does not reconnect.`;
+          }
+        });
     }
     async function continueToPayment() {
       if (!db || !orderBackendReady) {
