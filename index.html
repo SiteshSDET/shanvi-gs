@@ -110,7 +110,9 @@
     .add-btn:hover { color: white; background: var(--green); border-color: var(--green); }
     .empty { grid-column: 1/-1; padding: 55px 20px; color: var(--muted); text-align: center; background: white; border-radius: 16px; }
     .trust-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 42px; }
-    .trust { display: flex; align-items: center; gap: 12px; background: #eff3ec; border-radius: 14px; padding: 17px; }
+    .trust { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e8ece5; border-bottom: 3px solid #8eaf91; border-radius: 14px; padding: 17px; box-shadow: 0 5px 16px #173a2408; }
+    .trust:nth-child(2) { border-bottom-color: #d4a46d; }
+    .trust:nth-child(3) { border-bottom-color: #7e9fc1; }
     .trust-icon { font-size: 22px; }
     .trust strong { display: block; font-size: 13px; }
     .trust span { color: var(--muted); font-size: 11px; }
@@ -582,8 +584,10 @@
         <h3>Payment details</h3>
         <div class="form-grid">
           <div class="field"><label for="upi-id">Store UPI ID</label><input id="upi-id" placeholder="e.g. 9876543219@upi"></div>
+          <div class="field"><label for="upi-phone">Payment phone number (optional)</label><input id="upi-phone" type="tel" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="10-digit mobile number"><small class="small-note">Can be shown beside the UPI ID so customers can confirm payment details.</small></div>
           <div class="field"><label for="qr-image">UPI QR code image</label><input id="qr-image" type="file" accept="image/*"></div>
         </div>
+        <label class="payment-choice" style="max-width:360px"><input id="show-upi-phone" type="checkbox"><span><strong>Show payment phone number to customers</strong><small>Displays the number alongside the store UPI ID at checkout.</small></span></label>
         <label class="payment-choice" style="max-width:320px"><input id="cod-enabled" type="checkbox"><span><strong>Allow cash on delivery</strong><small>Customers can choose COD at payment.</small></span></label>
         <button class="btn btn-soft" id="save-payment">Save payment details</button>
       </div>
@@ -673,6 +677,7 @@
         selectState: "Select state / UT", pin: "PIN code", pinPlaceholder: "6 digits",
         pinTitle: "Enter a 6-digit PIN code.", continuePayment: "Continue to payment",
         payment: "Payment", backBasket: "Back to basket", order: "Order",
+        paymentPhoneLabel: "Payment phone number",
         itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay by UPI ID",
         enterYourUpi: "Enter the UPI ID you will pay from.", yourUpi: "Your UPI ID",
         upiExample: "Example: 9876543210@upi", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
@@ -762,6 +767,7 @@
         selectState: "राज्य / केंद्र शासित प्रदेश चुनें", pin: "पिन कोड", pinPlaceholder: "6 अंक",
         pinTitle: "6 अंकों का पिन कोड लिखें।", continuePayment: "भुगतान पर जाएँ",
         payment: "भुगतान", backBasket: "कार्ट पर वापस जाएँ", order: "ऑर्डर",
+        paymentPhoneLabel: "भुगतान फ़ोन नंबर",
         itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI ID से भुगतान",
         enterYourUpi: "जिस UPI ID से भुगतान करेंगे, वह लिखें।", yourUpi: "आपकी UPI ID",
         upiExample: "उदाहरण: 9876543210@upi", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
@@ -878,10 +884,13 @@
     let isAuthorizedManager = false;
     let managerRealtimeChannel = null;
     let checkoutAddressRealtimeChannel = null;
+    let paymentContactRealtimeChannel = null;
     let managerAudioContext = null;
     let managerOrdersPage = 0;
     let managerOrders = [];
     let managerOrderFilter = "pending";
+    let managerTapCount = 0;
+    let lastManagerTapAt = 0;
     let deferredInstallPrompt = null;
     const managerOpenProductSections = new Set();
     const $ = (id) => document.getElementById(id);
@@ -1250,6 +1259,39 @@
       $("store-help-phone").value = storeHelpPhone;
       $("store-call-enabled").checked = storeCallEnabled;
       renderCustomerHelp();
+    }
+    async function loadPaymentContact() {
+      if (!db) return;
+      const { data, error } = await db.from("store_settings").select("value").eq("key", "payment_contact").maybeSingle();
+      if (error) {
+        console.warn("Could not load shared payment contact", error.message);
+        return;
+      }
+      const value = data?.value;
+      const phone = typeof value?.phone === "string" && /^[0-9]{10}$/.test(value.phone) ? value.phone : "";
+      const showPhone = value?.show_phone === true && Boolean(phone);
+      settings = { ...settings, upi_phone: phone, show_upi_phone: showPhone };
+      storage.write("shanvi-settings", settings);
+      if (!isAuthorizedManager) {
+        $("upi-phone").value = phone;
+        $("show-upi-phone").checked = showPhone;
+      }
+      if (checkoutDraft) renderPaymentPage();
+    }
+    function subscribeToPaymentContact() {
+      if (!db || paymentContactRealtimeChannel) return;
+      paymentContactRealtimeChannel = db.channel("payment-contact-settings")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "store_settings",
+          filter: "key=eq.payment_contact"
+        }, () => void loadPaymentContact())
+        .subscribe((status, error) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.warn("Live payment contact settings are unavailable", error?.message || status);
+          }
+        });
     }
     function randomToken() {
       const bytes = new Uint8Array(32);
@@ -2139,7 +2181,7 @@
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_id" ${selectedPayment === "upi_id" ? "checked" : ""}><span><strong>${tr("upiId")}</strong><small>${tr("enterYourUpi")}</small></span></label>
         ${selectedPayment === "upi_id" ? `<div class="payment-box">
           <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" placeholder="9876543210@upi" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" pattern="[A-Za-z0-9._-]+@[A-Za-z0-9.-]+" title="${language === "hi" ? "इस तरह UPI ID लिखें: 9876543210@upi" : "Enter a UPI ID such as 9876543210@upi"}" required><small class="small-note">${tr("upiExample")}</small></div>
-          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button><a class="btn btn-soft full" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="${escapeAttr(upiLink)}">${tr("openUpi")}</a>` : tr("storeUpiMissing")}
+          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button>${settings.show_upi_phone && settings.upi_phone ? `<p class="small-note">${tr("paymentPhoneLabel")}: <strong>${escapeHtml(settings.upi_phone)}</strong></p>` : ""}<a class="btn btn-soft full" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="${escapeAttr(upiLink)}">${tr("openUpi")}</a>` : tr("storeUpiMissing")}
         </div>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""}><span><strong>${tr("qr")}</strong><small>${canPayQr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
         ${selectedPayment === "upi_qr" ? `<div class="payment-box">${canPayQr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}. ${tr("verifyPayment")}</p>` : tr("qrNotConfigured")}</div>` : ""}
@@ -2410,6 +2452,8 @@
       $("store-help-phone").value = storeHelpPhone;
       $("store-call-enabled").checked = storeCallEnabled;
       $("upi-id").value = settings.upi || "";
+      $("upi-phone").value = settings.upi_phone || "";
+      $("show-upi-phone").checked = settings.show_upi_phone === true;
       $("cod-enabled").checked = settings.cod_enabled !== false;
       brandLogoDraft = brandLogo;
       updateBrandLogo();
@@ -2547,7 +2591,15 @@
     $("help-overlay").addEventListener("click", (event) => {
       if (event.target === $("help-overlay")) $("help-overlay").classList.remove("open");
     });
-    $("manager-open").onclick = openAdmin;
+    $("manager-open").onclick = () => {
+      const now = Date.now();
+      managerTapCount = now - lastManagerTapAt > 4000 ? 1 : managerTapCount + 1;
+      lastManagerTapAt = now;
+      if (managerTapCount >= 6) {
+        managerTapCount = 0;
+        openAdmin();
+      }
+    };
     $("manager-close").onclick = () => {
       $("admin").classList.remove("open");
     };
@@ -2889,21 +2941,40 @@
     $("save-payment").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       try {
+        const upiPhone = $("upi-phone").value.trim();
+        if (upiPhone && !/^[0-9]{10}$/.test(upiPhone)) {
+          $("upi-phone").setCustomValidity("Enter a valid 10-digit payment phone number.");
+          $("upi-phone").reportValidity();
+          $("upi-phone").setCustomValidity("");
+          return;
+        }
         const qrFile = $("qr-image").files[0];
         const qr = qrFile ? await readImage(qrFile) : settings.qr;
         const next = {
           upi: $("upi-id").value.trim(),
+          upi_phone: upiPhone,
+          show_upi_phone: $("show-upi-phone").checked && Boolean(upiPhone),
           qr,
           cod_enabled: $("cod-enabled").checked,
           demo_upi: !$("upi-id").value.trim(),
           demo_qr: !qrFile && settings.demo_qr
         };
+        if (db) {
+          const { error } = await db.from("store_settings").upsert({
+            key: "payment_contact",
+            value: { phone: next.upi_phone, show_phone: next.show_upi_phone }
+          });
+          if (error) throw new Error(`Could not share the payment phone number: ${error.message}`);
+        }
         if (!storage.write("shanvi-settings", next)) return;
         settings = next;
         renderCart();
         showManagerSaved("Payment details saved successfully on this device.");
       } catch (error) { showToast(error.message || "Could not save payment details."); }
     };
+    $("upi-phone").addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
+    });
     $("language-toggle").onclick = () => {
       language = language === "en" ? "hi" : "en";
       storage.write("shanvi-language", language);
@@ -2960,6 +3031,8 @@
     if (db) {
       checkOrderBackend();
       loadStoreHelpContact();
+      loadPaymentContact();
+      subscribeToPaymentContact();
       loadCheckoutAddressFields();
       subscribeToCheckoutAddressSettings();
       restoreManagerSession();
