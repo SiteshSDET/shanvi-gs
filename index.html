@@ -823,7 +823,6 @@
     if (!Array.isArray(customerOrders)) customerOrders = [];
     const expandedCustomerOrderGroups = new Set();
     const expandedCustomerOrderDetails = new Set();
-    let customerStatusRefreshTimer = null;
     let customerStatusRefreshInProgress = false;
     let brandLogo = storage.read("shanvi-brand-logo", "");
     let brandLogoDraft = brandLogo;
@@ -859,7 +858,6 @@
     let isAuthorizedManager = false;
     let managerRealtimeChannel = null;
     let checkoutAddressRealtimeChannel = null;
-    let managerOrderRefreshTimer = null;
     let managerAudioContext = null;
     let managerOrdersPage = 0;
     let managerOrders = [];
@@ -1150,16 +1148,6 @@
         refreshButton.disabled = false;
         refreshButton.textContent = `↻ ${tr("refreshOrders")}`;
       }
-    }
-    function startCustomerStatusRefresh() {
-      stopCustomerStatusRefresh();
-      void refreshCustomerOrderStatuses();
-      customerStatusRefreshTimer = window.setInterval(refreshCustomerOrderStatuses, 12000);
-    }
-    function stopCustomerStatusRefresh() {
-      if (!customerStatusRefreshTimer) return;
-      window.clearInterval(customerStatusRefreshTimer);
-      customerStatusRefreshTimer = null;
     }
     function renderCustomerHelp() {
       $("customer-help-contact").innerHTML = storeHelpPhone
@@ -1684,26 +1672,8 @@
         playManagerAlert();
         showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
       }
-      loadManagerOrders();
     }
-    function startManagerOrderRefresh() {
-      if (managerOrderRefreshTimer) return;
-      managerOrderRefreshTimer = window.setInterval(() => {
-        if (
-          isAuthorizedManager
-          && $("admin").classList.contains("open")
-          && document.visibilityState === "visible"
-        ) {
-          loadManagerOrders({ silent: true });
-        }
-      }, 15000);
-    }
-    function stopManagerOrderRefresh() {
-      if (!managerOrderRefreshTimer) return;
-      window.clearInterval(managerOrderRefreshTimer);
-      managerOrderRefreshTimer = null;
-    }
-    async function loadManagerOrders({ append = false, silent = false } = {}) {
+    async function loadManagerOrders({ append = false } = {}) {
       const container = $("admin-orders");
       if (!db) {
         managerOrders = storage.read("shanvi-orders", []).slice().reverse();
@@ -1711,31 +1681,26 @@
         renderManagerOrders();
         return;
       }
-      const retainedOrders = silent ? managerOrders.slice(100) : [];
-      const previousPageCount = managerOrdersPage;
       if (!append) {
         managerOrdersPage = 0;
-        if (!silent) {
-          managerOrders = [];
-          container.innerHTML = `<p class="small-note">Loading orders…</p>`;
-        }
+        managerOrders = [];
+        container.innerHTML = `<p class="small-note">Loading orders…</p>`;
       }
-      if (!silent) $("load-more-orders").hidden = true;
+      $("load-more-orders").hidden = true;
       const { data, error } = await db.from("orders")
         .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, status, created_at")
         .order("created_at", { ascending: false })
         .range(managerOrdersPage * 100, managerOrdersPage * 100 + 99);
       if (error) {
-        if (!append && !silent) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message)}</p>`;
+        if (!append) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message)}</p>`;
         return;
       }
       if (append) {
         managerOrders = [...managerOrders, ...data];
         managerOrdersPage += 1;
       } else {
-        const latestReferences = new Set(data.map((order) => order.reference));
-        managerOrders = [...data, ...retainedOrders.filter((order) => !latestReferences.has(order.reference))];
-        managerOrdersPage = silent ? Math.max(previousPageCount, Math.ceil(managerOrders.length / 100)) : 1;
+        managerOrders = [...data];
+        managerOrdersPage = 1;
       }
       renderManagerOrders(data.length);
     }
@@ -1924,9 +1889,7 @@
           showToast(`New order received: ${reference}`);
           playManagerAlert();
           showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
-          loadManagerOrders({ silent: true });
         })
-        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, () => loadManagerOrders({ silent: true }))
         .subscribe((status, error) => {
           const notificationStatus = $("notification-status");
           if (status === "SUBSCRIBED") {
@@ -2334,7 +2297,6 @@
         renderAdminProducts();
         loadManagerOrders();
         subscribeToManagerOrders();
-        startManagerOrderRefresh();
       }
     }
     async function signInManagerWithSupabase(email, password) {
@@ -2356,7 +2318,6 @@
       renderAdminProducts();
       loadManagerOrders();
       subscribeToManagerOrders();
-      startManagerOrderRefresh();
       showToast("Manager signed in");
     }
     async function restoreManagerSession() {
@@ -2386,7 +2347,6 @@
       renderAdminProducts();
       loadManagerOrders();
       subscribeToManagerOrders();
-      if ($("admin").classList.contains("open")) startManagerOrderRefresh();
     }
     async function readImage(file) {
       if (!file) return "";
@@ -2435,7 +2395,6 @@
     $("profile-open").onclick = () => {
       renderCustomerOrders();
       $("profile-overlay").classList.add("open");
-      startCustomerStatusRefresh();
     };
     $("refresh-customer-orders").onclick = () => {
       if (!navigator.onLine) {
@@ -2446,12 +2405,10 @@
     };
     $("profile-close").onclick = () => {
       $("profile-overlay").classList.remove("open");
-      stopCustomerStatusRefresh();
     };
     $("profile-overlay").addEventListener("click", (event) => {
       if (event.target === $("profile-overlay")) {
         $("profile-overlay").classList.remove("open");
-        stopCustomerStatusRefresh();
       }
     });
     $("help-open").onclick = () => {
@@ -2465,7 +2422,6 @@
     $("manager-open").onclick = openAdmin;
     $("manager-close").onclick = () => {
       $("admin").classList.remove("open");
-      stopManagerOrderRefresh();
     };
     $("admin").addEventListener("contextmenu", (event) => event.preventDefault());
     $("enable-order-notifications").onclick = enableOrderNotifications;
@@ -2505,7 +2461,6 @@
         await db.removeChannel(managerRealtimeChannel);
         managerRealtimeChannel = null;
       }
-      stopManagerOrderRefresh();
       isAuthorizedManager = false;
       $("manager-tools").hidden = true;
       $("admin-login-card").hidden = false;
@@ -2647,18 +2602,6 @@
         return;
       }
       onLocalOrdersChanged(event);
-    });
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible" && $("profile-overlay").classList.contains("open")) {
-        void refreshCustomerOrderStatuses();
-      }
-      if (
-        document.visibilityState === "visible"
-        && isAuthorizedManager
-        && $("admin").classList.contains("open")
-      ) {
-        loadManagerOrders({ silent: true });
-      }
     });
     $("p-image").addEventListener("change", async () => {
       const file = $("p-image").files[0];
