@@ -584,8 +584,9 @@
       </div>
       <div class="admin-card">
         <h3>Help & contact</h3>
-        <p class="small-note">Customers can call this number from the Help section. Use a 10-digit mobile number.</p>
+        <p class="small-note">Set the store number for customer calls and WhatsApp. Use a 10-digit mobile number. WhatsApp chat stays available even when no store number is set.</p>
         <div class="field"><label for="store-help-phone">Store contact number</label><input id="store-help-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit mobile number"></div>
+        <label class="payment-choice" style="max-width:360px"><input id="store-call-enabled" type="checkbox"><span><strong>Enable call button in Help</strong><small>Customers can open their phone dialer to call the store.</small></span></label>
         <button class="btn btn-soft" id="save-help-phone" type="button">Save contact number</button>
       </div>
       <details class="admin-card manager-accordion products-manager-panel">
@@ -830,6 +831,7 @@
     let localNotificationsEnabled = storage.read("shanvi-local-notifications", false) === true;
     let managerAlertPhone = storage.read("shanvi-manager-alert-phone", "");
     let storeHelpPhone = "";
+    let storeCallEnabled = true;
     let customerOrders = storage.read("shanvi-customer-orders", []);
     if (!Array.isArray(customerOrders)) customerOrders = [];
     const expandedCustomerOrderGroups = new Set();
@@ -1190,12 +1192,16 @@
       }
     }
     function renderCustomerHelp() {
-      if (!storeHelpPhone) {
-        $("customer-help-contact").textContent = tr("helpMissing");
-        return;
-      }
-      const whatsappPhone = `91${storeHelpPhone}`;
-      $("customer-help-contact").innerHTML = `${tr("helpIntro")}<a class="customer-help-contact" href="tel:${escapeAttr(storeHelpPhone)}">${escapeHtml(storeHelpPhone)}</a><div class="customer-help-actions"><a class="btn btn-primary" href="tel:${escapeAttr(storeHelpPhone)}">${tr("callStore")}</a><a class="btn btn-soft" href="https://wa.me/${escapeAttr(whatsappPhone)}" target="_blank" rel="noopener noreferrer">${tr("chatWhatsApp")}</a></div>`;
+      const intro = storeHelpPhone ? tr("helpIntro") : tr("helpMissing");
+      const phone = storeHelpPhone ? `91${storeHelpPhone}` : "";
+      const whatsappUrl = phone
+        ? `https://wa.me/${escapeAttr(phone)}?text=${encodeURIComponent(tr("helpIntro"))}`
+        : `https://wa.me/?text=${encodeURIComponent(tr("helpIntro"))}`;
+      const callAction = storeHelpPhone && storeCallEnabled
+        ? `<a class="btn btn-primary" href="tel:${escapeAttr(storeHelpPhone)}">${tr("callStore")}</a>`
+        : "";
+      const whatsappIcon = `<svg aria-hidden="true" viewBox="0 0 32 32" width="19" height="19" fill="currentColor"><path d="M16 .5A15.4 15.4 0 0 0 2.7 23.7L.6 31.4l7.9-2.1A15.5 15.5 0 1 0 16 .5Zm0 28.2a12.6 12.6 0 0 1-6.4-1.7l-.5-.3-4.7 1.3 1.3-4.6-.3-.5A12.7 12.7 0 1 1 16 28.7Zm7-9.5c-.4-.2-2.2-1.1-2.6-1.2-.4-.1-.6-.2-.9.2-.3.4-1 1.2-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.2-1.1-1.9-2.4-2.1-2.8-.2-.4 0-.6.2-.8l.6-.7c.2-.2.3-.4.4-.6.1-.3 0-.5 0-.7-.1-.2-.9-2-1.2-2.7-.3-.7-.6-.6-.9-.6h-.8c-.3 0-.7.1-1 .5-.4.4-1.3 1.3-1.3 3.1s1.3 3.5 1.5 3.7c.2.2 2.6 4 6.3 5.5.9.4 1.6.6 2.1.7.9.3 1.7.2 2.3.1.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.6.2-1.8-.1-.2-.4-.3-.8-.5Z"/></svg>`;
+      $("customer-help-contact").innerHTML = `${intro}<div class="customer-help-actions">${callAction}<a class="btn btn-soft" href="${whatsappUrl}" target="_blank" rel="noopener noreferrer">${whatsappIcon}<span>${tr("chatWhatsApp")}</span></a></div>`;
     }
     async function loadCheckoutAddressFields() {
       if (!db) return;
@@ -1235,7 +1241,9 @@
       }
       const phone = data?.value?.phone;
       storeHelpPhone = typeof phone === "string" && /^[0-9]{10}$/.test(phone) ? phone : "";
+      storeCallEnabled = typeof data?.value?.call_enabled === "boolean" ? data.value.call_enabled : true;
       $("store-help-phone").value = storeHelpPhone;
+      $("store-call-enabled").checked = storeCallEnabled;
       renderCustomerHelp();
     }
     function randomToken() {
@@ -2395,6 +2403,7 @@
         : "Alerts are not enabled yet. Tap Enable browser alerts and allow the browser permission prompt.";
       $("manager-alert-phone").value = managerAlertPhone;
       $("store-help-phone").value = storeHelpPhone;
+      $("store-call-enabled").checked = storeCallEnabled;
       $("upi-id").value = settings.upi || "";
       $("cod-enabled").checked = settings.cod_enabled !== false;
       brandLogoDraft = brandLogo;
@@ -2687,12 +2696,14 @@
         showToast("A connected Supabase project is required to share the Help contact with customers.");
         return;
       }
-      const { error } = await db.from("store_settings").upsert({ key: "help", value: { phone } });
+      const callEnabled = $("store-call-enabled").checked;
+      const { error } = await db.from("store_settings").upsert({ key: "help", value: { phone, call_enabled: callEnabled } });
       if (error) {
         showToast(`Could not save store contact: ${error.message}`);
         return;
       }
       storeHelpPhone = phone;
+      storeCallEnabled = callEnabled;
       renderCustomerHelp();
       showManagerSaved(phone ? "Customer Help contact number saved." : "Customer Help contact number removed.");
     };
