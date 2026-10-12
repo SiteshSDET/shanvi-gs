@@ -968,6 +968,7 @@
           <div class="summary-row"><span>${tr("delivery")}</span><strong>${deliveryFee === null ? tr("calculatedAtCheckout") : money(deliveryFee)}</strong></div>
           <div class="summary-row total"><span>${tr("total")}</span><span>${money(total)}</span></div>
         </div>
+        ${db ? `
         <h3 style="font-size:15px;margin:20px 0 8px">${tr("deliveryDetails")}</h3>
         <div class="field"><label for="customer-name">${tr("fullName")}</label><input id="customer-name" autocomplete="name" placeholder="${tr("startLetter")}" required maxlength="100" pattern="[\\p{L}][\\p{L}\\p{M} .'-]{0,99}" title="${tr("nameTitle")}"></div>
         <div class="field"><label for="customer-phone">${tr("mobile")}</label><input id="customer-phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="${tr("mobile")}" required minlength="10" maxlength="10" pattern="[0-9]{10}" title="${language === "hi" ? "केवल 10 अंक लिखें।" : "Enter exactly 10 digits."}"></div>
@@ -983,7 +984,9 @@
           <div class="field"><label for="address-pin">${tr("pin")}</label><input id="address-pin" inputmode="numeric" autocomplete="postal-code" placeholder="${tr("pinPlaceholder")}" required minlength="6" maxlength="6" pattern="[0-9]{6}" title="${tr("pinTitle")}"></div>
         </div>
         ${hasFreeGift ? `<p class="small-note">${tr("freeGiftAdded")}</p>` : ""}
-        <button class="btn btn-primary full" id="place-order">${tr("continuePayment")} · ${money(total)}</button>`;
+          <button class="btn btn-primary full" id="place-order">${tr("continuePayment")} · ${money(total)}</button>` : `
+          <p class="payment-box">This public catalog is currently browse-only. Online orders will be enabled after the store connects its secure order service.</p>
+          <button class="btn btn-primary full" id="place-order" disabled>Online ordering unavailable</button>`}`;
       $("cart-content").querySelectorAll("[data-qty]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.qty, Number(button.dataset.step))));
       $("cart-content").querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.remove, -(cart[button.dataset.remove] || 0))));
       $("apply-coupon").onclick = () => {
@@ -1452,6 +1455,10 @@
         .subscribe();
     }
     async function continueToPayment() {
+      if (!db) {
+        showToast("Online ordering is unavailable until the store backend is configured.");
+        return;
+      }
       const fields = ["customer-name", "customer-phone", "address-landmark", "address-village", "address-state", "address-pin"].map($);
       for (const field of fields) {
         if (!field.value.trim() || !field.checkValidity()) {
@@ -1543,6 +1550,10 @@
     }
     async function saveOrder() {
       if (!checkoutDraft) return;
+      if (!db) {
+        showToast("Online ordering is unavailable until the store backend is configured.");
+        return;
+      }
       if (!selectedPayment) {
         showToast(tr("selectPayment"));
         return;

@@ -2,7 +2,9 @@
 
 A static storefront with a manager interface, cart, and checkout. Cross-device orders and manager access require the Supabase backend; browser storage alone does not synchronize orders.
 
-## Before publishing as a live store
+GitHub Pages deploys the current catalog as a public, browse-only preview. Checkout and manager sign-in stay disabled until Supabase is configured. The sample catalog is not the manager's browser-local product list.
+
+## Before accepting real customer orders
 
 1. Follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md) to configure Supabase Auth, database policies, and order storage.
 2. Add the Supabase project URL and anon/publishable key to `supabase-config.js`. Only public client values belong in this file.
