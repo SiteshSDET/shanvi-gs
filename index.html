@@ -245,6 +245,8 @@
     .manager-category-count { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 600; }
     .manager-category-products { padding: 2px 12px 8px; }
     .notification-help { margin: 14px 0; padding: 12px 14px; border-radius: 11px; background: #f4f7f2; color: #43574a; font-size: 12px; }
+    .manager-order-search { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: end; gap: 10px; margin: 12px 0; }
+    .manager-order-search .field { margin: 0; }
     .notification-help summary { cursor: pointer; font-weight: 750; color: var(--green-dark); }
     .notification-help ol { padding-left: 20px; line-height: 1.6; }
     .notification-help li + li { margin-top: 7px; }
@@ -391,6 +393,8 @@
       .order-filters button { min-height: 44px; padding: 9px 8px; }
       .order-status-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .order-status-actions .btn { min-width: 0; min-height: 44px; padding: 9px; }
+      .manager-order-search { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .manager-order-search .field { grid-column: 1 / -1; }
       .admin-product { align-items: flex-start; }
       .admin-product-actions { flex-wrap: wrap; justify-content: flex-end; }
       .admin-product-actions .btn, .admin-product-actions .remove { min-height: 40px; }
@@ -627,6 +631,11 @@
         <h3>Customer orders</h3>
         <p class="small-note">New orders start in Pending. Accept an order, mark it delivered, then complete it; reject an order that cannot be fulfilled.</p>
         <p class="small-note" id="orders-storage-note"></p>
+        <form id="manager-order-search-form" class="manager-order-search" role="search">
+          <div class="field"><label for="manager-order-search">Find order by phone number or order ID</label><input id="manager-order-search" type="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Enter part of a phone number or SNVGS order ID"></div>
+          <button class="btn btn-primary" type="submit">Search orders</button>
+          <button class="btn btn-soft" id="clear-manager-order-search" type="button">Clear</button>
+        </form>
         <button class="btn btn-soft" id="refresh-orders" type="button">Refresh orders</button>
         <button class="btn btn-soft" id="load-more-orders" type="button" hidden>Load more orders</button>
         <div class="order-filters" role="group" aria-label="Filter customer orders">
@@ -920,6 +929,7 @@
     let managerOrdersPage = 0;
     let managerOrders = [];
     let managerOrderFilter = "pending";
+    let managerOrderSearch = "";
     let managerTapCount = 0;
     let lastManagerTapAt = 0;
     let deferredInstallPrompt = null;
@@ -1818,10 +1828,14 @@
         showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
       }
     }
-    async function loadManagerOrders({ append = false } = {}) {
+    async function loadManagerOrders({ append = false, search = managerOrderSearch } = {}) {
       const container = $("admin-orders");
+      managerOrderSearch = String(search).trim().replace(/[^a-z0-9-]/gi, "");
       if (!db) {
-        managerOrders = storage.read("shanvi-orders", []).slice().reverse();
+        const allOrders = storage.read("shanvi-orders", []).slice().reverse();
+        managerOrders = managerOrderSearch
+          ? allOrders.filter((order) => `${order.reference || order.id || ""} ${order.customer_phone || order.phone || ""}`.toLowerCase().includes(managerOrderSearch.toLowerCase()))
+          : allOrders;
         managerOrdersPage = managerOrders.length ? 1 : 0;
         renderManagerOrders();
         return;
@@ -1832,9 +1846,13 @@
         container.innerHTML = `<p class="small-note">Loading orders…</p>`;
       }
       $("load-more-orders").hidden = true;
-      const { data, error } = await db.from("orders")
+      let ordersQuery = db.from("orders")
         .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, status, created_at")
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
+      if (managerOrderSearch) {
+        ordersQuery = ordersQuery.or(`reference.ilike.%${managerOrderSearch}%,customer_phone.ilike.%${managerOrderSearch}%`);
+      }
+      const { data, error } = await ordersQuery
         .range(managerOrdersPage * 100, managerOrdersPage * 100 + 99);
       if (error) {
         if (!append) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message)}</p>`;
@@ -1873,7 +1891,9 @@
       });
       const visibleOrders = managerOrderFilter === "all" ? managerOrders : groups[managerOrderFilter];
       if (!managerOrders.length) {
-        container.innerHTML = `<p class="small-note">No orders yet. Orders appear after a customer successfully places one.</p>`;
+        container.innerHTML = managerOrderSearch
+          ? `<p class="small-note">No orders match “${escapeHtml(managerOrderSearch)}”. Search by any part of the customer's phone number or the order ID.</p>`
+          : `<p class="small-note">No orders yet. Orders appear after a customer successfully places one.</p>`;
         return;
       }
       container.innerHTML = visibleOrders.length
@@ -2234,10 +2254,11 @@
         return;
       }
       const customerStatusToken = randomToken();
+      const customerPhone = $("customer-phone").value.trim();
       checkoutDraft = {
-        id: `SGS-${crypto.randomUUID().replace(/-/g, "").slice(0, 16).toUpperCase()}`,
+        id: `SNVGS-${customerPhone.slice(-4)}-${crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`,
         name: $("customer-name").value.trim(),
-        phone: $("customer-phone").value.trim(),
+        phone: customerPhone,
         address,
         items,
         subtotal,
@@ -2855,6 +2876,18 @@
         managerOrderFilter = button.dataset.orderFilter;
         renderManagerOrders();
       });
+    });
+    $("manager-order-search-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const search = $("manager-order-search").value;
+      if (search.trim()) managerOrderFilter = "all";
+      void loadManagerOrders({ search });
+    });
+    $("clear-manager-order-search").addEventListener("click", () => {
+      $("manager-order-search").value = "";
+      managerOrderFilter = "pending";
+      void loadManagerOrders({ search: "" });
     });
     $("refresh-orders").onclick = loadManagerOrders;
     $("load-more-orders").onclick = () => loadManagerOrders({ append: true });
