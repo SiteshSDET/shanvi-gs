@@ -37,7 +37,7 @@ create table if not exists public.orders (
 );
 
 comment on column public.orders.payment_confirmed is
-  'Customer attestation that an external UPI/QR payment was sent; not gateway-verified.';
+  'Customer returned from an external UPI/QR payment flow; not gateway-verified.';
 
 alter table public.store_managers enable row level security;
 alter table public.products enable row level security;

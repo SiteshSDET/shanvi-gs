@@ -10,7 +10,7 @@ alter table public.orders
   add column if not exists payment_confirmed boolean not null default false;
 
 comment on column public.orders.payment_confirmed is
-  'Customer attestation that an external UPI/QR payment was sent; not gateway-verified.';
+  'Customer returned from an external UPI/QR payment flow; not gateway-verified.';
 
 alter table public.orders
   alter column payment_method set default 'upi_id';
