@@ -366,7 +366,7 @@
         <span class="brand-mark">🛍️</span>
         <span><strong class="brand-name">Shanvi General Store</strong><small id="brand-tagline">Your neighborhood, in one place</small></span>
       </a>
-      <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" type="search" placeholder="Search products" aria-label="Search products"></div>
+      <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" name="store-product-search" type="search" placeholder="Search products" aria-label="Search products" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
       <div class="nav-actions">
         <button class="btn btn-quiet" id="manager-open">Manager</button>
         <button class="btn btn-soft" id="profile-open" type="button">Profile</button>
@@ -2613,6 +2613,7 @@
     };
     renderCategories();
     $("admin-category-filter").value = "All sections";
+    $("search").value = "";
     syncProductImagePreview();
     renderHero();
     renderProducts();
