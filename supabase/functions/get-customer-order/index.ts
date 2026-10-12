@@ -30,7 +30,7 @@ Deno.serve(async (request) => {
   }
   if (
     typeof body.reference !== "string"
-    || !/^SGS-[A-F0-9]{16}$/.test(body.reference)
+    || !/^(?:SGS-[A-F0-9]{16}|SNVGS-[0-9]{4}-[A-F0-9]{12})$/.test(body.reference)
     || typeof body.token !== "string"
     || !/^[a-f0-9]{64}$/.test(body.token)
   ) {
