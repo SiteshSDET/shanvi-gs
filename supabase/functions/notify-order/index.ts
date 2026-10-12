@@ -36,7 +36,8 @@ Deno.serve(async (request) => {
   if (
     typeof body.reference !== "string"
     || body.reference.length > 80
-    || (body.event !== "new" && body.event !== "approved" && body.event !== "rejected")
+    || typeof body.event !== "string"
+    || !["new", "approved", "rejected", "delivered", "completed"].includes(body.event)
   ) {
     return Response.json({ error: "Invalid order notification" }, { status: 400, headers: corsHeaders });
   }
@@ -65,6 +66,12 @@ Deno.serve(async (request) => {
   if (body.event === "rejected" && order.status !== "Rejected") {
     return Response.json({ error: "Order is not rejected" }, { status: 409, headers: corsHeaders });
   }
+  if (body.event === "delivered" && order.status !== "Delivered") {
+    return Response.json({ error: "Order is not delivered" }, { status: 409, headers: corsHeaders });
+  }
+  if (body.event === "completed" && order.status !== "Completed") {
+    return Response.json({ error: "Order is not completed" }, { status: 409, headers: corsHeaders });
+  }
   const { data: subscriptions, error: subscriptionError } = body.event === "new"
     ? await supabase.from("manager_push_subscriptions").select("endpoint, subscription")
     : await supabase.from("customer_push_subscriptions")
@@ -84,16 +91,28 @@ Deno.serve(async (request) => {
         ? (language === "hi" ? "नया Shanvi ऑर्डर" : "New Shanvi order")
         : body.event === "rejected"
           ? (language === "hi" ? "ऑर्डर अस्वीकार हुआ" : "Order rejected")
-          : (language === "hi" ? "ऑर्डर मंज़ूर हुआ" : "Order accepted"),
+          : body.event === "delivered"
+            ? (language === "hi" ? "ऑर्डर डिलीवर हुआ" : "Order delivered")
+            : body.event === "completed"
+              ? (language === "hi" ? "ऑर्डर पूरा हुआ" : "Order completed")
+              : (language === "hi" ? "ऑर्डर मंज़ूर हुआ" : "Order accepted"),
       body: body.event === "new"
         ? (language === "hi" ? `ऑर्डर ${order.reference} मिला` : `Order ${order.reference} received`)
         : body.event === "rejected"
           ? (language === "hi"
             ? `Shanvi General Store ने आपका ऑर्डर ${order.reference} अस्वीकार कर दिया।`
             : `Your order ${order.reference} was rejected by Shanvi General Store.`)
-          : (language === "hi"
-            ? `Shanvi General Store ने आपका ऑर्डर ${order.reference} स्वीकार कर लिया।`
-            : `Your order ${order.reference} was accepted by Shanvi General Store.`),
+          : body.event === "delivered"
+            ? (language === "hi"
+              ? `आपका ऑर्डर ${order.reference} डिलीवर कर दिया गया है।`
+              : `Your order ${order.reference} has been delivered.`)
+            : body.event === "completed"
+              ? (language === "hi"
+                ? `आपका ऑर्डर ${order.reference} पूरा हो गया है।`
+                : `Your order ${order.reference} is complete.`)
+              : (language === "hi"
+                ? `Shanvi General Store ने आपका ऑर्डर ${order.reference} स्वीकार कर लिया।`
+                : `Your order ${order.reference} was accepted by Shanvi General Store.`),
       reference: order.reference,
     });
     try {

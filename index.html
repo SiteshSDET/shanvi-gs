@@ -163,6 +163,18 @@
     .order-contact-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
     .profile-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; }
     .profile-toolbar .small-note { margin: 0; }
+    .profile-order-group { margin: 12px 0; border: 1px solid var(--line); border-radius: 14px; background: #f8faf7; overflow: hidden; }
+    .profile-order-group > summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding: 12px 14px; list-style: none; color: var(--green-dark); font-size: 14px; font-weight: 800; cursor: pointer; }
+    .profile-order-group > summary::-webkit-details-marker, .customer-order-details > summary::-webkit-details-marker { display: none; }
+    .profile-order-group > summary::after { content: "+"; display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; background: #eaf2e8; font-size: 20px; }
+    .profile-order-group[open] > summary::after { content: "−"; }
+    .profile-order-group-content { padding: 0 10px 8px; }
+    .customer-order-details { margin: 8px 0; border: 1px solid var(--line); border-radius: 12px; background: white; overflow: hidden; }
+    .customer-order-details > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 52px; padding: 10px 12px; list-style: none; cursor: pointer; }
+    .customer-order-details > summary::after { content: "⌄"; flex: 0 0 auto; color: var(--green-dark); font-size: 18px; }
+    .customer-order-details[open] > summary::after { content: "⌃"; }
+    .customer-order-reference { overflow-wrap: anywhere; color: var(--green-dark); font-size: 12px; font-weight: 850; }
+    .customer-order-details-content { padding: 0 12px 13px; border-top: 1px solid var(--line); }
     .customer-order-card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 13px 0; box-shadow: 0 5px 18px rgba(35, 55, 39, .05); }
     .customer-order-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
     .customer-order-card h3 { margin: 0 0 5px; font-size: 15px; overflow-wrap: anywhere; }
@@ -483,7 +495,7 @@
       </div>
       <div class="admin-card">
         <h3>Order notifications</h3>
-        <p class="small-note" id="notification-instructions">Push notifications are configured. To receive new-order alerts when this page is closed, enter the enrollment code below, then tap Enable browser alerts and allow notifications. The manager phone number is only a reminder; it does not send SMS or calls.</p>
+        <p class="small-note" id="notification-instructions">To receive new-order alerts while the store is closed, allow notifications, enter the manager push enrollment code, and tap Enable browser alerts until the page confirms push registration. The in-page test alert alone does not verify background push. The manager phone number is only a reminder; it does not send SMS or calls.</p>
         <div class="field"><label for="manager-alert-phone">Manager phone number (for SMS setup)</label><input id="manager-alert-phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit mobile number"><small class="small-note">Saved only in this browser as a reminder. This does not send SMS/calls. Browser alerts go to the phone where you enable them.</small></div>
         <button class="btn btn-soft" id="save-manager-alert-phone" type="button">Save manager number</button>
         <details class="notification-help"><summary>Mobile setup steps</summary><ol><li>Open this store link on the manager's phone and sign in. Use Chrome on Android. On iPhone/iPad, open in Safari, tap Share → Add to Home Screen, then launch the installed store icon.</li><li>Allow notifications when the phone asks. If no prompt appears, enable notifications for this site/app in the phone's Settings.</li><li>Enter the manager push code below and tap <strong>Enable browser alerts</strong>. Wait for the message that push is enabled on this device.</li><li>Tap <strong>Test sound and notification</strong>. New orders can then notify this phone even when the store page is closed, subject to phone notification, Focus/Do Not Disturb, and battery settings.</li></ol></details>
@@ -601,6 +613,9 @@
         cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
         profile: "Profile", help: "Help", profileTitle: "My profile & orders", profileNote: "Order history is private to this browser. Keep this device to follow order updates; customer sign-in is not enabled.",
         refreshOrders: "Refresh orders", refreshingOrders: "Refreshing orders…", profileOffline: "You appear to be offline. Reconnect and refresh again.",
+        noTrackedOrders: "No online-tracked orders are available to refresh in this browser.",
+        orderGroupInProgress: "In Progress", orderGroupPendingRejected: "Pending / Rejected", orderGroupCompleted: "Completed",
+        enableOrderPush: "Enable order notifications", orderPushEnabled: "Order notifications enabled on this device.",
         orderStepPlaced: "Placed", orderStepAccepted: "Accepted", orderStepDelivered: "Delivered", orderStepCompleted: "Complete",
         helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.",
         noCustomerOrders: "Your placed orders will appear here.", orderItems: "Items",
@@ -684,6 +699,9 @@
         cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
         profile: "प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर", profileNote: "ऑर्डर की जानकारी इसी ब्राउज़र में सुरक्षित है। अपडेट देखने के लिए इसी डिवाइस का उपयोग करें; ग्राहक लॉगिन चालू नहीं है।",
         refreshOrders: "ऑर्डर अपडेट करें", refreshingOrders: "ऑर्डर अपडेट हो रहे हैं…", profileOffline: "इंटरनेट उपलब्ध नहीं है। कनेक्ट करके फिर अपडेट करें।",
+        noTrackedOrders: "इस ब्राउज़र में अपडेट करने योग्य ऑनलाइन ऑर्डर नहीं हैं।",
+        orderGroupInProgress: "जारी ऑर्डर", orderGroupPendingRejected: "लंबित / अस्वीकार", orderGroupCompleted: "पूरे हुए",
+        enableOrderPush: "ऑर्डर सूचना चालू करें", orderPushEnabled: "इस डिवाइस पर ऑर्डर सूचनाएँ चालू हैं।",
         orderStepPlaced: "ऑर्डर मिला", orderStepAccepted: "स्वीकार", orderStepDelivered: "डिलीवर", orderStepCompleted: "पूरा",
         helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।",
         noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", orderItems: "सामान",
@@ -787,6 +805,8 @@
     let storeHelpPhone = "";
     let customerOrders = storage.read("shanvi-customer-orders", []);
     if (!Array.isArray(customerOrders)) customerOrders = [];
+    const expandedCustomerOrderGroups = new Set();
+    const expandedCustomerOrderDetails = new Set();
     let customerStatusRefreshTimer = null;
     let customerStatusRefreshInProgress = false;
     let brandLogo = storage.read("shanvi-brand-logo", "");
@@ -965,13 +985,31 @@
         showToast(error.message || "Could not copy. Please select and copy the order details.");
       }
     }
+    function customerOrderGroup(order) {
+      if (order.status === "Completed") return "completed";
+      if (order.status === "Approved" || order.status === "Delivered") return "in-progress";
+      return "pending-rejected";
+    }
     function renderCustomerOrders() {
       const container = $("customer-orders");
       if (!customerOrders.length) {
         container.innerHTML = `<p class="payment-box">${tr("noCustomerOrders")}</p>`;
         return;
       }
-      container.innerHTML = customerOrders.slice().reverse().map((order) => {
+      const groupedOrders = {
+        "in-progress": customerOrders.filter((order) => customerOrderGroup(order) === "in-progress"),
+        "pending-rejected": customerOrders.filter((order) => customerOrderGroup(order) === "pending-rejected"),
+        completed: customerOrders.filter((order) => customerOrderGroup(order) === "completed")
+      };
+      const groupLabels = {
+        "in-progress": tr("orderGroupInProgress"),
+        "pending-rejected": tr("orderGroupPendingRejected"),
+        completed: tr("orderGroupCompleted")
+      };
+      container.innerHTML = Object.entries(groupedOrders).map(([group, orders]) => `
+        <details class="profile-order-group" data-customer-order-group="${group}" ${expandedCustomerOrderGroups.has(group) ? "open" : ""}>
+          <summary><span>${groupLabels[group]}</span><span>${orders.length}</span></summary>
+          <div class="profile-order-group-content">${orders.slice().reverse().map((order) => {
         const reference = order.id || order.reference;
         const items = Array.isArray(order.items) ? order.items : [];
         const rejected = order.status === "Rejected";
@@ -982,24 +1020,42 @@
         }[order.status] ?? 0);
         const paymentMethod = order.paymentMethod === "cod" ? tr("cod")
           : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
-        return `<article class="customer-order-card">
-          <div class="customer-order-head"><div><h3>${tr("order")} ${escapeHtml(reference)}</h3><p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p></div><span class="customer-order-status" data-state="${rejected ? "rejected" : "active"}">${escapeHtml(customerOrderStatusLabel(order.status))}</span></div>
-          <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(order.status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
-          <div class="customer-order-actions">
-            <button class="btn btn-soft" type="button" data-copy-customer-order-id="${escapeAttr(reference)}">${tr("copyOrderId")}</button>
-            <button class="btn btn-soft" type="button" data-copy-customer-order-details="${escapeAttr(reference)}">${tr("copyOrderDetails")}</button>
-            <a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a>
+        return `<details class="customer-order-details" data-customer-order-id="${escapeAttr(reference)}" ${expandedCustomerOrderDetails.has(reference) ? "open" : ""}>
+          <summary><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-status" data-state="${rejected ? "rejected" : "active"}">${escapeHtml(customerOrderStatusLabel(order.status))}</span></summary>
+          <div class="customer-order-details-content">
+            <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
+            <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(order.status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
+            <div class="customer-order-actions">
+              <button class="btn btn-soft" type="button" data-copy-customer-order-id="${escapeAttr(reference)}">${tr("copyOrderId")}</button>
+              <button class="btn btn-soft" type="button" data-copy-customer-order-details="${escapeAttr(reference)}">${tr("copyOrderDetails")}</button>
+              <a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a>
+              ${db && order.customerStatusToken ? `<button class="btn btn-soft" type="button" data-enable-customer-order-push="${escapeAttr(reference)}" ${order.customerPushEnabled ? "disabled" : ""}>${order.customerPushEnabled ? tr("orderPushEnabled") : tr("enableOrderPush")}</button>` : ""}
+            </div>
+            ${db && order.customerStatusToken ? `<p class="small-note" data-customer-order-push-status="${escapeAttr(reference)}"></p>` : ""}
+            <strong>${tr("orderItems")}</strong>
+            <ul>${items.map((item) => `<li>${escapeHtml(item.name)} × ${Number(item.quantity) || 1} — ${money(Number(item.price) || 0)}</li>`).join("")}</ul>
+            <p class="small-note">${tr("orderAddress")}: ${escapeHtml(order.address || "")}</p>
+            <div class="summary-row"><span>${tr("subtotal")}</span><span>${money(Number(order.subtotal) || 0)}</span></div>
+            ${Number(order.discount) > 0 ? `<div class="summary-row"><span>${tr("couponSavings")}</span><span>−${money(Number(order.discount))}</span></div>` : ""}
+            <div class="summary-row"><span>${tr("delivery")}</span><span>${money(Number(order.deliveryFee) || 0)}</span></div>
+            <div class="summary-row"><span>${tr("total")}</span><strong>${money(Number(order.total) || 0)}</strong></div>
+            <p class="small-note">${tr("payment")}: ${escapeHtml(paymentMethod)}</p>
           </div>
-          <strong>${tr("orderItems")}</strong>
-          <ul>${items.map((item) => `<li>${escapeHtml(item.name)} × ${Number(item.quantity) || 1} — ${money(Number(item.price) || 0)}</li>`).join("")}</ul>
-          <p class="small-note">${tr("orderAddress")}: ${escapeHtml(order.address || "")}</p>
-          <div class="summary-row"><span>${tr("subtotal")}</span><span>${money(Number(order.subtotal) || 0)}</span></div>
-          ${Number(order.discount) > 0 ? `<div class="summary-row"><span>${tr("couponSavings")}</span><span>−${money(Number(order.discount))}</span></div>` : ""}
-          <div class="summary-row"><span>${tr("delivery")}</span><span>${money(Number(order.deliveryFee) || 0)}</span></div>
-          <div class="summary-row"><span>${tr("total")}</span><strong>${money(Number(order.total) || 0)}</strong></div>
-          <p class="small-note">${tr("payment")}: ${escapeHtml(paymentMethod)}</p>
-        </article>`;
-      }).join("");
+        </details>`;
+      }).join("")}</div>
+        </details>`).join("");
+      container.querySelectorAll("[data-customer-order-group]").forEach((section) => {
+        section.addEventListener("toggle", () => {
+          if (section.open) expandedCustomerOrderGroups.add(section.dataset.customerOrderGroup);
+          else expandedCustomerOrderGroups.delete(section.dataset.customerOrderGroup);
+        });
+      });
+      container.querySelectorAll("[data-customer-order-id]").forEach((orderDetails) => {
+        orderDetails.addEventListener("toggle", () => {
+          if (orderDetails.open) expandedCustomerOrderDetails.add(orderDetails.dataset.customerOrderId);
+          else expandedCustomerOrderDetails.delete(orderDetails.dataset.customerOrderId);
+        });
+      });
       container.querySelectorAll("[data-copy-customer-order-id]").forEach((button) => {
         button.addEventListener("click", () => copyCustomerOrderText(button.dataset.copyCustomerOrderId));
       });
@@ -1009,16 +1065,31 @@
           if (order) copyCustomerOrderText(customerOrderShareText(order));
         });
       });
+      container.querySelectorAll("[data-enable-customer-order-push]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const reference = button.dataset.enableCustomerOrderPush;
+          const order = customerOrders.find((item) => (item.id || item.reference) === reference);
+          const status = [...container.querySelectorAll("[data-customer-order-push-status]")]
+            .find((element) => element.dataset.customerOrderPushStatus === reference);
+          if (order && status) void registerCustomerOrderPush(order, button, status);
+        });
+      });
     }
-    async function refreshCustomerOrderStatuses() {
-      if (!db || customerStatusRefreshInProgress) return;
+    async function refreshCustomerOrderStatuses({ includeTerminal = false } = {}) {
+      if (!db) {
+        $("profile-sync-status").textContent = tr("noTrackedOrders");
+        return;
+      }
+      if (customerStatusRefreshInProgress) return;
       if (document.visibilityState !== "visible" && $("profile-overlay").classList.contains("open")) return;
       const ordersToCheck = customerOrders.filter((order) =>
         order.customerStatusToken
-        && !["Completed", "Rejected"].includes(order.status)
+        && (includeTerminal || !["Completed", "Rejected"].includes(order.status))
       );
       if (!ordersToCheck.length) {
-        $("profile-sync-status").textContent = navigator.onLine ? tr("orderStatusSynced") : tr("profileOffline");
+        $("profile-sync-status").textContent = customerOrders.length
+          ? tr("noTrackedOrders")
+          : tr("noCustomerOrders");
         return;
       }
       customerStatusRefreshInProgress = true;
@@ -1462,9 +1533,7 @@
         button.disabled = false;
       }
     }
-    async function registerCustomerOrderPush(order) {
-      const button = $("customer-approval-notify");
-      const status = $("customer-notification-status");
+    async function registerCustomerOrderPush(order, button = $("customer-approval-notify"), status = $("customer-notification-status")) {
       if (!db || !supabaseConfig.pushPublicKey) {
         status.textContent = "Order notifications need the Supabase push setup.";
         return;
@@ -1474,6 +1543,7 @@
         return;
       }
       button.disabled = true;
+      let registrationSucceeded = false;
       try {
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
@@ -1491,19 +1561,25 @@
           }
         });
         if (error) throw error;
+        if (data?.registered) {
+          registrationSucceeded = true;
+          order.customerPushEnabled = true;
+          storage.write("shanvi-customer-orders", customerOrders);
+          button.textContent = tr("orderPushEnabled");
+          status.textContent = data.status === "Awaiting manager approval"
+            ? tr("approvalNotificationsOn")
+            : `${tr("orderPushEnabled")} ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(data.status)}.`;
+        }
         if (data?.status === "Approved") {
-          status.textContent = tr("approvalAlreadyDone");
-          await registration.showNotification("Order approved", {
-            body: `Your order ${order.id} was approved by Shanvi General Store.`,
+          await registration.showNotification("Order already accepted", {
+            body: `Your order ${order.id} was already accepted. Future status changes can be notified on this device.`,
             icon: "./store-icon.svg"
           });
-        } else {
-          status.textContent = tr("approvalNotificationsOn");
-          button.textContent = tr("approvalNotificationsEnabled");
         }
       } catch (error) {
         status.textContent = error.message || "Could not enable order notifications.";
-        button.disabled = false;
+      } finally {
+        button.disabled = registrationSucceeded;
       }
     }
     function playManagerAlert() {
@@ -2272,7 +2348,7 @@
         $("profile-sync-status").textContent = tr("profileOffline");
         return;
       }
-      void refreshCustomerOrderStatuses();
+      void refreshCustomerOrderStatuses({ includeTerminal: true });
     };
     $("profile-close").onclick = () => {
       $("profile-overlay").classList.remove("open");
