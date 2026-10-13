@@ -932,6 +932,7 @@
     let paymentContactRealtimeChannel = null;
     let catalogRealtimeChannel = null;
     let storefrontRealtimeChannel = null;
+    let sharedStoreRefreshInProgress = false;
     let managerAudioContext = null;
     let managerOrdersPage = 0;
     let managerOrders = [];
@@ -1701,6 +1702,15 @@
       }
       if (!data?.value || typeof data.value !== "object") return;
       applySharedStorefront(data.value);
+    }
+    async function refreshSharedStorefront() {
+      if (!db || sharedStoreRefreshInProgress || !navigator.onLine) return;
+      sharedStoreRefreshInProgress = true;
+      try {
+        await Promise.all([loadSharedProducts(), loadSharedStorefront()]);
+      } finally {
+        sharedStoreRefreshInProgress = false;
+      }
     }
     function applySharedStorefront(value) {
       brandLogo = typeof value.logo === "string" ? value.logo : "";
@@ -3312,9 +3322,12 @@
     });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState !== "visible" || !db) return;
-      void loadSharedProducts();
-      void loadSharedStorefront();
+      void refreshSharedStorefront();
     });
+    window.addEventListener("online", () => void refreshSharedStorefront());
+    window.setInterval(() => {
+      if (document.visibilityState === "visible") void refreshSharedStorefront();
+    }, 15000);
     $("p-image").addEventListener("change", async () => {
       const file = $("p-image").files[0];
       if (!file) return;
@@ -3600,7 +3613,7 @@
     }
     if (db) {
       checkOrderBackend();
-      void loadSharedProducts();
+      void refreshSharedStorefront();
       subscribeToSharedCatalog();
       void loadSharedStorefront();
       subscribeToSharedStorefront();
