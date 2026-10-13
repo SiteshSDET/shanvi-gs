@@ -15,10 +15,11 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
 3. Run `supabase-order-payment-update.sql` the same way.
 4. Run `supabase/features.sql`.
 5. Run the latest `supabase/storefront-sync.sql` to add shared catalog display fields, enable live product/store setting updates, migrate existing Electronics products, and allow all current categories. Rerun it after deploying category/schema updates; it is safe to run repeatedly.
-6. Run `supabase/order-payment-confirmation.sql` last. Checkout remains disabled until all required order columns and policies are installed.
-7. Run `supabase/order-manager-delete.sql` to enable the manager-only permanent order deletion action.
-8. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
-9. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
+6. Run `supabase/order-payment-confirmation.sql` to finalize checkout columns and policies. Checkout remains disabled until all required order columns and policies are installed.
+7. Run `supabase/order-manager-decisions.sql` to add the reason field used for declined orders.
+8. Run `supabase/order-manager-delete.sql` to enable the manager-only permanent order deletion action.
+9. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
+10. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
 
    ```sql
    insert into public.store_managers (user_id)
@@ -26,7 +27,13 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
    on conflict (user_id) do nothing;
    ```
 
-10. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
+11. Redeploy the customer order status function so customers can see a manager's rejection reason:
+
+   ```sh
+   npx supabase functions deploy get-customer-order --no-verify-jwt --project-ref zhrdeemyofcxxigqazgz
+   ```
+
+12. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
 
 Customers can open **Profile** to see their order details; while Profile is open, order statuses refresh automatically about every 12 seconds, including accepted and rejected updates. Customers can copy an order ID/details or open a prefilled WhatsApp message to the store at `+91 97989 87872`. New order IDs use `SNVGS-<last 4 phone digits>-<unique suffix>` so the manager can recognize the customer without exposing the full phone number in the ID. In **Manager → Customer orders**, search by any part of the customer's phone number or order ID; phone matching is partial and searches all matching orders. Since customer sign-in is not enabled, order history and its private status-check token are kept in that browser only; order history is not shared across devices or browsers. The manager can save or change the customer-facing phone number in **Manager → Help & contact**, and customers can call it from **Help**. That contact, catalog, product images, offer, logo, delivery, and banner settings are shared through Supabase after the required SQL setup.
 
@@ -38,11 +45,11 @@ Open Manager by tapping the **Shanvi General Store** name six times within four 
 
 Use **Festival banner** to set the small heading, main headline, customer message, and background photo. The live preview shows the banner's center-crop; a wide landscape **16:6** image, ideally **1600 × 600 px**, gives the best fit. The customer-page photo uses a gentle animated zoom/pan with animated festival sparkles, with a dark overlay for readable text. Product and banner photos are resized locally before upload to Supabase Storage. In the product editor, use **Remove product photo** to clear the current/selected photo; an item without a photo uses its category placeholder. Banner, product details, logo, free-item offer, and delivery location are shared with customers' devices; all configured storefronts require the `storefront-sync.sql` migration.
 
-In **Payment details**, set a store UPI ID, choose a QR image, and toggle COD. Saving these settings shares them through Supabase with all customers; after this update, save payment details once from Manager to publish the values (the older version kept them only in the manager's browser). For UPI ID orders, customers enter their UPI ID, tap **Continue to pay in UPI app**, and return to the store page before **Confirm order** becomes available. For QR orders, they tap **Start QR payment**, open their UPI app to scan and pay, then return to the store page. COD remains available without leaving the page. Returning from an external UPI app is only a handoff signal; the website cannot verify payment, so the manager must check the payment account before accepting the order. The included UPI ID and QR are sample data for demonstration only; do not send money to them. Replace them with the store's real payment details before using payment options.
+In **Payment details**, set a store UPI ID, choose a QR image, and toggle COD. Saving these settings shares them through Supabase with all customers; after this update, save payment details once from Manager to publish the values (the older version kept them only in the manager's browser). For UPI ID orders, customers enter their UPI ID and tap **Continue to pay in UPI app**. For QR orders, they tap **Start QR payment** and scan the code. After paying, they tap **I have completed payment**; only then is **Confirm order** enabled. This button records the customer's statement, not verified payment. The manager must check the payment account before accepting. Managers can accept a UPI order as **Cash on delivery** if appropriate. The included UPI ID and QR are sample data for demonstration only; do not send money to them. Replace them with the store's real payment details before using payment options.
 
-An order appears in **Customer orders** only after it is successfully saved. UPI orders require the customer to return from the external payment flow before submission; this does not prove payment succeeded. The manager must verify payment manually. With Supabase configured, orders remain **Awaiting manager approval** until an authorized manager accepts them.
+An order appears in **Customer orders** only after it is successfully saved. UPI orders require the customer to confirm payment before submission; this does not prove payment succeeded. The manager must verify payment manually. With Supabase configured, orders remain **Awaiting manager approval** until an authorized manager accepts them.
 
-The customer Profile shows **Pending** in red, **In Progress** in yellow after the manager accepts the order, and **Completed** in green. Rejected orders are omitted from the customer Profile; they remain available to the manager in the **Rejected** filter. Customer status changes are checked only when the customer taps **Refresh orders**; the latest status saved by the manager is shown after that check. The Manager order list is at the bottom of the manager tools. Its **Pending**, **Completed**, **Rejected**, and **All** filters separate orders by status. Each order shows **Accept → Delivered → Complete** in that order; only the next valid action is enabled. **Reject** is available while an order is pending or accepted. Managers can permanently delete an order using **Delete order**, then explicitly confirm **Delete** or choose **Cancel**. Status changes are saved in Supabase when connected, or in this browser in local/demo mode.
+The customer Profile shows **Pending** in red, **In Progress** in yellow after the manager accepts the order, **Completed** in green, and rejected orders with the manager's reason. Customer status changes are checked when the customer taps **Refresh orders**. The Manager order list is at the bottom of the manager tools. Its **Pending**, **Completed**, **Rejected**, and **All** filters separate orders by status. The manager can **Accept** with the original payment method, **Accept as COD**, or **Reject** and provide a reason. Accepted orders can then be marked **Delivered** and **Complete**. Managers can permanently delete an order using **Delete order**, then explicitly confirm **Delete** or choose **Cancel**. Status changes are saved in Supabase when connected, or in this browser in local/demo mode.
 
 ## Storefront options
 
@@ -59,7 +66,7 @@ Push alerts need an online Supabase project and an HTTPS deployment; they cannot
 
 HTML, CSS, and browser JavaScript cannot securely synchronize customer orders between different phones or deliver push notifications while the manager page is closed. That requires an online backend.
 
-The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback. UPI payments currently open the customer's UPI app (or display a QR) and require manual payment verification by the store; there is no payment-gateway integration or automatic payment confirmation.
+The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback. UPI payments currently open the customer's UPI app (or display a QR); customers must confirm they paid before placing an order, and the store must still verify the payment manually. This is not a payment-gateway integration or automatic payment confirmation. Managers can accept an order as COD instead or reject it with a reason, which appears in the customer's Profile after the updated status function is deployed.
 
 ### Cross-device manager push setup
 

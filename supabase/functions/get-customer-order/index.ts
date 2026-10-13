@@ -45,7 +45,7 @@ Deno.serve(async (request) => {
 
   const supabase = createClient(projectUrl, serviceRoleKey);
   const { data: order, error } = await supabase.from("orders")
-    .select("reference, status, created_at")
+    .select("reference, status, rejection_reason, payment_method, created_at")
     .eq("reference", body.reference)
     .eq("customer_status_token_hash", await sha256Hex(body.token))
     .maybeSingle();
@@ -58,7 +58,13 @@ Deno.serve(async (request) => {
   }
 
   return Response.json(
-    { reference: order.reference, status: order.status, createdAt: order.created_at },
+    {
+      reference: order.reference,
+      status: order.status,
+      rejectionReason: order.rejection_reason,
+      paymentMethod: order.payment_method,
+      createdAt: order.created_at,
+    },
     { headers: corsHeaders },
   );
 });

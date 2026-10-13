@@ -55,7 +55,8 @@
     .cart-btn { position: relative; }
     .cart-count { display: inline-grid; place-items: center; background: var(--orange); color: white; width: 20px; height: 20px; border-radius: 99px; font-size: 11px; margin-left: 5px; }
     main { max-width: 1200px; margin: auto; padding: 26px 24px 70px; }
-    .hero { min-height: 330px; padding: 48px 52px; border-radius: 24px; overflow: hidden; position: relative; background: #e7efe3; display: flex; align-items: center; }
+    .hero { min-height: 330px; padding: 48px 52px; border-radius: 24px; overflow: hidden; position: relative; background: #e7efe3; display: flex; align-items: center; transition: opacity .2s ease; }
+    .hero.storefront-loading { opacity: 0; }
     .hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0; transition: opacity .8s ease; }
     .hero-photo.loaded { opacity: 1; animation: festival-drift 13s ease-in-out infinite alternate; }
     .hero-shade { display: none; position: absolute; inset: 0; z-index: 1; background: linear-gradient(110deg, rgba(12,24,17,.77), rgba(12,24,17,.12) 70%, rgba(111,44,13,.22)); background-size: 180% 180%; }
@@ -349,16 +350,17 @@
       .section-heading h2 { font-size: 25px; }
       .categories { gap: 7px; margin-right: -13px; padding: 2px 13px 10px 0; scroll-snap-type: x proximity; }
       .category-chip { min-height: 42px; padding: 9px 13px; scroll-snap-align: start; }
-      .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
       .product { border-radius: 13px; }
       .product-image { aspect-ratio: 1 / 1; }
-      .product-info { padding: 10px; }
-      .product-category { font-size: 9px; letter-spacing: .08em; }
-      .product h3 { min-height: 2.5em; margin: 5px 0 8px; font-size: 13px; line-height: 1.25; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-      .product-bottom { align-items: end; gap: 5px; }
-      .price { font-size: 14px; }
-      .mrp { display: block; margin: 3px 0 0; }
-      .add-btn { min-height: 40px; padding: 7px 9px; }
+      .product-info { padding: 7px; }
+      .product-category { font-size: 8px; letter-spacing: .04em; }
+      .product h3 { min-height: 2.4em; margin: 4px 0 6px; font-size: 11px; line-height: 1.2; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+      .product .small-note { display: none; }
+      .product-bottom { align-items: end; gap: 3px; }
+      .price { font-size: 12px; }
+      .mrp { display: block; margin: 2px 0 0; font-size: 10px; }
+      .add-btn { min-height: 34px; padding: 5px 6px; font-size: 10px; }
       .offer-banner { grid-template-columns: 42px 1fr; gap: 10px; padding: 14px; border-radius: 16px; }
       .offer-gift-icon { width: 42px; height: 42px; font-size: 23px; border-radius: 13px; }
       .offer-badge { grid-column: 2; justify-self: start; margin-top: -3px; }
@@ -708,11 +710,11 @@
         enableOrderPush: "Enable order notifications", orderPushEnabled: "Order notifications enabled on this device.",
         orderStepPlaced: "Placed", orderStepAccepted: "Accepted", orderStepDelivered: "Delivered", orderStepCompleted: "Complete",
         helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.", callStore: "Call store", chatWhatsApp: "Chat on WhatsApp",
-        noCustomerOrders: "Your placed orders will appear here.", noActiveCustomerOrders: "No active orders to show. Rejected orders are hidden here.", orderItems: "Items",
+        noCustomerOrders: "Your placed orders will appear here.", noActiveCustomerOrders: "No active orders to show.", orderItems: "Items",
         orderAddress: "Delivery address", orderStatusPending: "Pending", orderStatusApproved: "Accepted by store",
         viewOrderDetails: "Tap to view details",
         deleteOrder: "Delete order", confirmDeleteOrder: "Are you sure you want to permanently delete this order?", cancelDelete: "Cancel",
-        orderStatusDelivered: "Delivered", orderStatusCompleted: "Completed", orderStatusRejected: "Rejected",
+        orderStatusDelivered: "Delivered", orderStatusCompleted: "Completed", orderStatusRejected: "Rejected", orderGroupRejected: "Rejected orders", rejectionReason: "Reason",
         copyOrderId: "Copy order ID", copyOrderDetails: "Copy order details", copied: "Copied",
         whatsappOrder: "💬 WhatsApp store", orderWhatsAppIntro: "Hello Shanvi General Store, I am contacting you about my order.",
         orderIdLabel: "Order ID", orderStatusLabel: "Status", orderItemsLabel: "Items", orderTotalLabel: "Total",
@@ -739,7 +741,7 @@
         enterYourUpi: "Enter the UPI ID you will pay from.", yourUpi: "Your UPI ID",
         upiExample: "Example: 9876543210@upi", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
         payStoreAt: "Pay the store at:", copyUpi: "Copy store UPI ID",
-        markPaymentReturned: "I returned from my UPI app",
+        markPaymentReturned: "I have completed payment",
         storeUpiMissing: "Store UPI ID payment is not configured.",
         qr: "Scan UPI QR code", scanQr: "Scan the store QR code with your UPI app.",
         qrMissing: "Not configured yet; ask the store to add its QR code.",
@@ -748,12 +750,12 @@
         qrNotConfigured: "QR payment is not configured.",
         cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
         codUnavailable: "Currently unavailable; the store manager has disabled COD.",
-        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "Open your UPI app and return here to enable order confirmation. Returning does not verify payment; the store must check the payment account.",
+        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "After paying, tap “I have completed payment” to enable order confirmation. This is your confirmation only; payment is not verified automatically and the store must check its account.",
         continueToPay: "Continue to pay in UPI app", startQrPayment: "Start QR payment", qrPaymentStarted: "Open your UPI app, scan the QR code, then return here.",
-        paymentFlowPending: "Return here after opening your UPI app to continue. Payment is not verified automatically.",
-        paymentFlowReturned: "You returned from the payment flow. The store must verify payment before accepting the order.",
-        paymentCustomerMarkedPaid: "Customer returned from payment flow — verify receipt in the payment account.",
-        paymentCustomerNotMarkedPaid: "Customer did not return from the payment flow.",
+        paymentFlowPending: "Pay using your UPI app, then tap “I have completed payment”. Payment is not verified automatically.",
+        paymentFlowReturned: "You confirmed payment. The store must verify receipt in its payment account.",
+        paymentCustomerMarkedPaid: "Customer confirmed payment — verify receipt in the payment account.",
+        paymentCustomerNotMarkedPaid: "Customer has not confirmed payment.",
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
         itemsEach: "each", invalidCoupon: "That coupon code is not valid", couponApplied: "WELCOME10 applied",
@@ -806,11 +808,11 @@
         enableOrderPush: "ऑर्डर सूचना चालू करें", orderPushEnabled: "इस डिवाइस पर ऑर्डर सूचनाएँ चालू हैं।",
         orderStepPlaced: "ऑर्डर मिला", orderStepAccepted: "स्वीकार", orderStepDelivered: "डिलीवर", orderStepCompleted: "पूरा",
         helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।", callStore: "दुकान पर कॉल करें", chatWhatsApp: "WhatsApp पर चैट करें",
-        noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", noActiveCustomerOrders: "दिखाने के लिए कोई सक्रिय ऑर्डर नहीं है। अस्वीकार किए गए ऑर्डर यहाँ छिपे हैं।", orderItems: "सामान",
+        noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", noActiveCustomerOrders: "दिखाने के लिए कोई सक्रिय ऑर्डर नहीं है।", orderItems: "सामान",
         orderAddress: "डिलीवरी का पता", orderStatusPending: "लंबित", orderStatusApproved: "दुकान ने स्वीकार किया",
         viewOrderDetails: "विवरण देखने के लिए दबाएँ",
         deleteOrder: "ऑर्डर हटाएँ", confirmDeleteOrder: "क्या आप यह ऑर्डर हमेशा के लिए हटाना चाहते हैं?", cancelDelete: "रद्द करें",
-        orderStatusDelivered: "डिलीवर हो गया", orderStatusCompleted: "पूरा हुआ", orderStatusRejected: "ऑर्डर अस्वीकार हुआ",
+        orderStatusDelivered: "डिलीवर हो गया", orderStatusCompleted: "पूरा हुआ", orderStatusRejected: "ऑर्डर अस्वीकार हुआ", orderGroupRejected: "अस्वीकृत ऑर्डर", rejectionReason: "कारण",
         copyOrderId: "ऑर्डर ID कॉपी करें", copyOrderDetails: "ऑर्डर की जानकारी कॉपी करें", copied: "कॉपी हो गया",
         whatsappOrder: "💬 WhatsApp पर भेजें", orderWhatsAppIntro: "नमस्ते Shanvi General Store, मैं अपने ऑर्डर के बारे में पूछ रहा/रही हूँ।",
         orderIdLabel: "ऑर्डर ID", orderStatusLabel: "स्थिति", orderItemsLabel: "सामान", orderTotalLabel: "कुल",
@@ -837,7 +839,7 @@
         enterYourUpi: "जिस UPI ID से भुगतान करेंगे, वह लिखें।", yourUpi: "आपकी UPI ID",
         upiExample: "उदाहरण: 9876543210@upi", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
         payStoreAt: "दुकान को यहाँ भुगतान करें:", copyUpi: "दुकान की UPI ID कॉपी करें",
-        markPaymentReturned: "मैं UPI ऐप से वापस आ गया/गई हूँ",
+        markPaymentReturned: "मैंने भुगतान कर दिया है",
         storeUpiMissing: "दुकान की UPI ID अभी सेट नहीं है।",
         qr: "UPI QR कोड स्कैन करें", scanQr: "अपने UPI ऐप से दुकान का QR कोड स्कैन करें।",
         qrMissing: "अभी सेट नहीं है; दुकान से QR कोड जोड़ने को कहें।",
@@ -846,12 +848,12 @@
         qrNotConfigured: "QR भुगतान अभी सेट नहीं है।",
         cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
-        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "ऑर्डर की पुष्टि चालू करने के लिए UPI ऐप खोलकर यहाँ वापस आएँ। वापस आने से भुगतान सत्यापित नहीं होता; दुकान भुगतान खाते में इसकी जाँच करेगी।",
+        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "भुगतान के बाद ऑर्डर की पुष्टि चालू करने के लिए “मैंने भुगतान कर दिया है” दबाएँ। यह केवल आपकी पुष्टि है; भुगतान अपने आप सत्यापित नहीं होता और दुकान अपने खाते में जाँच करेगी।",
         continueToPay: "UPI ऐप में भुगतान जारी रखें", startQrPayment: "QR भुगतान शुरू करें", qrPaymentStarted: "UPI ऐप खोलें, QR कोड स्कैन करें, फिर यहाँ वापस आएँ।",
-        paymentFlowPending: "जारी रखने के लिए UPI ऐप खोलकर यहाँ वापस आएँ। भुगतान अपने आप सत्यापित नहीं होता।",
-        paymentFlowReturned: "आप भुगतान प्रक्रिया से वापस आ गए हैं। ऑर्डर स्वीकार करने से पहले दुकान भुगतान की जाँच करेगी।",
-        paymentCustomerMarkedPaid: "ग्राहक भुगतान प्रक्रिया से वापस आया — भुगतान खाते में जाँचें।",
-        paymentCustomerNotMarkedPaid: "ग्राहक भुगतान प्रक्रिया से वापस नहीं आया।",
+        paymentFlowPending: "UPI ऐप से भुगतान करें, फिर “मैंने भुगतान कर दिया है” दबाएँ। भुगतान अपने आप सत्यापित नहीं होता।",
+        paymentFlowReturned: "आपने भुगतान की पुष्टि की है। दुकान अपने भुगतान खाते में जाँच करेगी।",
+        paymentCustomerMarkedPaid: "ग्राहक ने भुगतान की पुष्टि की — भुगतान खाते में जाँचें।",
+        paymentCustomerNotMarkedPaid: "ग्राहक ने भुगतान की पुष्टि नहीं की है।",
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
         itemsEach: "प्रति सामान", invalidCoupon: "यह कूपन कोड मान्य नहीं है", couponApplied: "WELCOME10 लागू हुआ",
@@ -951,6 +953,8 @@
     };
     let heroSettings = { ...defaultHero, ...storage.read("shanvi-hero", {}) };
     let heroDraftImage = heroSettings.image;
+    let heroFormDirty = false;
+    let sharedStorefrontLoadSequence = 0;
     let productImageDraft = "";
     let productImageFit = "contain";
     let productImageZoom = 100;
@@ -1137,7 +1141,8 @@
         `${tr("orderStatusLabel")}: ${customerOrderStatusLabel(customerOrderDisplayStatus(order))}`,
         `${tr("orderItemsLabel")}:`,
         ...items.map((item) => `- ${item.name} x${Number(item.quantity) || 1} (${money(Number(item.price) || 0)})`),
-        `${tr("orderTotalLabel")}: ${money(Number(order.total) || 0)}`
+        `${tr("orderTotalLabel")}: ${money(Number(order.total) || 0)}`,
+        ...(order.rejectionReason ? [`${tr("rejectionReason")}: ${order.rejectionReason}`] : [])
       ].join("\n");
     }
     function customerOrderWhatsAppUrl(order) {
@@ -1155,7 +1160,7 @@
       const status = customerOrderDisplayStatus(order);
       if (status === "Completed") return "completed";
       if (status === "Approved" || status === "Delivered") return "in-progress";
-      if (status === "Rejected") return null;
+      if (status === "Rejected") return "rejected";
       return "pending";
     }
     function renderCustomerOrders() {
@@ -1168,12 +1173,14 @@
       const groupedOrders = {
         "in-progress": visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "in-progress"),
         pending: visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "pending"),
-        completed: visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "completed")
+        completed: visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "completed"),
+        rejected: visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "rejected")
       };
       const groupLabels = {
         "in-progress": tr("orderGroupInProgress"),
         pending: tr("orderGroupPending"),
-        completed: tr("orderGroupCompleted")
+        completed: tr("orderGroupCompleted"),
+        rejected: tr("orderGroupRejected")
       };
       container.innerHTML = Object.entries(groupedOrders).filter(([, orders]) => orders.length > 0).map(([group, orders], index) => `
         <details class="profile-order-group" data-customer-order-group="${group}" ${expandedCustomerOrderGroups.has(group) ? "open" : ""}>
@@ -1195,6 +1202,7 @@
           <div class="customer-order-details-content">
             <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
             <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
+            ${rejected && order.rejectionReason ? `<p class="small-note"><strong>${tr("rejectionReason")}:</strong> ${escapeHtml(order.rejectionReason)}</p>` : ""}
             <div class="customer-order-actions">
               <button class="btn btn-soft" type="button" data-copy-customer-order-id="${escapeAttr(reference)}">${tr("copyOrderId")}</button>
               <button class="btn btn-soft" type="button" data-copy-customer-order-details="${escapeAttr(reference)}">${tr("copyOrderDetails")}</button>
@@ -1271,7 +1279,11 @@
       let updated = 0;
       let failed = 0;
       let verified = 0;
-      const previousStatuses = new Map(ordersToCheck.map((order) => [order, order.status]));
+      const previousOrderState = new Map(ordersToCheck.map((order) => [order, {
+        status: order.status,
+        rejectionReason: order.rejectionReason,
+        paymentMethod: order.paymentMethod
+      }]));
       try {
         await Promise.all(ordersToCheck.map(async (order) => {
           try {
@@ -1285,10 +1297,21 @@
             ) {
               throw new Error("The order status response was invalid.");
             }
+            let orderChanged = false;
             if (order.status !== data.status) {
               order.status = data.status;
-              updated += 1;
+              orderChanged = true;
             }
+            const rejectionReason = typeof data.rejectionReason === "string" ? data.rejectionReason : "";
+            if (order.rejectionReason !== rejectionReason) {
+              order.rejectionReason = rejectionReason;
+              orderChanged = true;
+            }
+            if (["cod", "upi_id", "upi_qr"].includes(data.paymentMethod) && order.paymentMethod !== data.paymentMethod) {
+              order.paymentMethod = data.paymentMethod;
+              orderChanged = true;
+            }
+            if (orderChanged) updated += 1;
             verifiedCustomerOrderStatuses.set(order.id || order.reference, data.status);
             verified += 1;
           } catch (error) {
@@ -1297,7 +1320,12 @@
           }
         }));
         if (updated && !storage.write("shanvi-customer-orders", customerOrders)) {
-          previousStatuses.forEach((status, order) => { order.status = status; });
+          previousOrderState.forEach((previous, order) => {
+            order.status = previous.status;
+            order.rejectionReason = previous.rejectionReason;
+            order.paymentMethod = previous.paymentMethod;
+            verifiedCustomerOrderStatuses.delete(order.id || order.reference);
+          });
           updated = 0;
           failed = ordersToCheck.length;
         }
@@ -1500,9 +1528,14 @@
       const image = $("hero-photo");
       image.classList.remove("loaded");
       if (heroSettings.image) {
-        image.src = heroSettings.image;
-        image.onload = () => image.classList.add("loaded");
-        image.onerror = () => showToast(tr("bannerLoadError"));
+        const requestedImage = new URL(heroSettings.image, document.baseURI).href;
+        image.onload = () => {
+          if (image.src === requestedImage) image.classList.add("loaded");
+        };
+        image.onerror = () => {
+          if (image.src === requestedImage) showToast(tr("bannerLoadError"));
+        };
+        image.src = requestedImage;
       } else {
         image.removeAttribute("src");
       }
@@ -1521,6 +1554,7 @@
       $("hero-eyebrow-input").value = heroSettings.eyebrow;
       $("hero-title-input").value = heroSettings.title.replace(/\n/g, " ");
       $("hero-description-input").value = heroSettings.description;
+      heroFormDirty = false;
       updateHeroPreview(heroSettings.image);
     }
     function renderCategories() {
@@ -1810,30 +1844,38 @@
     }
     async function loadSharedStorefront({ migrateLocal = false } = {}) {
       if (!db) return;
-      const { data, error } = await db.from("store_settings").select("value").eq("key", "storefront").maybeSingle();
-      if (error) {
-        console.warn("Could not load shared storefront settings", error.message);
-        return;
-      }
-      if (!data && migrateLocal && isAuthorizedManager) {
-        try {
-          await saveSharedStorefront({
-            logo: brandLogo,
-            offer: offerSettings,
-            delivery: deliverySettings,
-            hero: heroSettings
-          });
-        } catch (migrationError) {
-          console.error("Could not publish the manager's existing storefront settings", migrationError);
-          showToast(migrationError.message || "Could not share storefront settings.");
+      const requestSequence = ++sharedStorefrontLoadSequence;
+      try {
+        const { data, error } = await db.from("store_settings").select("value").eq("key", "storefront").maybeSingle();
+        if (requestSequence !== sharedStorefrontLoadSequence) return;
+        if (error) {
+          console.warn("Could not load shared storefront settings", error.message);
+          return;
         }
-        return;
+        if (!data && migrateLocal && isAuthorizedManager) {
+          try {
+            await saveSharedStorefront({
+              logo: brandLogo,
+              offer: offerSettings,
+              delivery: deliverySettings,
+              hero: heroSettings
+            });
+          } catch (migrationError) {
+            console.error("Could not publish the manager's existing storefront settings", migrationError);
+            showToast(migrationError.message || "Could not share storefront settings.");
+          }
+          return;
+        }
+        if (!data?.value || typeof data.value !== "object") return;
+        const signature = JSON.stringify(data.value);
+        if (signature === loadedStorefrontSignature) return;
+        loadedStorefrontSignature = signature;
+        applySharedStorefront(data.value);
+      } finally {
+        if (requestSequence === sharedStorefrontLoadSequence) {
+          $("festival-hero").classList.remove("storefront-loading");
+        }
       }
-      if (!data?.value || typeof data.value !== "object") return;
-      const signature = JSON.stringify(data.value);
-      if (signature === loadedStorefrontSignature) return;
-      loadedStorefrontSignature = signature;
-      applySharedStorefront(data.value);
     }
     async function refreshSharedStorefront() {
       if (!db || sharedStoreRefreshInProgress || !navigator.onLine) return;
@@ -1859,7 +1901,7 @@
       if (!couponSettings.enabled) coupon = false;
       deliverySettings = { latitude: "", longitude: "", ...(value.delivery || {}) };
       heroSettings = { ...defaultHero, ...(value.hero || {}) };
-      heroDraftImage = heroSettings.image;
+      if (!heroFormDirty) heroDraftImage = heroSettings.image;
       updateBrandLogo();
       renderCategories();
       updateCustomerOffer();
@@ -1872,28 +1914,38 @@
         $("coupon-enabled").checked = Boolean(couponSettings.enabled);
         $("coupon-percent").value = Number(couponSettings.percent) || 10;
         $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
-        $("coupon-enabled").checked = Boolean(couponSettings.enabled);
-        $("coupon-percent").value = Number(couponSettings.percent) || 10;
-        $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
         $("store-latitude").value = deliverySettings.latitude || "";
         $("store-longitude").value = deliverySettings.longitude || "";
-        fillHeroForm();
+        if (!heroFormDirty) fillHeroForm();
       }
     }
     async function saveSharedStorefront(value) {
+      const hero = value.hero === heroSettings && heroFormDirty
+        ? {
+          ...heroSettings,
+          eyebrow: $("hero-eyebrow-input").value.trim() || defaultHero.eyebrow,
+          title: $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " "),
+          description: $("hero-description-input").value.trim() || defaultHero.description,
+          image: heroDraftImage
+        }
+        : value.hero;
       const next = {
         ...value,
         coupon: value.coupon || couponSettings,
         logo: await uploadStoreImage(value.logo || "", "store/logo.jpg"),
         hero: {
-          ...value.hero,
-          image: await uploadStoreImage(value.hero?.image || "", "store/hero.jpg")
+          ...hero,
+          image: await uploadStoreImage(hero?.image || "", "store/hero.jpg")
         }
       };
       const { error } = await db.from("store_settings").upsert({ key: "storefront", value: next });
       if (error) throw new Error(`Could not share storefront settings with customers: ${error.message}`);
+      sharedStorefrontLoadSequence += 1;
       loadedStorefrontSignature = JSON.stringify(next);
       applySharedStorefront(next);
+      $("festival-hero").classList.remove("storefront-loading");
+      heroFormDirty = false;
+      if (isAuthorizedManager && $("admin").classList.contains("open")) fillHeroForm();
       storage.write("shanvi-brand-logo", brandLogo);
       storage.write("shanvi-offer", offerSettings);
       storage.write("shanvi-coupon", couponSettings);
@@ -2304,7 +2356,7 @@
       }
       $("load-more-orders").hidden = true;
       let ordersQuery = db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, status, created_at")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, rejection_reason, status, created_at")
         .order("created_at", { ascending: false });
       if (managerOrderSearch) {
         ordersQuery = ordersQuery.or(`reference.ilike.%${managerOrderSearch}%,customer_phone.ilike.%${managerOrderSearch}%`);
@@ -2360,7 +2412,21 @@
         button.addEventListener("click", () => {
           const { orderAction, orderReference } = button.dataset;
           if (orderAction === "approve") approveOrder(orderReference, button);
-          else setOrderStatus(orderReference, orderAction, button);
+          else if (orderAction === "approve-cod") approveOrder(orderReference, button, true);
+          else if (orderAction === "show-rejection-form") {
+            const form = button.closest(".order-card").querySelector("[data-rejection-form]");
+            form.hidden = false;
+            form.querySelector("textarea").focus();
+          } else if (orderAction === "cancel-rejection") {
+            button.closest("[data-rejection-form]").hidden = true;
+          } else if (orderAction === "Rejected") {
+            const reason = button.closest("[data-rejection-form]").querySelector("textarea").value.trim();
+            if (!reason) {
+              showToast("Enter a reason before rejecting this order.");
+              return;
+            }
+            void setOrderStatus(orderReference, orderAction, button, reason);
+          } else setOrderStatus(orderReference, orderAction, button);
         });
       });
       container.querySelectorAll("[data-print-order]").forEach((button) => {
@@ -2410,9 +2476,10 @@
       const createdAt = order.created_at || order.createdAt;
       const payerUpi = order.payer_upi_id || order.payerUpiId || "";
       const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
+      const rejectionReason = order.rejection_reason || order.rejectionReason || "";
       const paymentConfirmation = paymentMethod === "cod"
         ? ""
-        : order.payment_confirmed === true
+        : order.payment_confirmed === true || order.paymentConfirmed === true
           ? tr("paymentCustomerMarkedPaid")
           : tr("paymentCustomerNotMarkedPaid");
       return `<article class="order-card">
@@ -2431,13 +2498,23 @@
           <div class="order-line"><strong>Total</strong><strong>${money(total)}</strong></div>
           <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer UPI ID: ${escapeHtml(payerUpi)}` : ""}</p>
           ${paymentConfirmation ? `<p class="small-note"><strong>${escapeHtml(paymentConfirmation)}</strong></p>` : ""}
+          ${rejectionReason ? `<p class="small-note"><strong>Rejection reason:</strong> ${escapeHtml(rejectionReason)}</p>` : ""}
         </section>
         <button class="btn btn-soft manager-order-print" type="button" data-print-order="${escapeAttr(reference)}">Generate / print bill</button>
         <div class="order-status-actions">
           <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen ? "disabled" : ""}>Accept</button>
+          ${!isAccepted && isOpen && paymentMethod !== "cod" ? `<button class="btn btn-soft" data-order-action="approve-cod" data-order-reference="${escapeAttr(reference)}">Accept as COD</button>` : ""}
           <button class="btn btn-soft" data-order-action="Delivered" data-order-reference="${escapeAttr(reference)}" ${!isAccepted ? "disabled" : ""}>Delivered</button>
-          <button class="btn btn-soft" data-order-action="Rejected" data-order-reference="${escapeAttr(reference)}" ${!isOpen && !isAccepted ? "disabled" : ""}>Reject</button>
+          <button class="btn btn-soft" data-order-action="show-rejection-form" data-order-reference="${escapeAttr(reference)}" ${!isOpen && !isAccepted ? "disabled" : ""}>Reject</button>
           <button class="btn btn-primary" data-order-action="Completed" data-order-reference="${escapeAttr(reference)}" ${!isDelivered ? "disabled" : ""}>Complete</button>
+        </div>
+        <div class="field" data-rejection-form hidden>
+          <label>Reason for rejecting</label>
+          <textarea maxlength="300" rows="2" placeholder="Tell the customer why the order cannot be fulfilled."></textarea>
+          <div class="order-delete-confirmation-actions">
+            <button class="btn btn-danger" type="button" data-order-action="Rejected" data-order-reference="${escapeAttr(reference)}">Confirm rejection</button>
+            <button class="btn btn-soft" type="button" data-order-action="cancel-rejection">Cancel</button>
+          </div>
         </div>
         <button class="btn btn-soft" type="button" data-show-delete-order="${escapeAttr(reference)}">${tr("deleteOrder")}</button>
         <div class="order-delete-confirmation" data-delete-confirmation role="group" aria-label="${escapeAttr(tr("confirmDeleteOrder"))}" hidden>
@@ -2530,12 +2607,15 @@
       </body></html>`);
       printWindow.document.close();
     }
-    async function approveOrder(reference, button) {
+    async function approveOrder(reference, button, asCashOnDelivery = false) {
       if (!isAuthorizedManager) return;
       button.disabled = true;
       if (db) {
         const { data, error } = await db.from("orders")
-          .update({ status: "Approved" })
+          .update({
+            status: "Approved",
+            ...(asCashOnDelivery ? { payment_method: "cod", payer_upi_id: null, payment_confirmed: false } : {})
+          })
           .eq("reference", reference)
           .eq("status", "Awaiting manager approval")
           .select("reference")
@@ -2551,20 +2631,22 @@
           return;
         }
       } else {
-        if (!updateLocalOrderStatus(reference, "Approved")) {
+        if (!updateLocalOrderStatus(reference, "Approved", asCashOnDelivery
+          ? { paymentMethod: "cod", payerUpiId: "", paymentConfirmed: false }
+          : {})) {
           button.disabled = false;
           return;
         }
       }
       showToast(db
-        ? `Order ${reference} approved; customer push will be sent if enabled.`
-        : `Order ${reference} approved on this browser.`);
+        ? `Order ${reference} accepted${asCashOnDelivery ? " as Cash on delivery" : ""}; customer push will be sent if enabled.`
+        : `Order ${reference} accepted${asCashOnDelivery ? " as Cash on delivery" : ""} on this browser.`);
       await loadManagerOrders();
     }
-    function updateLocalOrderStatus(reference, status) {
+    function updateLocalOrderStatus(reference, status, changes = {}) {
       const orders = storage.read("shanvi-orders", []);
       const updatedOrders = orders.map((order) =>
-        (order.id || order.reference) === reference ? { ...order, status } : order
+        (order.id || order.reference) === reference ? { ...order, ...changes, status } : order
       );
       if (updatedOrders.every((order, index) => order === orders[index])) {
         showToast("This order could not be found in this browser.");
@@ -2572,7 +2654,7 @@
       }
       return storage.write("shanvi-orders", updatedOrders);
     }
-    async function setOrderStatus(reference, status, button) {
+    async function setOrderStatus(reference, status, button, reason = "") {
       if (!isAuthorizedManager) return;
       button.disabled = true;
       const allowedPreviousStatuses = {
@@ -2585,9 +2667,14 @@
         showToast("This order status change is not supported.");
         return;
       }
+      if (status === "Rejected" && (!reason.trim() || reason.length > 300)) {
+        button.disabled = false;
+        showToast("Enter a rejection reason of 1 to 300 characters.");
+        return;
+      }
       if (db) {
         const { data, error } = await db.from("orders")
-          .update({ status })
+          .update({ status, rejection_reason: status === "Rejected" ? reason.trim() : null })
           .eq("reference", reference)
           .in("status", allowedPreviousStatuses)
           .select("reference")
@@ -2609,7 +2696,7 @@
           showToast("This order is no longer in a status that allows that change.");
           return;
         }
-        if (!updateLocalOrderStatus(reference, status)) {
+        if (!updateLocalOrderStatus(reference, status, status === "Rejected" ? { rejectionReason: reason.trim() } : {})) {
           button.disabled = false;
           return;
         }
@@ -2722,6 +2809,8 @@
         total,
         discount,
         deliveryFee,
+        paymentFlowReturned: false,
+        paymentConfirmed: false,
         customerStatusToken,
         customerStatusTokenHash: await sha256Hex(customerStatusToken),
         createdAt: new Date().toISOString()
@@ -2752,13 +2841,14 @@
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("qr")}</strong><small>${canPayQr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
         ${selectedPayment === "upi_qr" ? `<div class="payment-box">${canPayQr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}.</p><button class="btn btn-soft full" id="start-qr-payment" type="button">${tr("startQrPayment")}</button>` : tr("qrNotConfigured")}</div>` : ""}
         <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
-        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button>${selectedPayment === "upi_id" || selectedPayment === "upi_qr" ? `<button class="btn btn-soft" id="mark-payment-return" type="button">${tr("markPaymentReturned")}</button>` : ""}<button class="btn btn-primary full" id="confirm-payment" ${paymentReady && (selectedPayment === "cod" || checkoutDraft.paymentFlowReturned) ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
-        ${(selectedPayment === "upi_id" || selectedPayment === "upi_qr") ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentFlowReturned ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button>${selectedPayment === "upi_id" || selectedPayment === "upi_qr" ? `<button class="btn btn-soft" id="mark-payment-return" type="button">${tr("markPaymentReturned")}</button>` : ""}<button class="btn btn-primary full" id="confirm-payment" ${paymentReady && (selectedPayment === "cod" || checkoutDraft.paymentConfirmed) ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
+        ${(selectedPayment === "upi_id" || selectedPayment === "upi_qr") ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentConfirmed ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
       $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => radio.addEventListener("change", () => {
         selectedPayment = radio.value;
         checkoutDraft.paymentFlowReturned = false;
+        checkoutDraft.paymentConfirmed = false;
         checkoutDraft.paymentLaunchPending = false;
         checkoutDraft.paymentAppWasHidden = false;
         renderPaymentPage();
@@ -2768,6 +2858,7 @@
         const payerUpiId = payerUpiInput.value.trim();
         if (payerUpiId !== checkoutDraft.payerUpiId) {
           checkoutDraft.paymentFlowReturned = false;
+          checkoutDraft.paymentConfirmed = false;
           checkoutDraft.paymentLaunchPending = false;
           checkoutDraft.paymentAppWasHidden = false;
         }
@@ -2789,14 +2880,16 @@
           return;
         }
         checkoutDraft.paymentFlowReturned = false;
+        checkoutDraft.paymentConfirmed = false;
         checkoutDraft.paymentLaunchPending = true;
         checkoutDraft.paymentAppWasHidden = false;
         updatePaymentFlowControls();
-        showToast("Scan this QR from another device, then return here and tap the UPI return button.");
+        showToast("Scan this QR from another device, then return here and confirm that you paid.");
       };
       const returnedButton = $("mark-payment-return");
       if (returnedButton) returnedButton.onclick = () => {
         checkoutDraft.paymentFlowReturned = true;
+        checkoutDraft.paymentConfirmed = true;
         checkoutDraft.paymentLaunchPending = false;
         checkoutDraft.paymentAppWasHidden = false;
         updatePaymentFlowControls();
@@ -2816,6 +2909,7 @@
         return;
       }
       checkoutDraft.paymentFlowReturned = false;
+      checkoutDraft.paymentConfirmed = false;
       checkoutDraft.paymentLaunchPending = true;
       checkoutDraft.paymentAppWasHidden = false;
       updatePaymentFlowControls();
@@ -2836,12 +2930,12 @@
           : selectedPayment === "upi_qr" ? Boolean(settings.qr)
             : false;
       confirmButton.disabled = !detailsReady
-        || (selectedPayment !== "cod" && checkoutDraft.paymentFlowReturned !== true);
+        || (selectedPayment !== "cod" && checkoutDraft.paymentConfirmed !== true);
       const openUpiButton = $("open-upi");
       if (openUpiButton) openUpiButton.disabled = !paymentReadyForUpiId();
       const flowStatus = $("payment-flow-status");
       if (flowStatus) {
-        flowStatus.textContent = checkoutDraft.paymentFlowReturned
+        flowStatus.textContent = checkoutDraft.paymentConfirmed
           ? tr("paymentFlowReturned")
           : tr("paymentFlowPending");
       }
@@ -2912,7 +3006,7 @@
         renderPaymentPage();
         return;
       }
-      if ((selectedPayment === "upi_id" || selectedPayment === "upi_qr") && checkoutDraft.paymentFlowReturned !== true) {
+      if ((selectedPayment === "upi_id" || selectedPayment === "upi_qr") && checkoutDraft.paymentConfirmed !== true) {
         showToast(tr("paymentFlowPending"));
         updatePaymentFlowControls();
         return;
@@ -2923,7 +3017,7 @@
         upi_id: "UPI ID",
         upi_qr: language === "hi" ? "UPI QR कोड" : "UPI QR code"
       };
-      const order = { ...draft, paymentMethod: selectedPayment, paymentFlowReturned: selectedPayment !== "cod" && draft.paymentFlowReturned === true, status: db ? "Awaiting manager approval" : (selectedPayment === "cod" ? "COD order placed" : "Awaiting UPI payment verification") };
+      const order = { ...draft, paymentMethod: selectedPayment, paymentConfirmed: selectedPayment !== "cod" && draft.paymentConfirmed === true, status: db ? "Awaiting manager approval" : (selectedPayment === "cod" ? "COD order placed" : "Awaiting UPI payment verification") };
       const button = $("confirm-payment");
       button.disabled = true;
       const previousProducts = products;
@@ -2977,7 +3071,7 @@
             discount: order.discount,
             payment_method: order.paymentMethod,
             payer_upi_id: order.paymentMethod === "upi_id" ? order.payerUpiId : null,
-            payment_confirmed: order.paymentFlowReturned,
+            payment_confirmed: order.paymentConfirmed,
             status: order.status,
             customer_status_token_hash: order.customerStatusTokenHash
           });
@@ -3358,13 +3452,17 @@
       showToast("Signed out");
     };
     ["hero-eyebrow-input", "hero-title-input", "hero-description-input"].forEach((id) => {
-      $(id).addEventListener("input", () => updateHeroPreview(heroDraftImage));
+      $(id).addEventListener("input", () => {
+        heroFormDirty = true;
+        updateHeroPreview(heroDraftImage);
+      });
     });
     $("hero-image-input").addEventListener("change", async () => {
       const file = $("hero-image-input").files[0];
       if (!file) return;
       try {
         heroDraftImage = await optimizeImage(file, 1800, 1000);
+        heroFormDirty = true;
         updateHeroPreview(heroDraftImage);
       } catch (error) {
         $("hero-image-input").value = "";
@@ -3373,6 +3471,7 @@
     });
     $("clear-hero-image").onclick = () => {
       heroDraftImage = "";
+      heroFormDirty = true;
       $("hero-image-input").value = "";
       updateHeroPreview("");
     };
@@ -3390,6 +3489,7 @@
         }
         if (!db) heroSettings = next;
         if (!storage.write("shanvi-hero", heroSettings)) return false;
+        heroFormDirty = false;
         heroDraftImage = heroSettings.image;
         renderHero();
         showManagerSaved(db ? "Festival banner shared with all customers." : "Festival banner saved successfully on this device.");
@@ -3859,6 +3959,7 @@
     $("admin-category-filter").value = "All sections";
     $("search").value = "";
     syncProductImagePreview();
+    if (db) $("festival-hero").classList.add("storefront-loading");
     renderHero();
     renderProducts();
     renderCart();
@@ -3907,7 +4008,6 @@
       checkOrderBackend();
       void refreshSharedStorefront();
       subscribeToSharedCatalog();
-      void loadSharedStorefront();
       subscribeToSharedStorefront();
       loadStoreHelpContact();
       loadStorePaymentSettings();
