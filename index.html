@@ -93,6 +93,7 @@
     .hero p { color: #58695d; font-size: 16px; line-height: 1.65; margin: 0 0 23px; max-width: 410px; }
     .hero .btn { padding: 13px 19px; }
     .section-heading { display: flex; justify-content: space-between; align-items: end; margin: 40px 0 17px; }
+    #refresh-catalog { flex: 0 0 auto; min-height: 38px; padding: 8px 11px; font-size: 11px; }
     .section-heading h2 { font: 28px Georgia, serif; margin: 0 0 5px; letter-spacing: -.03em; }
     .section-heading p { margin: 0; font-size: 13px; color: var(--muted); }
     .categories { display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: thin; }
@@ -348,6 +349,7 @@
       .hero p { max-width: min(280px, 88%); font-size: 14px; line-height: 1.55; }
       .section-heading { margin: 30px 0 13px; }
       .section-heading h2 { font-size: 25px; }
+      #refresh-catalog { min-height: 34px; padding: 6px 8px; font-size: 10px; }
       .categories { gap: 7px; margin-right: -13px; padding: 2px 13px 10px 0; scroll-snap-type: x proximity; }
       .category-chip { min-height: 42px; padding: 9px 13px; scroll-snap-align: start; }
       .products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -466,6 +468,7 @@
     <section id="shop">
       <div class="section-heading">
         <div><h2 id="shop-title">Browse the shelves</h2><p id="shop-subtitle">Good things for every corner of your home.</p></div>
+        <button class="btn btn-soft" id="refresh-catalog" type="button">↻ Refresh stock</button>
       </div>
       <div class="categories" id="categories" aria-label="Product categories"></div>
       <div class="products" id="products" aria-live="polite"></div>
@@ -652,13 +655,15 @@
       <details class="admin-card manager-accordion products-manager-panel">
         <summary>Products in your storefront</summary>
         <div class="products-manager-content">
+          <button class="btn btn-soft" id="refresh-manager-products" type="button">↻ Refresh products</button>
+          <p class="small-note" id="manager-products-refresh-status" role="status" aria-live="polite"></p>
           <div class="field"><label for="admin-category-filter">Filter by section</label><select id="admin-category-filter"></select></div>
           <div class="admin-products" id="admin-products"></div>
         </div>
       </details>
       <div class="admin-card">
         <h3>Customer orders</h3>
-        <p class="small-note">New orders start in Pending. Accept an order, mark it delivered, then complete it; reject an order that cannot be fulfilled.</p>
+        <p class="small-note">New orders appear here automatically when live connection is available. Refresh this list without reloading the storefront.</p>
         <p class="small-note" id="orders-storage-note"></p>
         <form id="manager-order-search-form" class="manager-order-search" role="search">
           <div class="field"><label for="manager-order-search">Find order by phone number or order ID</label><input id="manager-order-search" type="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Enter part of a phone number or SNVGS order ID"></div>
@@ -666,6 +671,7 @@
           <button class="btn btn-soft" id="clear-manager-order-search" type="button">Clear</button>
         </form>
         <button class="btn btn-soft" id="refresh-orders" type="button">Refresh orders</button>
+        <p class="small-note" id="manager-orders-refresh-status" role="status" aria-live="polite"></p>
         <button class="btn btn-soft" id="load-more-orders" type="button" hidden>Load more orders</button>
         <div class="order-filters" role="group" aria-label="Filter customer orders">
           <button type="button" data-order-filter="pending" aria-pressed="true">Pending <span id="pending-order-count">0</span></button>
@@ -978,6 +984,18 @@
     let loadedStorefrontSignature = "";
     let loadedSharedProductsSignature = "";
     let sharedStoreRefreshInProgress = false;
+    let sharedProductsLoadSequence = 0;
+    let managerOrdersRequestSequence = 0;
+    const savedViewState = (() => {
+      try {
+        const value = JSON.parse(sessionStorage.getItem("shanvi-view-state") || "null");
+        return value && typeof value === "object" ? value : {};
+      } catch (error) {
+        console.warn("Could not restore the previous storefront view", error);
+        return {};
+      }
+    })();
+    let viewRestoreScheduled = false;
     let managerAudioContext = null;
     let managerOrdersPage = 0;
     let managerOrders = [];
@@ -1756,6 +1774,7 @@
     }
     async function loadSharedProducts({ migrateLocal = false } = {}) {
       if (!db) return false;
+      const requestSequence = ++sharedProductsLoadSequence;
       const { data, error } = await db.from("products")
         .select("id,name,category,price,mrp,stock,image_url,description,size,dimensions,image_fit,image_zoom,image_x,image_y,active")
         .eq("active", true)
@@ -1764,12 +1783,14 @@
         console.warn("Could not load shared products", error.message);
         return false;
       }
+      if (requestSequence !== sharedProductsLoadSequence) return false;
       const signature = JSON.stringify(data);
       if (signature === loadedSharedProductsSignature && !(migrateLocal && isAuthorizedManager)) return true;
       if (!data.length && migrateLocal && isAuthorizedManager) {
         try {
           const { data: existingRows, error: existingRowsError } = await db.from("products").select("id").limit(1);
           if (existingRowsError) throw new Error(`Could not check the shared catalog: ${existingRowsError.message}`);
+          if (requestSequence !== sharedProductsLoadSequence) return false;
           if (existingRows.length) {
             await markSharedCatalogInitialized();
             await clearSharedCatalog();
@@ -1780,6 +1801,7 @@
             .eq("key", "catalog_state")
             .maybeSingle();
           if (catalogStateError) throw new Error(`Could not check catalog setup: ${catalogStateError.message}`);
+          if (requestSequence !== sharedProductsLoadSequence) return false;
           if (catalogState?.value?.initialized === true) {
             await clearSharedCatalog();
             return true;
@@ -1799,20 +1821,25 @@
         return true;
       }
       if (!data.length) {
-        loadedSharedProductsSignature = signature;
         try {
           const { data: catalogState, error: catalogStateError } = await db.from("store_settings")
             .select("value")
             .eq("key", "catalog_state")
             .maybeSingle();
           if (catalogStateError) throw catalogStateError;
-          if (catalogState?.value?.initialized === true) await clearSharedCatalog();
+          if (requestSequence !== sharedProductsLoadSequence) return false;
+          if (catalogState?.value?.initialized === true) {
+            await clearSharedCatalog();
+          }
         } catch (catalogStateError) {
           console.warn("Could not check the shared catalog state", catalogStateError.message);
         }
+        if (requestSequence !== sharedProductsLoadSequence) return false;
+        loadedSharedProductsSignature = signature;
         return true;
       }
       if (isAuthorizedManager && migrateLocal) await markSharedCatalogInitialized();
+      if (requestSequence !== sharedProductsLoadSequence) return false;
       loadedSharedProductsSignature = signature;
       const sharedProducts = data.map(mapProduct);
       const productIdMap = new Map(products.map((product) => {
@@ -1835,7 +1862,27 @@
       renderProducts();
       renderCart();
       renderAdminProducts();
+      restoreSavedViewPosition();
       return true;
+    }
+    async function refreshSharedProducts(button, statusElement) {
+      if (!db || !navigator.onLine) {
+        if (statusElement) statusElement.textContent = "Connect to the internet to refresh shared product stock.";
+        return false;
+      }
+      if (button) button.disabled = true;
+      if (statusElement) statusElement.textContent = "Refreshing products and stock…";
+      try {
+        const refreshed = await loadSharedProducts();
+        if (!refreshed) throw new Error("Could not load the latest shared products.");
+        if (statusElement) statusElement.textContent = `Products and stock refreshed at ${new Date().toLocaleTimeString()}.`;
+        return true;
+      } catch (error) {
+        if (statusElement) statusElement.textContent = error.message || "Could not refresh products.";
+        return false;
+      } finally {
+        if (button) button.disabled = false;
+      }
     }
     async function loadManagerSharedData() {
       if (await loadSharedProducts({ migrateLocal: true })) {
@@ -2340,6 +2387,11 @@
     async function loadManagerOrders({ append = false, search = managerOrderSearch } = {}) {
       const container = $("admin-orders");
       managerOrderSearch = String(search).trim().replace(/[^a-z0-9-]/gi, "");
+      const requestSequence = ++managerOrdersRequestSequence;
+      const refreshButton = $("refresh-orders");
+      const refreshStatus = $("manager-orders-refresh-status");
+      refreshButton.disabled = true;
+      if (refreshStatus) refreshStatus.textContent = "Refreshing orders…";
       if (!db) {
         const allOrders = storage.read("shanvi-orders", []).slice().reverse();
         managerOrders = managerOrderSearch
@@ -2347,12 +2399,13 @@
           : allOrders;
         managerOrdersPage = managerOrders.length ? 1 : 0;
         renderManagerOrders();
+        refreshButton.disabled = false;
+        if (refreshStatus) refreshStatus.textContent = `Orders refreshed at ${new Date().toLocaleTimeString()}.`;
+        restoreSavedViewPosition();
         return;
       }
       if (!append) {
-        managerOrdersPage = 0;
-        managerOrders = [];
-        container.innerHTML = `<p class="small-note">Loading orders…</p>`;
+        if (!managerOrders.length) container.innerHTML = `<p class="small-note">Loading orders…</p>`;
       }
       $("load-more-orders").hidden = true;
       let ordersQuery = db.from("orders")
@@ -2361,10 +2414,24 @@
       if (managerOrderSearch) {
         ordersQuery = ordersQuery.or(`reference.ilike.%${managerOrderSearch}%,customer_phone.ilike.%${managerOrderSearch}%`);
       }
-      const { data, error } = await ordersQuery
-        .range(managerOrdersPage * 100, managerOrdersPage * 100 + 99);
+      let result;
+      try {
+        const queryPage = append ? managerOrdersPage : 0;
+        result = await ordersQuery.range(queryPage * 100, queryPage * 100 + 99);
+      } catch (error) {
+        if (requestSequence !== managerOrdersRequestSequence) return;
+        if (!managerOrders.length) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message || "Network request failed.")}</p>`;
+        if (refreshStatus) refreshStatus.textContent = `Could not refresh orders: ${error.message || "Network request failed."}`;
+        refreshButton.disabled = false;
+        return;
+      }
+      const { data, error } = result;
+      if (requestSequence !== managerOrdersRequestSequence) return;
       if (error) {
-        if (!append) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message)}</p>`;
+        if (!managerOrders.length) container.innerHTML = `<p class="small-note">Could not load orders: ${escapeHtml(error.message)}</p>`;
+        else renderManagerOrders();
+        if (refreshStatus) refreshStatus.textContent = `Could not refresh orders: ${error.message}`;
+        refreshButton.disabled = false;
         return;
       }
       if (append) {
@@ -2375,6 +2442,9 @@
         managerOrdersPage = 1;
       }
       renderManagerOrders(data.length);
+      refreshButton.disabled = false;
+      if (refreshStatus) refreshStatus.textContent = `Orders refreshed at ${new Date().toLocaleTimeString()}.`;
+      restoreSavedViewPosition();
     }
     function orderStatusGroup(status) {
       if (status === "Completed") return "completed";
@@ -2477,9 +2547,10 @@
       const payerUpi = order.payer_upi_id || order.payerUpiId || "";
       const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
       const rejectionReason = order.rejection_reason || order.rejectionReason || "";
+      const paymentConfirmed = order.payment_confirmed === true || order.paymentConfirmed === true;
       const paymentConfirmation = paymentMethod === "cod"
         ? ""
-        : order.payment_confirmed === true || order.paymentConfirmed === true
+        : paymentConfirmed
           ? tr("paymentCustomerMarkedPaid")
           : tr("paymentCustomerNotMarkedPaid");
       return `<article class="order-card">
@@ -2502,10 +2573,10 @@
         </section>
         <button class="btn btn-soft manager-order-print" type="button" data-print-order="${escapeAttr(reference)}">Generate / print bill</button>
         <div class="order-status-actions">
-          <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen ? "disabled" : ""}>Accept</button>
+          <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen || (paymentMethod !== "cod" && !paymentConfirmed) ? "disabled" : ""} ${paymentMethod !== "cod" && !paymentConfirmed ? 'title="Customer has not confirmed payment. Accept as COD or reject instead."' : ""}>Accept</button>
           ${!isAccepted && isOpen && paymentMethod !== "cod" ? `<button class="btn btn-soft" data-order-action="approve-cod" data-order-reference="${escapeAttr(reference)}">Accept as COD</button>` : ""}
           <button class="btn btn-soft" data-order-action="Delivered" data-order-reference="${escapeAttr(reference)}" ${!isAccepted ? "disabled" : ""}>Delivered</button>
-          <button class="btn btn-soft" data-order-action="show-rejection-form" data-order-reference="${escapeAttr(reference)}" ${!isOpen && !isAccepted ? "disabled" : ""}>Reject</button>
+          <button class="btn btn-soft" data-order-action="show-rejection-form" data-order-reference="${escapeAttr(reference)}" ${!isOpen && !isAccepted ? "disabled" : ""}>${paymentMethod === "cod" ? "Reject COD order" : "Reject order"}</button>
           <button class="btn btn-primary" data-order-action="Completed" data-order-reference="${escapeAttr(reference)}" ${!isDelivered ? "disabled" : ""}>Complete</button>
         </div>
         <div class="field" data-rejection-form hidden>
@@ -2707,11 +2778,16 @@
     function subscribeToManagerOrders() {
       if (!db || managerRealtimeChannel) return;
       managerRealtimeChannel = db.channel("manager-new-orders")
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
-          const reference = payload.new.reference;
-          showToast(`New order received: ${reference}`);
-          playManagerAlert();
-          showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
+        .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload) => {
+          if (payload.eventType === "INSERT") {
+            const reference = payload.new.reference;
+            showToast(`New order received: ${reference}`);
+            playManagerAlert();
+            showManagerSystemAlert("New Shanvi order", `Order ${reference} received.`);
+          }
+          if (isAuthorizedManager && $("admin").classList.contains("open")) {
+            void loadManagerOrders();
+          }
         })
         .subscribe((status, error) => {
           const notificationStatus = $("notification-status");
@@ -3258,6 +3334,7 @@
         loadManagerOrders();
         subscribeToManagerOrders();
       }
+      persistStoreViewState();
     }
     async function signInManagerWithSupabase(email, password) {
       const { data, error } = await db.auth.signInWithPassword({ email, password });
@@ -3311,6 +3388,7 @@
       renderAdminProducts();
       loadManagerOrders();
       subscribeToManagerOrders();
+      if (savedViewState.managerOpen) openAdmin();
     }
     async function readImage(file) {
       if (!file) return "";
@@ -3406,6 +3484,7 @@
     });
     $("manager-close").onclick = () => {
       $("admin").classList.remove("open");
+      persistStoreViewState();
     };
     $("admin").addEventListener("contextmenu", (event) => event.preventDefault());
     $("enable-order-notifications").onclick = enableOrderNotifications;
@@ -3449,6 +3528,7 @@
       $("manager-tools").hidden = true;
       $("admin-login-card").hidden = false;
       $("manager-login").reset();
+      persistStoreViewState();
       showToast("Signed out");
     };
     ["hero-eyebrow-input", "hero-title-input", "hero-description-input"].forEach((id) => {
@@ -3519,6 +3599,15 @@
       void loadManagerOrders({ search: "" });
     });
     $("refresh-orders").onclick = loadManagerOrders;
+    $("refresh-manager-products").onclick = () => {
+      void refreshSharedProducts($("refresh-manager-products"), $("manager-products-refresh-status"));
+    };
+    $("refresh-catalog").onclick = async () => {
+      const refreshed = await refreshSharedProducts($("refresh-catalog"), null);
+      showToast(refreshed
+        ? "Product stock is up to date."
+        : "Could not refresh product stock. Check your connection and try again.");
+    };
     $("load-more-orders").onclick = () => loadManagerOrders({ append: true });
     $("save-checkout-address-fields").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
@@ -3637,6 +3726,14 @@
     window.setInterval(() => {
       if (document.visibilityState === "visible") void refreshSharedStorefront();
     }, 15000);
+    window.setInterval(() => {
+      if (
+        document.visibilityState === "visible"
+        && isAuthorizedManager
+        && $("admin").classList.contains("open")
+        && db
+      ) void loadManagerOrders();
+    }, 20000);
     $("p-image").addEventListener("change", async () => {
       const file = $("p-image").files[0];
       if (!file) return;
@@ -3955,14 +4052,86 @@
       storage.write("shanvi-language", language);
       applyCustomerLanguage();
     };
+    function persistStoreViewState() {
+      const activeElement = document.activeElement;
+      const state = {
+        scrollTop: $("customer-scroll").scrollTop,
+        search: $("search").value,
+        category: activeCategory,
+        managerOpen: $("admin").classList.contains("open"),
+        managerOrderFilter,
+        managerOrderSearch: $("manager-order-search").value,
+        adminCategoryFilter: $("admin-category-filter").value,
+        focusedElementId: activeElement instanceof HTMLElement && activeElement.getClientRects().length
+          ? activeElement.id
+          : "",
+        openAccordions: [...document.querySelectorAll("#admin details[id][open]")].map((item) => item.id)
+      };
+      try {
+        sessionStorage.setItem("shanvi-view-state", JSON.stringify(state));
+      } catch (error) {
+        console.warn("Could not preserve the storefront view", error);
+      }
+    }
+    function restoreSavedViewPosition() {
+      if (viewRestoreScheduled || !Number.isFinite(Number(savedViewState.scrollTop))) return;
+      viewRestoreScheduled = true;
+      let attempts = 0;
+      const restore = () => {
+        $("customer-scroll").scrollTop = Math.max(0, Number(savedViewState.scrollTop) || 0);
+        attempts += 1;
+        if (attempts < 5) window.setTimeout(restore, 180);
+        else viewRestoreScheduled = false;
+      };
+      requestAnimationFrame(restore);
+    }
+    if (typeof savedViewState.search === "string") $("search").value = savedViewState.search;
+    if (categories.includes(savedViewState.category)) activeCategory = savedViewState.category;
+    if (["pending", "completed", "rejected", "all"].includes(savedViewState.managerOrderFilter)) {
+      managerOrderFilter = savedViewState.managerOrderFilter;
+    }
+    if (typeof savedViewState.managerOrderSearch === "string") {
+      managerOrderSearch = savedViewState.managerOrderSearch;
+      $("manager-order-search").value = managerOrderSearch;
+    }
+    if (typeof savedViewState.adminCategoryFilter === "string") {
+      $("admin-category-filter").value = savedViewState.adminCategoryFilter;
+    }
+    if (Array.isArray(savedViewState.openAccordions)) {
+      for (const id of savedViewState.openAccordions) {
+        const accordion = typeof id === "string" ? $(id) : null;
+        if (accordion instanceof HTMLDetailsElement) accordion.open = true;
+      }
+    }
+    $("customer-scroll").addEventListener("scroll", () => {
+      clearTimeout(persistStoreViewState.timer);
+      persistStoreViewState.timer = window.setTimeout(persistStoreViewState, 220);
+    }, { passive: true });
+    document.addEventListener("focusin", persistStoreViewState);
+    window.addEventListener("pagehide", persistStoreViewState);
+    if (savedViewState.focusedElementId) {
+      let focusAttempts = 0;
+      const restoreFocus = () => {
+        const focusTarget = $(savedViewState.focusedElementId);
+        if (focusTarget && focusTarget.getClientRects().length && !focusTarget.disabled && focusTarget.type !== "password") {
+          focusTarget.focus({ preventScroll: true });
+        } else if (focusAttempts < 12) {
+          focusAttempts += 1;
+          window.setTimeout(restoreFocus, 200);
+        }
+      };
+      window.setTimeout(restoreFocus, 250);
+    }
     renderCategories();
-    $("admin-category-filter").value = "All sections";
-    $("search").value = "";
+    $("admin-category-filter").value = categories.includes(savedViewState.adminCategoryFilter)
+      ? savedViewState.adminCategoryFilter
+      : "All sections";
     syncProductImagePreview();
     if (db) $("festival-hero").classList.add("storefront-loading");
     renderHero();
     renderProducts();
     renderCart();
+    restoreSavedViewPosition();
     applyCustomerLanguage();
     const syncHeaderSpacer = () => {
       $("customer-scroll").style.top = `${$("store-header").getBoundingClientRect().height}px`;
