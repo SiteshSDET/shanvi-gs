@@ -11,6 +11,28 @@ alter table public.products
   add column if not exists image_y integer not null default 50
     check (image_y between 0 and 100);
 
+alter table public.products
+  drop constraint if exists products_category_check;
+
+update public.products
+set category = 'Electrical & Electronics'
+where category = 'Electronics';
+
+alter table public.products
+  add constraint products_category_check
+  check (category in (
+    'Kids',
+    'Gifts',
+    'Stationery',
+    'Puja',
+    'Gharelu Samaan',
+    'Snacks',
+    'Beauty & Personal Care',
+    'Electrical & Electronics',
+    'Clothing',
+    'Grocery'
+  ));
+
 alter table public.products replica identity full;
 alter table public.store_settings replica identity full;
 

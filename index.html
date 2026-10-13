@@ -501,6 +501,11 @@
       </div>
       <div id="manager-tools" hidden>
       <div class="admin-card">
+        <h3>Save manager changes</h3>
+        <p class="small-note">Save pending product, storefront, payment, delivery, and customer contact changes together.</p>
+        <button class="btn btn-primary" id="save-all-manager-changes" type="button">Save all changes</button>
+      </div>
+      <div class="admin-card">
         <h3>Store logo</h3>
         <p class="small-note">Choose the logo shown beside Shanvi General Store in the customer header.</p>
         <div class="field"><label for="brand-logo-input">Logo image</label><input id="brand-logo-input" type="file" accept="image/*"><small class="small-note">A square PNG or JPEG works best. Images are resized before saving.</small></div>
@@ -667,7 +672,8 @@
         shopSubtitle: "Good things for every corner of your home.",
         footer: "· Made for everyday needs",
         allItems: "All items", kids: "Kids", gifts: "Gifts", stationery: "Stationery",
-        puja: "Puja", household: "Gharelu Samaan", electronics: "Electronics",
+        puja: "Puja", household: "Gharelu Samaan", electronics: "Electrical & Electronics",
+        snacks: "Snacks", beauty: "Beauty & Personal Care", clothing: "Clothing", grocery: "Grocery",
         search: "Search products",
         cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
         profile: "Profile", help: "Help", profileTitle: "My profile & orders",
@@ -763,7 +769,8 @@
         shopSubtitle: "आपके घर के हर कोने के लिए कुछ खास।",
         footer: "· रोज़मर्रा की ज़रूरतों के लिए",
         allItems: "सभी सामान", kids: "बच्चों के सामान", gifts: "उपहार", stationery: "स्टेशनरी",
-        puja: "पूजा सामग्री", household: "घरेलू सामान", electronics: "इलेक्ट्रॉनिक्स",
+        puja: "पूजा सामग्री", household: "घरेलू सामान", electronics: "इलेक्ट्रिकल और इलेक्ट्रॉनिक्स",
+        snacks: "नाश्ता", beauty: "ब्यूटी और व्यक्तिगत देखभाल", clothing: "कपड़े", grocery: "किराना",
         search: "सामान खोजें",
         cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
         profile: "प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर",
@@ -850,7 +857,10 @@
         }
       }
     };
-    const categories = ["All items", "Kids", "Gifts", "Stationery", "Puja", "Gharelu Samaan", "Electronics"];
+    const categories = [
+      "All items", "Kids", "Gifts", "Stationery", "Puja", "Gharelu Samaan",
+      "Snacks", "Beauty & Personal Care", "Electrical & Electronics", "Clothing", "Grocery"
+    ];
     const defaultProducts = [
       { id: "p1", name: "Rainbow Art & Craft Kit", category: "Kids", price: 249, mrp: 299, image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=700&q=80" },
       { id: "p2", name: "Little Moments Gift Box", category: "Gifts", price: 399, mrp: 499, image: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=700&q=80" },
@@ -860,7 +870,7 @@
       { id: "p6", name: "Wooden Building Blocks", category: "Kids", price: 349, mrp: 399, image: "https://images.unsplash.com/photo-1599629954294-14df9ec8c5e9?auto=format&fit=crop&w=700&q=80" },
       { id: "p7", name: "Floral Greeting Cards", category: "Gifts", price: 99, mrp: 120, image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?auto=format&fit=crop&w=700&q=80" },
       { id: "p8", name: "Colorful Gel Pen Pack", category: "Stationery", price: 89, mrp: 99, image: "https://images.unsplash.com/photo-1455390582262-044cdaad277a?auto=format&fit=crop&w=700&q=80" },
-      { id: "p9", name: "Compact Bluetooth Speaker", category: "Electronics", price: 799, mrp: 999, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&q=80" }
+      { id: "p9", name: "Compact Bluetooth Speaker", category: "Electrical & Electronics", price: 799, mrp: 999, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&q=80" }
     ];
     const storage = {
       read(key, fallback) {
@@ -975,7 +985,9 @@
     );
     const categoryTranslationKey = {
       "All items": "allItems", "Kids": "kids", "Gifts": "gifts", "Stationery": "stationery",
-      "Puja": "puja", "Gharelu Samaan": "household", "Electronics": "electronics"
+      "Puja": "puja", "Gharelu Samaan": "household", "Electronics": "electronics",
+      "Electrical & Electronics": "electronics", "Snacks": "snacks",
+      "Beauty & Personal Care": "beauty", "Clothing": "clothing", "Grocery": "grocery"
     };
     function translatedCategory(category) {
       const key = categoryTranslationKey[category];
@@ -1550,7 +1562,7 @@
       return {
         id: row.id,
         name: row.name,
-        category: row.category,
+        category: row.category === "Electronics" ? "Electrical & Electronics" : row.category,
         price: Number(row.price),
         mrp: Number(row.mrp),
         image: row.image_url || "",
@@ -1565,6 +1577,8 @@
       };
     }
     const isUuid = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value));
+    const normalizeProductCategory = (category) =>
+      category === "Electronics" ? "Electrical & Electronics" : category;
     async function uploadStoreImage(image, path) {
       if (!image || !image.startsWith("data:")) return image || "";
       const response = await fetch(image);
@@ -1583,7 +1597,7 @@
       return {
         id,
         name: product.name,
-        category: product.category,
+        category: normalizeProductCategory(product.category),
         price: product.price,
         mrp: product.mrp,
         stock: Number.isFinite(Number(product.stock)) ? Number(product.stock) : 0,
@@ -1611,6 +1625,7 @@
         ? await db.from("products").delete().not("id", "in", `(${ids.join(",")})`)
         : await db.from("products").delete().neq("id", "00000000-0000-0000-0000-000000000000");
       if (deleteError) throw new Error(`Could not remove old shared products: ${deleteError.message}`);
+      await markSharedCatalogInitialized();
       const sharedProducts = rows.map(mapProduct);
       const idMap = new Map(nextProducts.map((product, index) => [product.id, sharedProducts[index].id]));
       offerSettings = {
@@ -1624,6 +1639,23 @@
       }
       return sharedProducts;
     }
+    async function markSharedCatalogInitialized() {
+      const { error } = await db.from("store_settings").upsert({
+        key: "catalog_state",
+        value: { initialized: true }
+      });
+      if (error) throw new Error(`Could not publish catalog state: ${error.message}`);
+    }
+    async function clearSharedCatalog() {
+      products = [];
+      cart = {};
+      storage.write("shanvi-products", products);
+      storage.write("shanvi-cart", cart);
+      renderCategories();
+      renderProducts();
+      renderCart();
+      renderAdminProducts();
+    }
     async function loadSharedProducts({ migrateLocal = false } = {}) {
       if (!db) return false;
       const { data, error } = await db.from("products")
@@ -1636,6 +1668,22 @@
       }
       if (!data.length && migrateLocal && isAuthorizedManager) {
         try {
+          const { data: existingRows, error: existingRowsError } = await db.from("products").select("id").limit(1);
+          if (existingRowsError) throw new Error(`Could not check the shared catalog: ${existingRowsError.message}`);
+          if (existingRows.length) {
+            await markSharedCatalogInitialized();
+            await clearSharedCatalog();
+            return true;
+          }
+          const { data: catalogState, error: catalogStateError } = await db.from("store_settings")
+            .select("value")
+            .eq("key", "catalog_state")
+            .maybeSingle();
+          if (catalogStateError) throw new Error(`Could not check catalog setup: ${catalogStateError.message}`);
+          if (catalogState?.value?.initialized === true) {
+            await clearSharedCatalog();
+            return true;
+          }
           const localProducts = await saveSharedProducts(products);
           products = localProducts;
           storage.write("shanvi-products", products);
@@ -1650,7 +1698,20 @@
         }
         return true;
       }
-      if (!data.length) return true;
+      if (!data.length) {
+        try {
+          const { data: catalogState, error: catalogStateError } = await db.from("store_settings")
+            .select("value")
+            .eq("key", "catalog_state")
+            .maybeSingle();
+          if (catalogStateError) throw catalogStateError;
+          if (catalogState?.value?.initialized === true) await clearSharedCatalog();
+        } catch (catalogStateError) {
+          console.warn("Could not check the shared catalog state", catalogStateError.message);
+        }
+        return true;
+      }
+      if (isAuthorizedManager && migrateLocal) await markSharedCatalogInitialized();
       const sharedProducts = data.map(mapProduct);
       const productIdMap = new Map(products.map((product) => {
         const shared = sharedProducts.find((item) =>
@@ -2922,6 +2983,7 @@
         if (db) {
           const { error } = await db.from("products").delete().eq("id", id);
           if (error) throw new Error(`Could not remove shared product: ${error.message}`);
+          await markSharedCatalogInitialized();
         }
         products = nextProducts;
         delete cart[id];
@@ -3413,6 +3475,34 @@
         showToast(error.message || "Could not save the store delivery location.");
       }
     };
+    $("save-all-manager-changes").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      const button = $("save-all-manager-changes");
+      button.disabled = true;
+      try {
+        const hasProductChanges = Boolean($("p-edit-id").value || $("p-name").value.trim());
+        if (hasProductChanges && !await saveProductForm()) return;
+        for (const id of [
+          "save-brand-logo",
+          "save-offer",
+          "save-delivery-settings",
+          "save-hero",
+          "save-payment",
+          "save-checkout-address-fields",
+          "save-help-phone",
+          "save-manager-alert-phone"
+        ]) {
+          const save = $(id).onclick;
+          if (typeof save !== "function") throw new Error(`The ${id} save action is unavailable.`);
+          await save.call($(id));
+        }
+        showManagerSaved("Save all changes finished. Check any section messages for validation or save errors.");
+      } catch (error) {
+        showToast(error.message || "Could not save all Manager changes.");
+      } finally {
+        button.disabled = false;
+      }
+    };
     $("use-store-location").onclick = () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       if (!navigator.geolocation) {
@@ -3447,10 +3537,11 @@
       $(id).addEventListener("change", syncProductImagePreview);
     });
     $("product-cancel-edit").onclick = resetProductForm;
-    $("product-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
-      const button = event.submitter;
+    async function saveProductForm(event = null) {
+      if (event) event.preventDefault();
+      else if (!$("product-form").reportValidity()) return false;
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
+      const button = event?.submitter;
       if (button) button.disabled = true;
       const file = $("p-image").files[0];
       try {
@@ -3476,25 +3567,28 @@
         };
         if (!product.name || product.price < 1 || product.mrp < product.price || product.stock < 0) {
           showToast("Enter valid product details. MRP must be at least the selling price.");
-          return;
+          return false;
         }
         let nextProducts = existing
           ? products.map((item) => item.id === editId ? product : item)
           : [product, ...products];
         if (db) nextProducts = await saveSharedProducts(nextProducts);
-        if (!storage.write("shanvi-products", nextProducts)) return;
+        if (!storage.write("shanvi-products", nextProducts)) return false;
         products = nextProducts;
         resetProductForm();
         renderCategories(); renderProducts(); renderAdminProducts();
         showManagerSaved(db
           ? (existing ? "Product updated and shared with all customers." : "Product added and shared with all customers.")
           : (existing ? "Product updated successfully on this device." : "Product added successfully on this device."));
+        return true;
       } catch (error) {
         showToast(error.message || "Could not add product.");
+        return false;
       } finally {
         if (button) button.disabled = false;
       }
-    });
+    }
+    $("product-form").addEventListener("submit", (event) => { void saveProductForm(event); });
     $("save-payment").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       if (db && !paymentSettingsReady) {
