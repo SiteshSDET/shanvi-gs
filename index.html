@@ -168,7 +168,7 @@
     #refresh-customer-orders { flex: 0 0 auto; min-height: 44px; padding: 10px 16px; font-size: 13px; font-weight: 800; }
     .profile-order-group { margin: 12px 0; border: 1px solid var(--line); border-radius: 14px; background: #f8faf7; overflow: hidden; }
     .profile-order-group[data-customer-order-group="in-progress"] { border-color: #e7c96e; background: #fffdf5; }
-    .profile-order-group[data-customer-order-group="pending-rejected"] { border-color: #e8b5ae; background: #fff8f7; }
+    .profile-order-group[data-customer-order-group="pending"] { border-color: #e8b5ae; background: #fff8f7; }
     .profile-order-group[data-customer-order-group="completed"] { border-color: #a9cfad; background: #f5fbf5; }
     .profile-order-group > summary { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto 28px; align-items: center; gap: 10px; min-height: 58px; padding: 10px 13px; list-style: none; color: var(--green-dark); font-size: 14px; font-weight: 800; cursor: pointer; }
     .profile-order-group > summary::-webkit-details-marker, .customer-order-details > summary::-webkit-details-marker { display: none; }
@@ -176,9 +176,9 @@
     .profile-order-group[data-customer-order-group="in-progress"] .profile-order-group-number,
     .profile-order-group[data-customer-order-group="in-progress"] > summary { color: #80600a; }
     .profile-order-group[data-customer-order-group="in-progress"] .profile-order-group-number { background: #f8ebbc; }
-    .profile-order-group[data-customer-order-group="pending-rejected"] .profile-order-group-number,
-    .profile-order-group[data-customer-order-group="pending-rejected"] > summary { color: #a33b2d; }
-    .profile-order-group[data-customer-order-group="pending-rejected"] .profile-order-group-number { background: #fde4df; }
+    .profile-order-group[data-customer-order-group="pending"] .profile-order-group-number,
+    .profile-order-group[data-customer-order-group="pending"] > summary { color: #a33b2d; }
+    .profile-order-group[data-customer-order-group="pending"] .profile-order-group-number { background: #fde4df; }
     .profile-order-group[data-customer-order-group="completed"] .profile-order-group-number,
     .profile-order-group[data-customer-order-group="completed"] > summary { color: #205b35; }
     .profile-order-group-count { min-width: 28px; padding: 4px 8px; border-radius: 999px; background: #edf3ed; font-size: 11px; text-align: center; }
@@ -197,7 +197,7 @@
     .customer-order-card h3 { margin: 0 0 5px; font-size: 15px; overflow-wrap: anywhere; }
     .customer-order-card ul { padding-left: 20px; font-size: 13px; line-height: 1.7; }
     .customer-order-status { display: inline-flex; align-items: center; min-height: 28px; padding: 5px 10px; border-radius: 999px; background: #edf3ed; color: var(--green-dark); font-size: 11px; font-weight: 800; text-align: center; }
-    .customer-order-status[data-state="pending-rejected"] { background: #fff0ed; color: #a33b2d; }
+    .customer-order-status[data-state="pending"] { background: #fff0ed; color: #a33b2d; }
     .customer-order-status[data-state="in-progress"] { background: #fff4cc; color: #80600a; }
     .customer-order-status[data-state="completed"] { background: #e7f4e8; color: #205b35; }
     .customer-order-progress { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 14px 0 10px; }
@@ -676,12 +676,12 @@
         orderRefreshUpdated: "Checked {checked} orders; updated {updated} status(es).",
         orderRefreshCurrent: "Checked {checked} orders; all statuses are current.",
         orderRefreshPartial: "Refreshed {checked} orders; {failed} could not be checked.",
-        orderGroupInProgress: "In Progress", orderGroupPendingRejected: "Pending / Rejected", orderGroupCompleted: "Completed",
+        orderGroupInProgress: "In Progress", orderGroupPending: "Pending", orderGroupCompleted: "Completed",
         enableOrderPush: "Enable order notifications", orderPushEnabled: "Order notifications enabled on this device.",
         orderStepPlaced: "Placed", orderStepAccepted: "Accepted", orderStepDelivered: "Delivered", orderStepCompleted: "Complete",
         helpTitle: "Help & contact", helpIntro: "Need help with an order? Contact Shanvi General Store:", helpMissing: "The store has not added a contact number yet.", callStore: "Call store", chatWhatsApp: "Chat on WhatsApp",
-        noCustomerOrders: "Your placed orders will appear here.", orderItems: "Items",
-        orderAddress: "Delivery address", orderStatusPending: "Waiting for store confirmation", orderStatusApproved: "Accepted by store",
+        noCustomerOrders: "Your placed orders will appear here.", noActiveCustomerOrders: "No active orders to show. Rejected orders are hidden here.", orderItems: "Items",
+        orderAddress: "Delivery address", orderStatusPending: "Pending", orderStatusApproved: "Accepted by store",
         viewOrderDetails: "Tap to view details",
         deleteOrder: "Delete order", confirmDeleteOrder: "Are you sure you want to permanently delete this order?", cancelDelete: "Cancel",
         orderStatusDelivered: "Delivered", orderStatusCompleted: "Completed", orderStatusRejected: "Rejected",
@@ -772,12 +772,12 @@
         orderRefreshUpdated: "{checked} ऑर्डर जाँचे; {updated} की स्थिति अपडेट हुई।",
         orderRefreshCurrent: "{checked} ऑर्डर जाँचे; सभी की स्थिति नवीनतम है।",
         orderRefreshPartial: "{checked} ऑर्डर अपडेट हुए; {failed} की स्थिति नहीं जाँची जा सकी।",
-        orderGroupInProgress: "जारी ऑर्डर", orderGroupPendingRejected: "लंबित / अस्वीकार", orderGroupCompleted: "पूरे हुए",
+        orderGroupInProgress: "जारी ऑर्डर", orderGroupPending: "लंबित", orderGroupCompleted: "पूरे हुए",
         enableOrderPush: "ऑर्डर सूचना चालू करें", orderPushEnabled: "इस डिवाइस पर ऑर्डर सूचनाएँ चालू हैं।",
         orderStepPlaced: "ऑर्डर मिला", orderStepAccepted: "स्वीकार", orderStepDelivered: "डिलीवर", orderStepCompleted: "पूरा",
         helpTitle: "मदद और संपर्क", helpIntro: "ऑर्डर में मदद के लिए Shanvi General Store से संपर्क करें:", helpMissing: "दुकान ने अभी संपर्क नंबर नहीं जोड़ा है।", callStore: "दुकान पर कॉल करें", chatWhatsApp: "WhatsApp पर चैट करें",
-        noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", orderItems: "सामान",
-        orderAddress: "डिलीवरी का पता", orderStatusPending: "दुकान की पुष्टि बाकी", orderStatusApproved: "दुकान ने स्वीकार किया",
+        noCustomerOrders: "आपके ऑर्डर यहाँ दिखाई देंगे।", noActiveCustomerOrders: "दिखाने के लिए कोई सक्रिय ऑर्डर नहीं है। अस्वीकार किए गए ऑर्डर यहाँ छिपे हैं।", orderItems: "सामान",
+        orderAddress: "डिलीवरी का पता", orderStatusPending: "लंबित", orderStatusApproved: "दुकान ने स्वीकार किया",
         viewOrderDetails: "विवरण देखने के लिए दबाएँ",
         deleteOrder: "ऑर्डर हटाएँ", confirmDeleteOrder: "क्या आप यह ऑर्डर हमेशा के लिए हटाना चाहते हैं?", cancelDelete: "रद्द करें",
         orderStatusDelivered: "डिलीवर हो गया", orderStatusCompleted: "पूरा हुआ", orderStatusRejected: "ऑर्डर अस्वीकार हुआ",
@@ -930,6 +930,8 @@
     let managerRealtimeChannel = null;
     let checkoutAddressRealtimeChannel = null;
     let paymentContactRealtimeChannel = null;
+    let catalogRealtimeChannel = null;
+    let storefrontRealtimeChannel = null;
     let managerAudioContext = null;
     let managerOrdersPage = 0;
     let managerOrders = [];
@@ -1096,25 +1098,27 @@
       const status = customerOrderDisplayStatus(order);
       if (status === "Completed") return "completed";
       if (status === "Approved" || status === "Delivered") return "in-progress";
-      return "pending-rejected";
+      if (status === "Rejected") return null;
+      return "pending";
     }
     function renderCustomerOrders() {
       const container = $("customer-orders");
-      if (!customerOrders.length) {
-        container.innerHTML = `<p class="payment-box">${tr("noCustomerOrders")}</p>`;
+      const visibleCustomerOrders = customerOrders.filter((order) => customerOrderGroup(order) !== null);
+      if (!visibleCustomerOrders.length) {
+        container.innerHTML = `<p class="payment-box">${customerOrders.length ? tr("noActiveCustomerOrders") : tr("noCustomerOrders")}</p>`;
         return;
       }
       const groupedOrders = {
-        "in-progress": customerOrders.filter((order) => customerOrderGroup(order) === "in-progress"),
-        "pending-rejected": customerOrders.filter((order) => customerOrderGroup(order) === "pending-rejected"),
-        completed: customerOrders.filter((order) => customerOrderGroup(order) === "completed")
+        "in-progress": visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "in-progress"),
+        pending: visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "pending"),
+        completed: visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "completed")
       };
       const groupLabels = {
         "in-progress": tr("orderGroupInProgress"),
-        "pending-rejected": tr("orderGroupPendingRejected"),
+        pending: tr("orderGroupPending"),
         completed: tr("orderGroupCompleted")
       };
-      container.innerHTML = Object.entries(groupedOrders).map(([group, orders], index) => `
+      container.innerHTML = Object.entries(groupedOrders).filter(([, orders]) => orders.length > 0).map(([group, orders], index) => `
         <details class="profile-order-group" data-customer-order-group="${group}" ${expandedCustomerOrderGroups.has(group) ? "open" : ""}>
           <summary><span class="profile-order-group-number">${index + 1}</span><span>${groupLabels[group]}</span><span class="profile-order-group-count">${orders.length}</span></summary>
           <div class="profile-order-group-content">${orders.slice().reverse().map((order) => {
@@ -1130,7 +1134,7 @@
         const paymentMethod = order.paymentMethod === "cod" ? tr("cod")
           : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
         return `<details class="customer-order-details" data-customer-order-id="${escapeAttr(reference)}" ${expandedCustomerOrderDetails.has(reference) ? "open" : ""}>
-          <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${status === "Completed" ? "completed" : status === "Approved" || status === "Delivered" ? "in-progress" : "pending-rejected"}">${escapeHtml(customerOrderStatusLabel(status))}</span></summary>
+          <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${status === "Completed" ? "completed" : status === "Approved" || status === "Delivered" ? "in-progress" : "pending"}">${escapeHtml(customerOrderStatusLabel(status))}</span></summary>
           <div class="customer-order-details-content">
             <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
             <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
@@ -1550,8 +1554,216 @@
         mrp: Number(row.mrp),
         image: row.image_url || "",
         description: row.description || "",
-        stock: Number(row.stock ?? 0)
+        stock: row.stock_tracked === false ? undefined : Number(row.stock ?? 0),
+        size: row.size || "",
+        dimensions: row.dimensions || "",
+        imageFit: row.image_fit === "cover" ? "cover" : "contain",
+        imageZoom: Number(row.image_zoom ?? 100),
+        imageX: Number(row.image_x ?? 50),
+        imageY: Number(row.image_y ?? 50)
       };
+    }
+    const isUuid = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value));
+    async function uploadStoreImage(image, path) {
+      if (!image || !image.startsWith("data:")) return image || "";
+      const response = await fetch(image);
+      const blob = await response.blob();
+      const { error } = await db.storage.from("product-images").upload(path, blob, {
+        contentType: blob.type || "image/jpeg",
+        upsert: true
+      });
+      if (error) throw new Error(`Could not share an image: ${error.message}`);
+      const { data } = db.storage.from("product-images").getPublicUrl(path);
+      return `${data.publicUrl}?v=${Date.now()}`;
+    }
+    async function prepareSharedProduct(product) {
+      const id = isUuid(product.id) ? product.id : crypto.randomUUID();
+      const image = await uploadStoreImage(product.image, `products/${id}.jpg`);
+      return {
+        id,
+        name: product.name,
+        category: product.category,
+        price: product.price,
+        mrp: product.mrp,
+        stock: Number.isFinite(Number(product.stock)) ? Number(product.stock) : 0,
+        stock_tracked: Number.isFinite(Number(product.stock)),
+        image_url: image || fallbackImage(product.category),
+        description: product.description || "",
+        size: product.size || "",
+        dimensions: product.dimensions || "",
+        image_fit: product.imageFit === "cover" ? "cover" : "contain",
+        image_zoom: boundedImageValue(product.imageZoom, 100, 40, 200),
+        image_x: boundedImageValue(product.imageX, 50, 0, 100),
+        image_y: boundedImageValue(product.imageY, 50, 0, 100),
+        active: true
+      };
+    }
+    async function saveSharedProducts(nextProducts) {
+      const rows = [];
+      for (const product of nextProducts) rows.push(await prepareSharedProduct(product));
+      if (rows.length) {
+        const { error } = await db.from("products").upsert(rows);
+        if (error) throw new Error(`Could not share products with customers: ${error.message}`);
+      }
+      const ids = rows.map((product) => product.id);
+      const { error: deleteError } = ids.length
+        ? await db.from("products").delete().not("id", "in", `(${ids.join(",")})`)
+        : await db.from("products").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      if (deleteError) throw new Error(`Could not remove old shared products: ${deleteError.message}`);
+      const sharedProducts = rows.map(mapProduct);
+      const idMap = new Map(nextProducts.map((product, index) => [product.id, sharedProducts[index].id]));
+      offerSettings = {
+        ...offerSettings,
+        giftProductId: idMap.get(offerSettings.giftProductId) || offerSettings.giftProductId
+      };
+      const nextCart = Object.fromEntries(Object.entries(cart).map(([id, quantity]) => [idMap.get(id) || id, quantity]));
+      if (JSON.stringify(nextCart) !== JSON.stringify(cart)) {
+        cart = nextCart;
+        storage.write("shanvi-cart", cart);
+      }
+      return sharedProducts;
+    }
+    async function loadSharedProducts({ migrateLocal = false } = {}) {
+      if (!db) return false;
+      const { data, error } = await db.from("products")
+        .select("id,name,category,price,mrp,stock,image_url,description,size,dimensions,image_fit,image_zoom,image_x,image_y,active")
+        .eq("active", true)
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.warn("Could not load shared products", error.message);
+        return false;
+      }
+      if (!data.length && migrateLocal && isAuthorizedManager) {
+        try {
+          const localProducts = await saveSharedProducts(products);
+          products = localProducts;
+          storage.write("shanvi-products", products);
+          renderCategories();
+          renderProducts();
+          renderCart();
+          renderAdminProducts();
+        } catch (migrationError) {
+          console.error("Could not publish the manager's existing catalog", migrationError);
+          showToast(migrationError.message || "Could not share the existing catalog.");
+          return false;
+        }
+        return true;
+      }
+      if (!data.length) return true;
+      const sharedProducts = data.map(mapProduct);
+      const productIdMap = new Map(products.map((product) => {
+        const shared = sharedProducts.find((item) =>
+          item.id === product.id || (item.name === product.name && item.category === product.category)
+        );
+        return [product.id, shared?.id];
+      }));
+      const syncedCart = Object.fromEntries(Object.entries(cart).flatMap(([id, quantity]) => {
+        const sharedId = productIdMap.get(id);
+        return sharedId ? [[sharedId, quantity]] : [];
+      }));
+      if (JSON.stringify(syncedCart) !== JSON.stringify(cart)) {
+        cart = syncedCart;
+        storage.write("shanvi-cart", cart);
+      }
+      products = sharedProducts;
+      storage.write("shanvi-products", products);
+      renderCategories();
+      renderProducts();
+      renderCart();
+      renderAdminProducts();
+      return true;
+    }
+    async function loadManagerSharedData() {
+      if (await loadSharedProducts({ migrateLocal: true })) {
+        await loadSharedStorefront({ migrateLocal: true });
+      }
+    }
+    async function loadSharedStorefront({ migrateLocal = false } = {}) {
+      if (!db) return;
+      const { data, error } = await db.from("store_settings").select("value").eq("key", "storefront").maybeSingle();
+      if (error) {
+        console.warn("Could not load shared storefront settings", error.message);
+        return;
+      }
+      if (!data && migrateLocal && isAuthorizedManager) {
+        try {
+          await saveSharedStorefront({
+            logo: brandLogo,
+            offer: offerSettings,
+            delivery: deliverySettings,
+            hero: heroSettings
+          });
+        } catch (migrationError) {
+          console.error("Could not publish the manager's existing storefront settings", migrationError);
+          showToast(migrationError.message || "Could not share storefront settings.");
+        }
+        return;
+      }
+      if (!data?.value || typeof data.value !== "object") return;
+      applySharedStorefront(data.value);
+    }
+    function applySharedStorefront(value) {
+      brandLogo = typeof value.logo === "string" ? value.logo : "";
+      brandLogoDraft = brandLogo;
+      offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...(value.offer || {}) };
+      deliverySettings = { latitude: "", longitude: "", ...(value.delivery || {}) };
+      heroSettings = { ...defaultHero, ...(value.hero || {}) };
+      heroDraftImage = heroSettings.image;
+      updateBrandLogo();
+      renderCategories();
+      updateCustomerOffer();
+      renderHero();
+      renderCart();
+      if (isAuthorizedManager && $("admin").classList.contains("open")) {
+        $("offer-enabled").checked = Boolean(offerSettings.enabled);
+        $("offer-threshold").value = Number(offerSettings.threshold) || 100;
+        $("offer-product").value = offerSettings.giftProductId || "";
+        $("store-latitude").value = deliverySettings.latitude || "";
+        $("store-longitude").value = deliverySettings.longitude || "";
+        fillHeroForm();
+      }
+    }
+    async function saveSharedStorefront(value) {
+      const next = {
+        ...value,
+        logo: await uploadStoreImage(value.logo || "", "store/logo.jpg"),
+        hero: {
+          ...value.hero,
+          image: await uploadStoreImage(value.hero?.image || "", "store/hero.jpg")
+        }
+      };
+      const { error } = await db.from("store_settings").upsert({ key: "storefront", value: next });
+      if (error) throw new Error(`Could not share storefront settings with customers: ${error.message}`);
+      applySharedStorefront(next);
+      storage.write("shanvi-brand-logo", brandLogo);
+      storage.write("shanvi-offer", offerSettings);
+      storage.write("shanvi-delivery", deliverySettings);
+      storage.write("shanvi-hero", heroSettings);
+    }
+    function subscribeToSharedStorefront() {
+      if (!db || storefrontRealtimeChannel) return;
+      storefrontRealtimeChannel = db.channel("shared-storefront-settings")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "store_settings",
+          filter: "key=eq.storefront"
+        }, () => void loadSharedStorefront())
+        .subscribe((status, error) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.warn("Live storefront settings are unavailable", error?.message || status);
+          }
+        });
+    }
+    function subscribeToSharedCatalog() {
+      if (!db || catalogRealtimeChannel) return;
+      catalogRealtimeChannel = db.channel("shared-store-catalog")
+        .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => void loadSharedProducts())
+        .subscribe((status, error) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.warn("Live product updates are unavailable", error?.message || status);
+          }
+        });
     }
     function fallbackImage(category) {
       return `https://placehold.co/700x500/e9efe7/236b4a?text=${encodeURIComponent(category)}`;
@@ -2693,18 +2905,31 @@
       $("product-submit").textContent = "Add to storefront";
       $("product-cancel-edit").hidden = true;
     }
-    function deleteProduct(id) {
+    async function deleteProduct(id) {
       if (!isAuthorizedManager) return;
-      products = products.filter((product) => product.id !== id);
-      delete cart[id];
-      if (!storage.write("shanvi-products", products)) return;
-      storage.write("shanvi-cart", cart);
-      if (offerSettings.giftProductId === id) {
-        offerSettings = { ...offerSettings, enabled: false, giftProductId: "" };
-        storage.write("shanvi-offer", offerSettings);
+      const nextProducts = products.filter((product) => product.id !== id);
+      try {
+        if (db) {
+          const { error } = await db.from("products").delete().eq("id", id);
+          if (error) throw new Error(`Could not remove shared product: ${error.message}`);
+        }
+        products = nextProducts;
+        delete cart[id];
+        if (!storage.write("shanvi-products", products)) return;
+        storage.write("shanvi-cart", cart);
+        if (offerSettings.giftProductId === id) {
+          offerSettings = { ...offerSettings, enabled: false, giftProductId: "" };
+          if (db) {
+            await saveSharedStorefront({ logo: brandLogo, offer: offerSettings, delivery: deliverySettings, hero: heroSettings });
+          } else {
+            storage.write("shanvi-offer", offerSettings);
+          }
+        }
+        renderCategories(); renderAdminProducts(); renderProducts(); renderCart();
+        showManagerSaved(db ? "Product removed for all customers." : "Product removed successfully.");
+      } catch (error) {
+        showToast(error.message || "Could not remove the product.");
       }
-      renderCategories(); renderAdminProducts(); renderProducts(); renderCart();
-      showManagerSaved("Product removed successfully.");
     }
     function openAdmin() {
       $("admin").classList.add("open");
@@ -2755,6 +2980,7 @@
       $("manager-tools").hidden = false;
       $("manager-password").value = "";
       void loadStorePaymentSettings();
+      void loadManagerSharedData();
       renderAdminProducts();
       loadManagerOrders();
       subscribeToManagerOrders();
@@ -2785,6 +3011,7 @@
       $("admin-login-card").hidden = true;
       $("manager-tools").hidden = false;
       void loadStorePaymentSettings();
+      void loadManagerSharedData();
       renderAdminProducts();
       loadManagerOrders();
       subscribeToManagerOrders();
@@ -2938,17 +3165,26 @@
       $("hero-image-input").value = "";
       updateHeroPreview("");
     };
-    $("save-hero").onclick = () => {
+    $("save-hero").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       const next = {
         eyebrow: $("hero-eyebrow-input").value.trim() || defaultHero.eyebrow,
         title: $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " "),
         description: $("hero-description-input").value.trim() || defaultHero.description,
         image: heroDraftImage
       };
-      if (!storage.write("shanvi-hero", next)) return;
-      heroSettings = next;
-      renderHero();
-      showManagerSaved("Festival banner saved successfully on this device.");
+      try {
+        if (db) {
+          await saveSharedStorefront({ logo: brandLogo, offer: offerSettings, delivery: deliverySettings, hero: next });
+        }
+        if (!db) heroSettings = next;
+        if (!storage.write("shanvi-hero", heroSettings)) return;
+        heroDraftImage = heroSettings.image;
+        renderHero();
+        showManagerSaved(db ? "Festival banner shared with all customers." : "Festival banner saved successfully on this device.");
+      } catch (error) {
+        showToast(error.message || "Could not save the festival banner.");
+      }
     };
     $("admin-category-filter").addEventListener("change", renderAdminProducts);
     document.querySelectorAll("[data-order-filter]").forEach((button) => {
@@ -3074,6 +3310,11 @@
       }
       onLocalOrdersChanged(event);
     });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState !== "visible" || !db) return;
+      void loadSharedProducts();
+      void loadSharedStorefront();
+    });
     $("p-image").addEventListener("change", async () => {
       const file = $("p-image").files[0];
       if (!file) return;
@@ -3104,14 +3345,20 @@
       $("brand-logo-input").value = "";
       updateBrandLogo();
     };
-    $("save-brand-logo").onclick = () => {
+    $("save-brand-logo").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
-      if (!storage.write("shanvi-brand-logo", brandLogoDraft)) return;
-      brandLogo = brandLogoDraft;
-      updateBrandLogo();
-      showManagerSaved("Store logo saved successfully on this device.");
+      try {
+        if (db) await saveSharedStorefront({ logo: brandLogoDraft, offer: offerSettings, delivery: deliverySettings, hero: heroSettings });
+        if (!db) brandLogo = brandLogoDraft;
+        brandLogoDraft = brandLogo;
+        if (!storage.write("shanvi-brand-logo", brandLogo)) return;
+        updateBrandLogo();
+        showManagerSaved(db ? "Store logo shared with all customers." : "Store logo saved successfully on this device.");
+      } catch (error) {
+        showToast(error.message || "Could not save the store logo.");
+      }
     };
-    $("save-offer").onclick = () => {
+    $("save-offer").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       const threshold = Number($("offer-threshold").value);
       const giftProductId = $("offer-product").value;
@@ -3120,13 +3367,18 @@
         return;
       }
       const nextOffer = { enabled: $("offer-enabled").checked, threshold, giftProductId };
-      if (!storage.write("shanvi-offer", nextOffer)) return;
-      offerSettings = nextOffer;
-      updateCustomerOffer();
-      renderCart();
-      showManagerSaved("Free-item offer saved successfully on this device.");
+      try {
+        if (db) await saveSharedStorefront({ logo: brandLogo, offer: nextOffer, delivery: deliverySettings, hero: heroSettings });
+        if (!db) offerSettings = nextOffer;
+        if (!storage.write("shanvi-offer", offerSettings)) return;
+        updateCustomerOffer();
+        renderCart();
+        showManagerSaved(db ? "Free-item offer shared with all customers." : "Free-item offer saved successfully on this device.");
+      } catch (error) {
+        showToast(error.message || "Could not save the free-item offer.");
+      }
     };
-    $("save-delivery-settings").onclick = () => {
+    $("save-delivery-settings").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       const latitude = $("store-latitude").value.trim();
       const longitude = $("store-longitude").value.trim();
@@ -3137,11 +3389,16 @@
         return;
       }
       const nextLocation = { latitude, longitude };
-      if (!storage.write("shanvi-delivery", nextLocation)) return;
-      deliverySettings = nextLocation;
-      deliveryFee = null;
-      renderCart();
-      showManagerSaved("Store delivery location saved successfully on this device.");
+      try {
+        if (db) await saveSharedStorefront({ logo: brandLogo, offer: offerSettings, delivery: nextLocation, hero: heroSettings });
+        if (!db) deliverySettings = nextLocation;
+        if (!storage.write("shanvi-delivery", deliverySettings)) return;
+        deliveryFee = null;
+        renderCart();
+        showManagerSaved(db ? "Store delivery location shared with all customers." : "Store delivery location saved successfully on this device.");
+      } catch (error) {
+        showToast(error.message || "Could not save the store delivery location.");
+      }
     };
     $("use-store-location").onclick = () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
@@ -3208,14 +3465,17 @@
           showToast("Enter valid product details. MRP must be at least the selling price.");
           return;
         }
-        const nextProducts = existing
+        let nextProducts = existing
           ? products.map((item) => item.id === editId ? product : item)
           : [product, ...products];
+        if (db) nextProducts = await saveSharedProducts(nextProducts);
         if (!storage.write("shanvi-products", nextProducts)) return;
         products = nextProducts;
         resetProductForm();
         renderCategories(); renderProducts(); renderAdminProducts();
-        showManagerSaved(existing ? "Product updated successfully on this device." : "Product added successfully on this device.");
+        showManagerSaved(db
+          ? (existing ? "Product updated and shared with all customers." : "Product added and shared with all customers.")
+          : (existing ? "Product updated successfully on this device." : "Product added successfully on this device."));
       } catch (error) {
         showToast(error.message || "Could not add product.");
       } finally {
@@ -3340,6 +3600,10 @@
     }
     if (db) {
       checkOrderBackend();
+      void loadSharedProducts();
+      subscribeToSharedCatalog();
+      void loadSharedStorefront();
+      subscribeToSharedStorefront();
       loadStoreHelpContact();
       loadStorePaymentSettings();
       subscribeToStorePaymentSettings();
