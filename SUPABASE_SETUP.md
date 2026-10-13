@@ -14,7 +14,7 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
 2. Open **SQL Editor → New query**. Copy the full contents of `supabase-setup.sql` from the GitHub repository into the editor and click **Run**.
 3. Run `supabase-order-payment-update.sql` the same way.
 4. Run `supabase/features.sql`.
-5. Run `supabase/storefront-sync.sql` to add shared catalog display fields, enable live product/store setting updates, and add the new product categories. This script is safe to rerun after later edits.
+5. Run the latest `supabase/storefront-sync.sql` to add shared catalog display fields, enable live product/store setting updates, migrate existing Electronics products, and allow all current categories. Rerun it after deploying category/schema updates; it is safe to run repeatedly.
 6. Run `supabase/order-payment-confirmation.sql` last. Checkout remains disabled until all required order columns and policies are installed.
 7. Run `supabase/order-manager-delete.sql` to enable the manager-only permanent order deletion action.
 8. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
@@ -26,7 +26,7 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
    on conflict (user_id) do nothing;
    ```
 
-10. Reload the live site. Sign in via **Manager** using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
+10. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
 
 Customers can open **Profile** to see their order details; while Profile is open, order statuses refresh automatically about every 12 seconds, including accepted and rejected updates. Customers can copy an order ID/details or open a prefilled WhatsApp message to the store at `+91 97989 87872`. New order IDs use `SNVGS-<last 4 phone digits>-<unique suffix>` so the manager can recognize the customer without exposing the full phone number in the ID. In **Manager → Customer orders**, search by any part of the customer's phone number or order ID; phone matching is partial and searches all matching orders. Since customer sign-in is not enabled, order history and its private status-check token are kept in that browser only; order history is not shared across devices or browsers. The manager can save or change the customer-facing phone number in **Manager → Help & contact**, and customers can call it from **Help**. That contact, catalog, product images, offer, logo, delivery, and banner settings are shared through Supabase after the required SQL setup.
 
@@ -34,7 +34,7 @@ The publishable key in `supabase-config.js` is designed to be public; the databa
 
 ## Managing the catalog
 
-Open **Manager**, enter the manager credentials, then add products with their category (Kids, Gifts, Stationery, Puja, Gharelu Samaan, Snacks, Beauty & Personal Care, Electrical & Electronics, Clothing, or Grocery), name, selling price, MRP, stock, optional size and dimensions, description, and photo. Portrait and landscape photos with any aspect ratio are accepted up to 2 MB and resized locally before being shared through Supabase Storage. After selecting a photo, use the visible **×** in the preview's top-right corner to remove it. Choose Fill frame or Show full image, then adjust zoom and horizontal/vertical position; the 4:3 preview matches the customer product card and saves those display settings with the item. Product changes are saved to the shared Supabase catalog and appear on all customer devices, live while the storefront is open. The manager's existing local catalog is published the first time an authorized manager signs in if the shared catalog is empty. The manager's product list is grouped by section and has a section filter, plus Edit and Remove controls. Use **Save all changes** at the top of Manager to save pending changes across the product editor and manager settings.
+Open Manager by tapping the **Shanvi General Store** name six times within four seconds, then enter the manager credentials. Add products with their category (Kids, Gifts, Stationery, Puja, Gharelu Samaan, Snacks, Beauty & Personal Care, Electrical & Electronics, Clothing, or Grocery), name, selling price, MRP, stock, optional size and dimensions, description, and photo. Portrait and landscape photos with any aspect ratio are accepted up to 2 MB and resized locally before being shared through Supabase Storage. After selecting a photo, use the visible **×** in the preview's top-right corner to remove it. Choose Fill frame or Show full image, then adjust zoom and horizontal/vertical position; the 4:3 preview matches the customer product card and saves those display settings with the item. Product changes are saved to the shared Supabase catalog and appear on all customer devices, live while the storefront is open. The manager's existing local catalog is published the first time an authorized manager signs in if the shared catalog is empty. The manager's product list is grouped by section and has a section filter, plus Edit and Remove controls. Use **Save all changes** at the top of Manager to save pending changes across the product editor and manager settings.
 
 Use **Festival banner** to set the small heading, main headline, customer message, and background photo. The live preview shows the banner's center-crop; a wide landscape **16:6** image, ideally **1600 × 600 px**, gives the best fit. The customer-page photo uses a gentle animated zoom/pan with animated festival sparkles, with a dark overlay for readable text. Product and banner photos are resized locally before upload to Supabase Storage. In the product editor, use **Remove product photo** to clear the current/selected photo; an item without a photo uses its category placeholder. Banner, product details, logo, free-item offer, and delivery location are shared with customers' devices; all configured storefronts require the `storefront-sync.sql` migration.
 
@@ -48,6 +48,7 @@ The customer Profile shows **Pending** in red, **In Progress** in yellow after t
 
 - **Logo:** in Manager, upload a square image and save it. It is resized and shared through Supabase Storage.
 - **Free-item offer:** choose an integer minimum basket amount and a product to give free. The threshold is checked against the item subtotal after the existing coupon discount and before delivery. One free unit is added to eligible baskets; it counts against available stock. Offer settings are shared with all customers.
+- **Coupon:** enable or disable the `WELCOME10` coupon and set its percentage and maximum discount in Manager. Customers see a celebration when the coupon is applied. Coupon settings are shared with all customers.
 - **Inventory:** tracked products show remaining units to customers and cannot be added beyond the saved stock. Manager stock edits are shared with all customers.
 - **Delivery:** enter the store latitude and longitude in Manager, or use the manager device's location button while at the store. Customer checkout requests browser location. A straight-line distance over 2 km costs ₹20; within 2 km costs ₹0. If the store pin or customer location is unavailable/denied, checkout uses the agreed ₹20 fallback. The store location is shared with all customers. Location permission requires HTTPS (localhost is also treated as secure by browsers).
 - The top announcement strip has been removed; the English/Hindi button is beside the cart.
@@ -58,7 +59,7 @@ Push alerts need an online Supabase project and an HTTPS deployment; they cannot
 
 HTML, CSS, and browser JavaScript cannot securely synchronize customer orders between different phones or deliver push notifications while the manager page is closed. That requires an online backend.
 
-The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback.
+The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback. UPI payments currently open the customer's UPI app (or display a QR) and require manual payment verification by the store; there is no payment-gateway integration or automatic payment confirmation.
 
 ### Cross-device manager push setup
 
@@ -114,7 +115,7 @@ The following steps are only needed to install the backend from scratch or rotat
    };
    ```
 
-6. Open the deployed site on the manager's phone. In **Order notifications**, enter the `MANAGER_ENROLLMENT_CODE` from step 3, tap **Enable browser alerts**, and allow the notification prompt. Tap **Test sound and notification**. On iPhone/iPad, add the site to the Home Screen first if the browser requires it for push notifications.
+6. Open the deployed site on the manager's phone. Tap the **Shanvi General Store** name six times within four seconds, then in **Order notifications** enter the `MANAGER_ENROLLMENT_CODE` from step 3, tap **Enable browser alerts**, and allow the notification prompt. Tap **Test sound and notification**. On iPhone/iPad, add the site to the Home Screen first if the browser requires it for push notifications.
 7. Customers can opt in on the order-success screen to receive approval/rejection notifications. Customer order statuses in **Profile** refresh automatically while that panel is open.
 
-Hosted Supabase and static hosts offer free tiers with usage limits; this is not a guarantee of unlimited or permanently free hosting. Browser push itself has no per-message fee, but needs supported browsers, HTTPS, and permission; notification sound/vibration follows phone settings. SMS/calls to a phone number are not included. Static product/logo/offer/delivery settings remain in browser storage and do not sync to customers' devices in this version.
+Hosted Supabase and static hosts offer free tiers with usage limits; this is not a guarantee of unlimited or permanently free hosting. Browser push itself has no per-message fee, but needs supported browsers, HTTPS, and permission; notification sound/vibration follows phone settings. SMS/calls to a phone number are not included.

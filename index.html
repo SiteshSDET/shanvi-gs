@@ -31,8 +31,8 @@
     .language-toggle:hover { background: #edf3ed; }
     header { background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); position: fixed; inset: 0 0 auto; z-index: 5; backdrop-filter: blur(12px); box-shadow: 0 5px 20px #173a240b; }
     #customer-scroll { position: fixed; inset: 74px 0 0; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; }
-    .nav { max-width: 1200px; margin: auto; padding: 16px 24px; display: flex; align-items: center; gap: 24px; }
-    .brand { color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; min-width: 225px; }
+    .nav { max-width: 1200px; margin: auto; padding: 12px 24px; display: grid; grid-template-columns: minmax(205px,auto) minmax(150px,1fr) auto auto; grid-template-areas: "brand search actions utility"; align-items: center; gap: 10px 18px; }
+    .brand { color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; min-width: 0; grid-area: brand; user-select: none; }
     .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; background: #e9f2e9; border-radius: 14px; font-size: 22px; }
     .brand-mark img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
     .brand strong { display: block; font-family: Georgia, serif; font-size: 19px; letter-spacing: -.03em; }
@@ -42,7 +42,10 @@
     .search-wrap input { width: 100%; padding: 13px 16px 13px 43px; border: 1px solid var(--line); border-radius: 12px; outline: none; background: #f8f8f5; }
     .search-wrap input:focus { border-color: #9bb8a2; box-shadow: 0 0 0 3px #236b4a12; }
     .search-icon { position: absolute; left: 15px; top: 12px; color: var(--muted); }
-    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; grid-area: actions; }
+    .nav-actions .btn { padding: 9px 12px; font-size: 12px; white-space: nowrap; }
+    .nav-utility { display: flex; align-items: center; justify-content: flex-end; gap: 7px; grid-area: utility; }
+    .nav-utility .btn { min-height: 38px; padding: 8px 10px; font-size: 11px; }
     .btn { border: 0; border-radius: 10px; padding: 11px 16px; font-weight: 650; transition: .15s ease; }
     .btn:hover { transform: translateY(-1px); }
     .btn-primary { background: var(--green); color: white; }
@@ -109,14 +112,13 @@
     .add-btn { border: 1px solid #bdd0c0; background: white; color: var(--green); padding: 8px 13px; border-radius: 9px; font-size: 12px; font-weight: 700; }
     .add-btn:hover { color: white; background: var(--green); border-color: var(--green); }
     .empty { grid-column: 1/-1; padding: 55px 20px; color: var(--muted); text-align: center; background: white; border-radius: 16px; }
-    .trust-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 42px; }
-    .trust { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e8ece5; border-bottom: 3px solid #8eaf91; border-radius: 14px; padding: 17px; box-shadow: 0 5px 16px #173a2408; }
-    .trust:nth-child(2) { border-bottom-color: #d4a46d; }
-    .trust:nth-child(3) { border-bottom-color: #7e9fc1; }
-    .trust-icon { font-size: 22px; }
-    .trust strong { display: block; font-size: 13px; }
-    .trust span { color: var(--muted); font-size: 11px; }
-    footer { background: #183d2d; color: #e8f1e9; padding: 28px 24px; text-align: center; font-size: 12px; }
+    .trust-row { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 25px; padding: 7px 9px; border: 1px solid #e8ece5; border-radius: 11px; background: #fff; }
+    .trust { display: flex; flex: 1 1 0; min-width: 0; align-items: center; justify-content: center; gap: 7px; padding: 3px 8px; }
+    .trust + .trust { border-left: 1px solid var(--line); }
+    .trust-icon { font-size: 15px; }
+    .trust strong { display: block; font-size: 11px; white-space: nowrap; }
+    .trust span:last-child { display: none; }
+    footer { background: #183d2d; color: #e8f1e9; padding: 12px 24px; text-align: center; font-size: 11px; }
     footer span { color: #b6c9b8; }
     .overlay { display: none; position: fixed; inset: 0; z-index: 10; background: #13221888; }
     .overlay.open { display: block; }
@@ -135,6 +137,13 @@
     .summary-row { display: flex; justify-content: space-between; color: #68766e; font-size: 13px; margin: 9px 0; }
     .summary-row.total { color: var(--ink); border-top: 1px solid var(--line); padding-top: 13px; font-weight: 800; font-size: 17px; }
     .coupon { display: flex; gap: 7px; margin-top: 14px; }
+    .coupon[hidden], .coupon-hint[hidden] { display: none; }
+    .coupon-success { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .coupon-success[hidden] { display: none; }
+    .coupon-success-card { position: relative; padding: 20px 28px; border: 1px solid #b8d9b8; border-radius: 18px; background: #f8fff7; box-shadow: 0 18px 70px #16321b45; color: #205b35; font-weight: 850; font-size: 20px; animation: coupon-pop .55s cubic-bezier(.2,.85,.25,1.2) both; }
+    .coupon-confetti { position: absolute; top: 50%; left: 50%; width: 8px; height: 13px; border-radius: 2px; background: hsl(var(--hue) 80% 55%); opacity: 0; animation: coupon-burst .95s ease-out var(--delay) both; }
+    @keyframes coupon-pop { from { opacity: 0; transform: scale(.65) translateY(14px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes coupon-burst { 0% { opacity: 1; transform: translate(0,0) rotate(0); } 100% { opacity: 0; transform: translate(var(--x),var(--y)) rotate(220deg); } }
     .field { margin: 13px 0; }
     .field label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: #536158; }
     .field input, .field select { width: 100%; border: 1px solid #dfe4dd; border-radius: 9px; padding: 11px 12px; background: white; outline: none; }
@@ -296,10 +305,10 @@
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
     @media (max-width: 850px) {
-      .nav { flex-wrap: wrap; gap: 12px; padding: 13px 16px; }
-      .brand { min-width: 0; flex: 1; }
-      .search-wrap { order: 3; flex-basis: 100%; }
-      .nav-actions { flex-wrap: wrap; justify-content: flex-end; }
+      .nav { grid-template-columns: minmax(170px,1fr) auto; grid-template-areas: "brand utility" "actions actions" "search search"; gap: 9px 12px; padding: 10px 14px; }
+      .search-wrap { grid-area: search; }
+      .nav-actions { justify-content: space-evenly; }
+      .nav-utility { justify-self: end; }
       main { padding: 19px 16px 50px; }
       .hero { min-height: 300px; padding: 35px 30px; }
       .hero:before { right: 1%; opacity: .8; }
@@ -309,28 +318,26 @@
     @media (max-width: 520px) {
       :root { color-scheme: light; }
       .nav {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 10px;
-        padding: 10px 14px 12px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "brand utility" "actions actions" "search search";
+        gap: 7px 8px;
+        padding: 8px 12px 9px;
       }
-      .brand { min-width: 0; }
       .brand strong { font-size: 17px; }
       .brand small { font-size: 9px; }
-      .language-toggle { min-height: 44px; padding: 8px 10px; }
+      .language-toggle { min-height: 36px; padding: 6px 9px; }
       .brand-mark { width: 38px; height: 38px; flex: 0 0 38px; }
       .nav-actions {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        order: 2;
         width: 100%;
         gap: 6px;
       }
-      .nav-actions .btn, .nav-actions .language-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 0; min-height: 44px; padding: 7px 4px; font-size: 11px; white-space: normal; text-align: center; }
+      .nav-actions .btn { display: inline-flex; align-items: center; justify-content: center; min-width: 0; min-height: 36px; padding: 5px 6px; font-size: 11px; white-space: nowrap; text-align: center; }
       #cart-label { display: none; }
-      .nav-actions .language-toggle { flex: 0 0 auto; }
-      .search-wrap { order: 3; width: 100%; }
-      .search-wrap input { min-height: 46px; border-radius: 14px; }
+      .nav-utility .btn { min-height: 36px; }
+      .search-wrap { width: 100%; }
+      .search-wrap input { min-height: 40px; padding-top: 9px; padding-bottom: 9px; border-radius: 12px; }
       main { padding: 14px 13px 38px; }
       .hero { min-height: 275px; padding: 26px 20px; border-radius: 19px; }
       .hero-copy { max-width: 100%; }
@@ -355,8 +362,11 @@
       .offer-banner { grid-template-columns: 42px 1fr; gap: 10px; padding: 14px; border-radius: 16px; }
       .offer-gift-icon { width: 42px; height: 42px; font-size: 23px; border-radius: 13px; }
       .offer-badge { grid-column: 2; justify-self: start; margin-top: -3px; }
-      .trust-row { grid-template-columns: 1fr; gap: 8px; margin-top: 30px; }
-      .trust { padding: 14px; }
+      .trust-row { justify-content: space-around; margin-top: 18px; padding: 5px 2px; }
+      .trust { gap: 4px; padding: 3px 4px; }
+      .trust strong { font-size: 9px; }
+      .trust-icon { font-size: 13px; }
+      footer { padding: 8px 12px; }
       .overlay { background: #102016a8; }
       .drawer {
         width: 100%;
@@ -403,7 +413,8 @@
     @media (max-width: 360px) {
       .nav { padding-left: 10px; padding-right: 10px; }
       .nav-actions { gap: 4px; }
-      .nav-actions .btn, .nav-actions .language-toggle { padding: 7px 2px; font-size: 10px; }
+      .nav-actions .btn { padding: 5px 2px; font-size: 10px; }
+      .brand-mark { width: 34px; height: 34px; flex-basis: 34px; }
       .brand strong { font-size: 15px; }
       .brand small { letter-spacing: .08em; }
       main { padding-left: 10px; padding-right: 10px; }
@@ -420,18 +431,19 @@
 <body>
   <header id="store-header">
     <nav class="nav" aria-label="Main navigation">
-      <a class="brand" href="#" aria-label="Shanvi General Store home">
+      <a class="brand" id="store-brand" href="#" aria-label="Shanvi General Store home">
         <span class="brand-mark">🛍️</span>
         <span><strong class="brand-name">Shanvi General Store</strong><small id="brand-tagline">Your neighborhood, in one place</small></span>
       </a>
       <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" name="store-product-search" type="search" placeholder="Search products" aria-label="Search products" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
-      <div class="nav-actions">
-        <button class="btn btn-quiet" id="manager-open">Manager</button>
-        <button class="btn btn-soft" id="profile-open" type="button">Profile</button>
-        <button class="btn btn-soft" id="help-open" type="button">Help</button>
-        <button class="btn btn-soft cart-btn" id="cart-open" aria-label="Cart">🛒 <span id="cart-label">Cart</span> <span class="cart-count" id="cart-count">0</span></button>
+      <div class="nav-utility">
         <button class="btn btn-soft" id="install-app" type="button" hidden>Install app</button>
         <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch language">हिन्दी</button>
+      </div>
+      <div class="nav-actions">
+        <button class="btn btn-soft cart-btn" id="cart-open" aria-label="Cart">🛒 <span id="cart-label">Cart</span> <span class="cart-count" id="cart-count">0</span></button>
+        <button class="btn btn-soft" id="profile-open" type="button">Profile</button>
+        <button class="btn btn-soft" id="help-open" type="button">Help</button>
       </div>
     </nav>
   </header>
@@ -504,6 +516,15 @@
         <h3>Save manager changes</h3>
         <p class="small-note">Save pending product, storefront, payment, delivery, and customer contact changes together.</p>
         <button class="btn btn-primary" id="save-all-manager-changes" type="button">Save all changes</button>
+      </div>
+      <div class="admin-card">
+        <h3>Coupon code</h3>
+        <label class="payment-choice"><input id="coupon-enabled" type="checkbox"><span><strong>Enable customer coupon</strong><small>Customers can apply the WELCOME10 discount in their cart.</small></span></label>
+        <div class="form-grid">
+          <div class="field"><label for="coupon-percent">Discount percent</label><input id="coupon-percent" type="number" min="1" max="100" step="1" value="10"></div>
+          <div class="field"><label for="coupon-limit">Maximum discount (₹)</label><input id="coupon-limit" type="number" min="1" step="1" value="100"></div>
+        </div>
+        <button class="btn btn-soft" id="save-coupon-settings" type="button">Save coupon settings</button>
       </div>
       <div class="admin-card">
         <h3>Store logo</h3>
@@ -657,6 +678,7 @@
     </div>
   </div>
   <div class="toast" id="toast" role="status"></div>
+  <div class="coupon-success" id="coupon-success" role="status" aria-live="polite" hidden></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
@@ -701,7 +723,7 @@
         upiEasy: "Easy UPI payment", upiSub: "Pay directly using your favorite UPI app",
         basket: "Your basket", emptyBasket: "Your basket is waiting for something lovely.",
         continueShopping: "Continue shopping", remove: "Remove", coupon: "Coupon code",
-        apply: "Apply", couponHint: "Try coupon", couponDeal: "for 10% off (up to ₹100).",
+        apply: "Apply", couponHint: "Try coupon", couponDeal: "for {percent}% off (up to {maxDiscount}).",
         subtotal: "Items subtotal", couponSavings: "Coupon savings", delivery: "Delivery",
         deliveryArranged: "Arranged with store", total: "Total", deliveryDetails: "Delivery details",
         fullName: "Full name", startLetter: "Start with a letter",
@@ -717,6 +739,7 @@
         enterYourUpi: "Enter the UPI ID you will pay from.", yourUpi: "Your UPI ID",
         upiExample: "Example: 9876543210@upi", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
         payStoreAt: "Pay the store at:", copyUpi: "Copy store UPI ID",
+        markPaymentReturned: "I returned from my UPI app",
         storeUpiMissing: "Store UPI ID payment is not configured.",
         qr: "Scan UPI QR code", scanQr: "Scan the store QR code with your UPI app.",
         qrMissing: "Not configured yet; ask the store to add its QR code.",
@@ -798,7 +821,7 @@
         upiEasy: "आसान UPI भुगतान", upiSub: "अपने पसंदीदा UPI ऐप से भुगतान करें",
         basket: "आपका कार्ट", emptyBasket: "आपका कार्ट खाली है। इसमें कुछ सामान जोड़ें।",
         continueShopping: "खरीदारी जारी रखें", remove: "हटाएँ", coupon: "कूपन कोड",
-        apply: "लागू करें", couponHint: "कूपन", couponDeal: "से 10% छूट पाएँ (₹100 तक)।",
+        apply: "लागू करें", couponHint: "कूपन", couponDeal: "{percent}% छूट पाएँ ({maxDiscount} तक)।",
         subtotal: "सामान का कुल मूल्य", couponSavings: "कूपन की बचत", delivery: "डिलीवरी",
         deliveryArranged: "दुकान से तय करें", total: "कुल", deliveryDetails: "डिलीवरी की जानकारी",
         fullName: "पूरा नाम", startLetter: "नाम अक्षर से शुरू करें",
@@ -814,6 +837,7 @@
         enterYourUpi: "जिस UPI ID से भुगतान करेंगे, वह लिखें।", yourUpi: "आपकी UPI ID",
         upiExample: "उदाहरण: 9876543210@upi", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
         payStoreAt: "दुकान को यहाँ भुगतान करें:", copyUpi: "दुकान की UPI ID कॉपी करें",
+        markPaymentReturned: "मैं UPI ऐप से वापस आ गया/गई हूँ",
         storeUpiMissing: "दुकान की UPI ID अभी सेट नहीं है।",
         qr: "UPI QR कोड स्कैन करें", scanQr: "अपने UPI ऐप से दुकान का QR कोड स्कैन करें।",
         qrMissing: "अभी सेट नहीं है; दुकान से QR कोड जोड़ने को कहें।",
@@ -902,6 +926,7 @@
     let brandLogo = storage.read("shanvi-brand-logo", "");
     let brandLogoDraft = brandLogo;
     let offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...storage.read("shanvi-offer", {}) };
+    let couponSettings = { enabled: true, code: "WELCOME10", percent: 10, maxDiscount: 100, ...(storage.read("shanvi-coupon", {}) || {}) };
     let deliverySettings = { latitude: "", longitude: "", ...storage.read("shanvi-delivery", {}) };
     const defaultCheckoutAddressFields = { landmark: true, locality: true, postOffice: true, district: true, state: true, pin: true };
     let checkoutAddressFields = { ...defaultCheckoutAddressFields };
@@ -914,6 +939,10 @@
     let paymentSettingsReady = !db;
     let paymentSettingsError = false;
     let paymentSettingsNeedMigration = false;
+    let loadedPaymentSettingsSignature = "";
+    let loadedPaymentContactSignature = "";
+    let loadedStoreHelpSignature = "";
+    let loadedCheckoutAddressSignature = "";
     const defaultHero = {
       eyebrow: "A warm hello from your local store",
       title: "Everyday finds.\nThoughtfully picked.",
@@ -942,6 +971,8 @@
     let paymentContactRealtimeChannel = null;
     let catalogRealtimeChannel = null;
     let storefrontRealtimeChannel = null;
+    let loadedStorefrontSignature = "";
+    let loadedSharedProductsSignature = "";
     let sharedStoreRefreshInProgress = false;
     let managerAudioContext = null;
     let managerOrdersPage = 0;
@@ -958,7 +989,7 @@
       tools.querySelectorAll(":scope > .admin-card").forEach((card) => {
         if (card instanceof HTMLDetailsElement) {
           card.classList.add("manager-accordion");
-          return;
+          return false;
         }
         const heading = card.querySelector(":scope > h3");
         if (!heading) return;
@@ -1014,7 +1045,6 @@
       $("help-overlay").setAttribute("aria-label", tr("helpTitle"));
       if ($("profile-overlay").classList.contains("open")) renderCustomerOrders();
       renderCustomerHelp();
-      $("manager-open").textContent = tr("manager");
       updateBrandLogo();
       $("cart-heading").textContent = tr("basket");
       $("cart-overlay").setAttribute("aria-label", tr("basket"));
@@ -1062,6 +1092,20 @@
       status.textContent = message;
       status.classList.add("visible");
       showToast(message);
+    }
+    function showCouponCelebration(message) {
+      const celebration = $("coupon-success");
+      celebration.innerHTML = `<div class="coupon-success-card"><span aria-hidden="true">✓</span> ${escapeHtml(message)}</div>${Array.from({ length: 14 }, (_, index) => {
+        const angle = index * (360 / 14);
+        const radians = angle * Math.PI / 180;
+        return `<span class="coupon-confetti" style="--x:${Math.round(Math.cos(radians) * 115)}px;--y:${Math.round(Math.sin(radians) * 100)}px;--hue:${index * 29};--delay:${(index % 5) * 25}ms"></span>`;
+      }).join("")}`;
+      celebration.hidden = false;
+      clearTimeout(showCouponCelebration.timer);
+      showCouponCelebration.timer = setTimeout(() => {
+        celebration.hidden = true;
+        celebration.replaceChildren();
+      }, 1400);
     }
     function customerOrderStatusLabel(status) {
       const labels = {
@@ -1119,7 +1163,7 @@
       const visibleCustomerOrders = customerOrders.filter((order) => customerOrderGroup(order) !== null);
       if (!visibleCustomerOrders.length) {
         container.innerHTML = `<p class="payment-box">${customerOrders.length ? tr("noActiveCustomerOrders") : tr("noCustomerOrders")}</p>`;
-        return;
+        return false;
       }
       const groupedOrders = {
         "in-progress": visibleCustomerOrders.filter((order) => customerOrderGroup(order) === "in-progress"),
@@ -1204,7 +1248,7 @@
     async function refreshCustomerOrderStatuses({ includeTerminal = false } = {}) {
       if (!db) {
         $("profile-sync-status").textContent = tr("noTrackedOrders");
-        return;
+        return false;
       }
       if (customerStatusRefreshInProgress) return;
       const ordersToCheck = customerOrders.filter((order) =>
@@ -1215,7 +1259,7 @@
         $("profile-sync-status").textContent = customerOrders.length
           ? tr("noTrackedOrders")
           : tr("noCustomerOrders");
-        return;
+        return false;
       }
       customerStatusRefreshInProgress = true;
       const refreshButton = $("refresh-customer-orders");
@@ -1295,38 +1339,48 @@
         checkoutAddressSettingsError = true;
         $("checkout-address-settings-status").textContent = "Could not load the saved address settings. Reopen checkout to retry before changing these options.";
         renderCart();
-        return;
+        return false;
       }
-      if (data?.value && typeof data.value === "object") {
-        checkoutAddressFields = Object.fromEntries(
+      const nextFields = data?.value && typeof data.value === "object"
+        ? Object.fromEntries(
           Object.keys(defaultCheckoutAddressFields).map((key) => [
             key,
             typeof data.value[key] === "boolean" ? data.value[key] : defaultCheckoutAddressFields[key]
           ])
-        );
-      } else {
-        checkoutAddressFields = { ...defaultCheckoutAddressFields };
-      }
+        )
+        : { ...defaultCheckoutAddressFields };
+      const changed = JSON.stringify(nextFields) !== loadedCheckoutAddressSignature;
+      checkoutAddressFields = nextFields;
+      loadedCheckoutAddressSignature = JSON.stringify(nextFields);
       checkoutAddressSettingsReady = true;
       checkoutAddressSettingsError = false;
       $("checkout-address-settings-status").textContent = "Saved address fields are loaded and shared with customers.";
-      $("checkout-address-field-options").querySelectorAll("[data-address-field]").forEach((input) => {
-        input.checked = checkoutAddressFields[input.dataset.addressField] !== false;
-      });
-      renderCart();
+      if (changed) {
+        $("checkout-address-field-options").querySelectorAll("[data-address-field]").forEach((input) => {
+          input.checked = checkoutAddressFields[input.dataset.addressField] !== false;
+        });
+        renderCart();
+      }
     }
     async function loadStoreHelpContact() {
       if (!db) return;
       const { data, error } = await db.from("store_settings").select("value").eq("key", "help").maybeSingle();
       if (error) {
         console.warn("Could not load store help contact", error.message);
-        return;
+        return false;
       }
       const phone = data?.value?.phone;
-      storeHelpPhone = typeof phone === "string" && /^[0-9]{10}$/.test(phone) ? phone : "";
-      storeCallEnabled = typeof data?.value?.call_enabled === "boolean" ? data.value.call_enabled : true;
-      $("store-help-phone").value = storeHelpPhone;
-      $("store-call-enabled").checked = storeCallEnabled;
+      const nextPhone = typeof phone === "string" && /^[0-9]{10}$/.test(phone) ? phone : "";
+      const nextCallEnabled = typeof data?.value?.call_enabled === "boolean" ? data.value.call_enabled : true;
+      const signature = JSON.stringify({ phone: nextPhone, call_enabled: nextCallEnabled });
+      if (signature === loadedStoreHelpSignature) return;
+      loadedStoreHelpSignature = signature;
+      storeHelpPhone = nextPhone;
+      storeCallEnabled = nextCallEnabled;
+      if (!isAuthorizedManager || document.activeElement !== $("store-help-phone")) {
+        $("store-help-phone").value = storeHelpPhone;
+        $("store-call-enabled").checked = storeCallEnabled;
+      }
       renderCustomerHelp();
     }
     async function loadPaymentContact() {
@@ -1339,6 +1393,9 @@
       const value = data?.value;
       const phone = typeof value?.phone === "string" && /^[0-9]{10}$/.test(value.phone) ? value.phone : "";
       const showPhone = value?.show_phone === true && Boolean(phone);
+      const signature = JSON.stringify({ phone, showPhone });
+      if (signature === loadedPaymentContactSignature) return;
+      loadedPaymentContactSignature = signature;
       settings = { ...settings, upi_phone: phone, show_upi_phone: showPhone };
       storage.write("shanvi-settings", settings);
       if (!isAuthorizedManager) {
@@ -1364,6 +1421,9 @@
         return;
       }
       const value = data?.value;
+      const signature = JSON.stringify(value || null);
+      if (signature === loadedPaymentSettingsSignature) return;
+      loadedPaymentSettingsSignature = signature;
       paymentSettingsNeedMigration = !value || value.schema_version !== 1;
       settings = {
         ...settings,
@@ -1376,7 +1436,7 @@
       paymentSettingsReady = true;
       paymentSettingsError = false;
       storage.write("shanvi-settings", settings);
-      if (isAuthorizedManager && $("admin").classList.contains("open")) {
+      if (isAuthorizedManager && $("admin").classList.contains("open") && document.activeElement !== $("upi-id")) {
         $("upi-id").value = paymentSettingsNeedMigration && typeof browserPaymentSettings.upi === "string"
           ? browserPaymentSettings.upi
           : settings.upi;
@@ -1493,7 +1553,9 @@
       return items.filter((item) => !item.isFreeGift).reduce((sum, item) => sum + item.price * item.quantity, 0);
     }
     function currentDiscount(subtotal) {
-      return coupon ? Math.min(Math.round(subtotal * .1), 100) : 0;
+      return coupon && couponSettings.enabled
+        ? Math.min(Math.round(subtotal * Number(couponSettings.percent) / 100), Number(couponSettings.maxDiscount))
+        : 0;
     }
     function updateCustomerOffer() {
       const offer = $("customer-offer");
@@ -1626,6 +1688,7 @@
         : await db.from("products").delete().neq("id", "00000000-0000-0000-0000-000000000000");
       if (deleteError) throw new Error(`Could not remove old shared products: ${deleteError.message}`);
       await markSharedCatalogInitialized();
+      loadedSharedProductsSignature = JSON.stringify(rows);
       const sharedProducts = rows.map(mapProduct);
       const idMap = new Map(nextProducts.map((product, index) => [product.id, sharedProducts[index].id]));
       offerSettings = {
@@ -1649,6 +1712,7 @@
     async function clearSharedCatalog() {
       products = [];
       cart = {};
+      loadedSharedProductsSignature = "[]";
       storage.write("shanvi-products", products);
       storage.write("shanvi-cart", cart);
       renderCategories();
@@ -1666,6 +1730,8 @@
         console.warn("Could not load shared products", error.message);
         return false;
       }
+      const signature = JSON.stringify(data);
+      if (signature === loadedSharedProductsSignature && !(migrateLocal && isAuthorizedManager)) return true;
       if (!data.length && migrateLocal && isAuthorizedManager) {
         try {
           const { data: existingRows, error: existingRowsError } = await db.from("products").select("id").limit(1);
@@ -1699,6 +1765,7 @@
         return true;
       }
       if (!data.length) {
+        loadedSharedProductsSignature = signature;
         try {
           const { data: catalogState, error: catalogStateError } = await db.from("store_settings")
             .select("value")
@@ -1712,6 +1779,7 @@
         return true;
       }
       if (isAuthorizedManager && migrateLocal) await markSharedCatalogInitialized();
+      loadedSharedProductsSignature = signature;
       const sharedProducts = data.map(mapProduct);
       const productIdMap = new Map(products.map((product) => {
         const shared = sharedProducts.find((item) =>
@@ -1762,13 +1830,23 @@
         return;
       }
       if (!data?.value || typeof data.value !== "object") return;
+      const signature = JSON.stringify(data.value);
+      if (signature === loadedStorefrontSignature) return;
+      loadedStorefrontSignature = signature;
       applySharedStorefront(data.value);
     }
     async function refreshSharedStorefront() {
       if (!db || sharedStoreRefreshInProgress || !navigator.onLine) return;
       sharedStoreRefreshInProgress = true;
       try {
-        await Promise.all([loadSharedProducts(), loadSharedStorefront()]);
+        await Promise.all([
+          loadSharedProducts(),
+          loadSharedStorefront(),
+          loadStorePaymentSettings(),
+          loadPaymentContact(),
+          loadStoreHelpContact(),
+          loadCheckoutAddressFields()
+        ]);
       } finally {
         sharedStoreRefreshInProgress = false;
       }
@@ -1777,6 +1855,8 @@
       brandLogo = typeof value.logo === "string" ? value.logo : "";
       brandLogoDraft = brandLogo;
       offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...(value.offer || {}) };
+      couponSettings = { enabled: true, code: "WELCOME10", percent: 10, maxDiscount: 100, ...(value.coupon || {}) };
+      if (!couponSettings.enabled) coupon = false;
       deliverySettings = { latitude: "", longitude: "", ...(value.delivery || {}) };
       heroSettings = { ...defaultHero, ...(value.hero || {}) };
       heroDraftImage = heroSettings.image;
@@ -1789,6 +1869,12 @@
         $("offer-enabled").checked = Boolean(offerSettings.enabled);
         $("offer-threshold").value = Number(offerSettings.threshold) || 100;
         $("offer-product").value = offerSettings.giftProductId || "";
+        $("coupon-enabled").checked = Boolean(couponSettings.enabled);
+        $("coupon-percent").value = Number(couponSettings.percent) || 10;
+        $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
+        $("coupon-enabled").checked = Boolean(couponSettings.enabled);
+        $("coupon-percent").value = Number(couponSettings.percent) || 10;
+        $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
         $("store-latitude").value = deliverySettings.latitude || "";
         $("store-longitude").value = deliverySettings.longitude || "";
         fillHeroForm();
@@ -1797,6 +1883,7 @@
     async function saveSharedStorefront(value) {
       const next = {
         ...value,
+        coupon: value.coupon || couponSettings,
         logo: await uploadStoreImage(value.logo || "", "store/logo.jpg"),
         hero: {
           ...value.hero,
@@ -1805,9 +1892,11 @@
       };
       const { error } = await db.from("store_settings").upsert({ key: "storefront", value: next });
       if (error) throw new Error(`Could not share storefront settings with customers: ${error.message}`);
+      loadedStorefrontSignature = JSON.stringify(next);
       applySharedStorefront(next);
       storage.write("shanvi-brand-logo", brandLogo);
       storage.write("shanvi-offer", offerSettings);
+      storage.write("shanvi-coupon", couponSettings);
       storage.write("shanvi-delivery", deliverySettings);
       storage.write("shanvi-hero", heroSettings);
     }
@@ -1883,6 +1972,11 @@
         .join("");
     }
     function renderCart() {
+      const preservedCheckoutValues = Object.fromEntries(
+        ["customer-name", "customer-phone", "address-landmark", "address-village", "address-post", "address-district", "address-state", "address-pin", "coupon-code"]
+          .map((id) => [id, $(id)?.value ?? ""])
+          .filter(([, value]) => value !== "")
+      );
       const items = cartProducts();
       const count = items.reduce((sum, item) => sum + item.quantity, 0);
       $("cart-count").textContent = count;
@@ -1901,8 +1995,8 @@
           <div><strong>${escapeHtml(item.name)}</strong><small>${item.isFreeGift ? tr("freeGift") : `${money(item.price)} ${tr("itemsEach")}`}</small>${item.isFreeGift ? "" : `<div class="quantity"><button data-qty="${escapeAttr(item.id)}" data-step="-1" aria-label="${language === "hi" ? "मात्रा घटाएँ" : "Decrease quantity"}">−</button><span>${item.quantity}</span><button data-qty="${escapeAttr(item.id)}" data-step="1" aria-label="${language === "hi" ? "मात्रा बढ़ाएँ" : "Increase quantity"}" ${Number.isFinite(Number(item.stock)) && item.quantity >= Number(item.stock) ? "disabled" : ""}>+</button></div>`}</div>
           <div><strong>${item.isFreeGift ? tr("free") : money(item.price * item.quantity)}</strong>${item.isFreeGift ? "" : `<button class="remove" data-remove="${escapeAttr(item.id)}">${tr("remove")}</button>`}</div>
         </div>`).join("")}</div>
-        <div class="coupon"><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon">${tr("apply")}</button></div>
-        <div class="small-note" style="margin-top:6px">${tr("couponHint")} <strong>WELCOME10</strong> ${tr("couponDeal")}</div>
+        <div class="coupon" ${couponSettings.enabled ? "" : "hidden"}><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon">${coupon ? "Remove" : tr("apply")}</button></div>
+        <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}</div>
         <div class="summary">
           <div class="summary-row"><span>${tr("subtotal")}</span><strong>${money(subtotal)}</strong></div>
           ${discount ? `<div class="summary-row"><span>${tr("couponSavings")}</span><strong>−${money(discount)}</strong></div>` : ""}
@@ -1926,11 +2020,23 @@
               : "The secure order database is still being set up. Online ordering will be enabled after setup is complete."
             : "This public catalog is currently browse-only. Online orders will be enabled after the store connects its secure order service."}</p>
           <button class="btn btn-primary full" id="place-order" disabled>Online ordering unavailable</button>`}`;
+      for (const [id, value] of Object.entries(preservedCheckoutValues)) {
+        const field = $(id);
+        if (field) field.value = value;
+      }
       $("cart-content").querySelectorAll("[data-qty]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.qty, Number(button.dataset.step))));
       $("cart-content").querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.remove, -(cart[button.dataset.remove] || 0))));
       $("apply-coupon").onclick = () => {
-        coupon = $("coupon-code").value.trim().toUpperCase() === "WELCOME10";
-        showToast(coupon ? tr("couponApplied") : tr("invalidCoupon"));
+        const code = $("coupon-code").value.trim().toUpperCase();
+        if (coupon) {
+          coupon = false;
+          showToast("Coupon removed.");
+          renderCart();
+          return;
+        }
+        coupon = couponSettings.enabled && code === String(couponSettings.code).toUpperCase();
+        if (coupon) showCouponCelebration(`${code} applied successfully!`);
+        else showToast(couponSettings.enabled ? tr("invalidCoupon") : "Coupons are currently unavailable.");
         renderCart();
       };
       const checkoutForm = $("checkout-form");
@@ -2646,7 +2752,7 @@
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("qr")}</strong><small>${canPayQr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
         ${selectedPayment === "upi_qr" ? `<div class="payment-box">${canPayQr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}.</p><button class="btn btn-soft full" id="start-qr-payment" type="button">${tr("startQrPayment")}</button>` : tr("qrNotConfigured")}</div>` : ""}
         <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
-        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentReady && (selectedPayment === "cod" || checkoutDraft.paymentFlowReturned) ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button>${selectedPayment === "upi_id" || selectedPayment === "upi_qr" ? `<button class="btn btn-soft" id="mark-payment-return" type="button">${tr("markPaymentReturned")}</button>` : ""}<button class="btn btn-primary full" id="confirm-payment" ${paymentReady && (selectedPayment === "cod" || checkoutDraft.paymentFlowReturned) ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
         ${(selectedPayment === "upi_id" || selectedPayment === "upi_qr") ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentFlowReturned ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
@@ -2674,20 +2780,26 @@
           showToast(tr("invalidPayerUpi"));
           return;
         }
-        checkoutDraft.paymentFlowReturned = false;
-        checkoutDraft.paymentLaunchPending = true;
-        checkoutDraft.paymentAppWasHidden = false;
-        updatePaymentFlowControls();
-        const upiLink = `upi://pay?${new URLSearchParams({pa:settings.upi,pn:"Shanvi General Store",am:checkoutDraft.total.toFixed(2),cu:"INR",tn:checkoutDraft.id})}`;
-        window.location.href = upiLink;
+        launchUpiPaymentApp();
       };
       const startQrPaymentButton = $("start-qr-payment");
       if (startQrPaymentButton) startQrPaymentButton.onclick = () => {
+        if (settings.upi) {
+          launchUpiPaymentApp();
+          return;
+        }
         checkoutDraft.paymentFlowReturned = false;
         checkoutDraft.paymentLaunchPending = true;
         checkoutDraft.paymentAppWasHidden = false;
         updatePaymentFlowControls();
-        showToast(tr("qrPaymentStarted"));
+        showToast("Scan this QR from another device, then return here and tap the UPI return button.");
+      };
+      const returnedButton = $("mark-payment-return");
+      if (returnedButton) returnedButton.onclick = () => {
+        checkoutDraft.paymentFlowReturned = true;
+        checkoutDraft.paymentLaunchPending = false;
+        checkoutDraft.paymentAppWasHidden = false;
+        updatePaymentFlowControls();
       };
       const copyButton = $("copy-upi");
       if (copyButton) copyButton.onclick = async () => {
@@ -2697,6 +2809,24 @@
       $("confirm-payment").onclick = saveOrder;
       installPaymentReturnListeners();
       updatePaymentFlowControls();
+    }
+    function launchUpiPaymentApp() {
+      if (!checkoutDraft || !settings.upi) {
+        showToast("The store UPI ID is not configured. Scan the QR code from another device.");
+        return;
+      }
+      checkoutDraft.paymentFlowReturned = false;
+      checkoutDraft.paymentLaunchPending = true;
+      checkoutDraft.paymentAppWasHidden = false;
+      updatePaymentFlowControls();
+      const upiLink = `upi://pay?${new URLSearchParams({
+        pa: settings.upi,
+        pn: "Shanvi General Store",
+        am: checkoutDraft.total.toFixed(2),
+        cu: "INR",
+        tn: checkoutDraft.id
+      })}`;
+      window.location.href = upiLink;
     }
     function updatePaymentFlowControls() {
       const confirmButton = $("confirm-payment");
@@ -3162,7 +3292,16 @@
     $("help-overlay").addEventListener("click", (event) => {
       if (event.target === $("help-overlay")) $("help-overlay").classList.remove("open");
     });
-    $("manager-open").onclick = () => {
+    function syncCustomerScrollOffset() {
+      $("customer-scroll").style.top = `${$("store-header").getBoundingClientRect().height}px`;
+    }
+    syncCustomerScrollOffset();
+    window.addEventListener("resize", syncCustomerScrollOffset);
+    if (typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(syncCustomerScrollOffset).observe($("store-header"));
+    }
+    $("store-brand").addEventListener("click", (event) => {
+      event.preventDefault();
       const now = Date.now();
       managerTapCount = now - lastManagerTapAt > 4000 ? 1 : managerTapCount + 1;
       lastManagerTapAt = now;
@@ -3170,7 +3309,7 @@
         managerTapCount = 0;
         openAdmin();
       }
-    };
+    });
     $("manager-close").onclick = () => {
       $("admin").classList.remove("open");
     };
@@ -3238,7 +3377,7 @@
       updateHeroPreview("");
     };
     $("save-hero").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const next = {
         eyebrow: $("hero-eyebrow-input").value.trim() || defaultHero.eyebrow,
         title: $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " "),
@@ -3250,12 +3389,14 @@
           await saveSharedStorefront({ logo: brandLogo, offer: offerSettings, delivery: deliverySettings, hero: next });
         }
         if (!db) heroSettings = next;
-        if (!storage.write("shanvi-hero", heroSettings)) return;
+        if (!storage.write("shanvi-hero", heroSettings)) return false;
         heroDraftImage = heroSettings.image;
         renderHero();
         showManagerSaved(db ? "Festival banner shared with all customers." : "Festival banner saved successfully on this device.");
+        return true;
       } catch (error) {
         showToast(error.message || "Could not save the festival banner.");
+        return false;
       }
     };
     $("admin-category-filter").addEventListener("change", renderAdminProducts);
@@ -3280,22 +3421,22 @@
     $("refresh-orders").onclick = loadManagerOrders;
     $("load-more-orders").onclick = () => loadManagerOrders({ append: true });
     $("save-checkout-address-fields").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const nextFields = Object.fromEntries(
         [...$("checkout-address-field-options").querySelectorAll("[data-address-field]")]
           .map((input) => [input.dataset.addressField, input.checked])
       );
       if (!Object.values(nextFields).some(Boolean)) {
         showToast("Keep at least one delivery address field enabled.");
-        return;
+        return false;
       }
       if (!db) {
         showToast("A connected Supabase project is required to share checkout fields with customers.");
-        return;
+        return false;
       }
       if (!checkoutAddressSettingsReady || checkoutAddressSettingsError) {
         showToast("Load the saved checkout address settings before changing them.");
-        return;
+        return false;
       }
       const button = $("save-checkout-address-fields");
       button.disabled = true;
@@ -3309,8 +3450,10 @@
         $("checkout-address-settings-status").textContent = "Saved address fields are now active for customers.";
         renderCart();
         showManagerSaved("Checkout address fields saved for all customers.");
+        return true;
       } catch (error) {
         showToast(`Could not save address fields: ${error.message}`);
+        return false;
       } finally {
         button.disabled = false;
       }
@@ -3322,39 +3465,43 @@
       event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
     });
     $("save-manager-alert-phone").onclick = () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const phone = $("manager-alert-phone").value.trim();
       if (phone && !/^[0-9]{10}$/.test(phone)) {
         $("manager-alert-phone").reportValidity();
-        return;
+        return false;
       }
-      if (!storage.write("shanvi-manager-alert-phone", phone)) return;
+      if (!storage.write("shanvi-manager-alert-phone", phone)) return false;
       managerAlertPhone = phone;
       showManagerSaved(phone
         ? "Manager number saved in this browser. It does not enable SMS or calls."
         : "Manager number cleared from this browser.");
+      return true;
     };
     $("save-help-phone").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const phone = $("store-help-phone").value.trim();
       if (phone && !/^[0-9]{10}$/.test(phone)) {
         $("store-help-phone").reportValidity();
-        return;
+        return false;
       }
       if (!db) {
         showToast("A connected Supabase project is required to share the Help contact with customers.");
-        return;
+        return false;
       }
-      const callEnabled = $("store-call-enabled").checked;
-      const { error } = await db.from("store_settings").upsert({ key: "help", value: { phone, call_enabled: callEnabled } });
-      if (error) {
+      try {
+        const callEnabled = $("store-call-enabled").checked;
+        const { error } = await db.from("store_settings").upsert({ key: "help", value: { phone, call_enabled: callEnabled } });
+        if (error) throw error;
+        storeHelpPhone = phone;
+        storeCallEnabled = callEnabled;
+        renderCustomerHelp();
+        showManagerSaved(phone ? "Customer Help contact number saved." : "Customer Help contact number removed.");
+        return true;
+      } catch (error) {
         showToast(`Could not save store contact: ${error.message}`);
-        return;
+        return false;
       }
-      storeHelpPhone = phone;
-      storeCallEnabled = callEnabled;
-      renderCustomerHelp();
-      showManagerSaved(phone ? "Customer Help contact number saved." : "Customer Help contact number removed.");
     };
     $("test-order-notification").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
@@ -3421,58 +3568,100 @@
       updateBrandLogo();
     };
     $("save-brand-logo").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       try {
         if (db) await saveSharedStorefront({ logo: brandLogoDraft, offer: offerSettings, delivery: deliverySettings, hero: heroSettings });
         if (!db) brandLogo = brandLogoDraft;
         brandLogoDraft = brandLogo;
-        if (!storage.write("shanvi-brand-logo", brandLogo)) return;
+        if (!storage.write("shanvi-brand-logo", brandLogo)) return false;
         updateBrandLogo();
         showManagerSaved(db ? "Store logo shared with all customers." : "Store logo saved successfully on this device.");
+        return true;
       } catch (error) {
         showToast(error.message || "Could not save the store logo.");
+        return false;
       }
     };
     $("save-offer").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const threshold = Number($("offer-threshold").value);
       const giftProductId = $("offer-product").value;
       if (!Number.isInteger(threshold) || threshold < 1 || ($("offer-enabled").checked && !products.some((product) => product.id === giftProductId))) {
         showToast("Set a valid minimum amount and select a free product.");
-        return;
+        return false;
       }
       const nextOffer = { enabled: $("offer-enabled").checked, threshold, giftProductId };
       try {
         if (db) await saveSharedStorefront({ logo: brandLogo, offer: nextOffer, delivery: deliverySettings, hero: heroSettings });
         if (!db) offerSettings = nextOffer;
-        if (!storage.write("shanvi-offer", offerSettings)) return;
+        if (!storage.write("shanvi-offer", offerSettings)) return false;
         updateCustomerOffer();
         renderCart();
         showManagerSaved(db ? "Free-item offer shared with all customers." : "Free-item offer saved successfully on this device.");
+        return true;
       } catch (error) {
         showToast(error.message || "Could not save the free-item offer.");
+        return false;
+      }
+    };
+    $("save-coupon-settings").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
+      const percent = Number($("coupon-percent").value);
+      const maxDiscount = Number($("coupon-limit").value);
+      if (!Number.isInteger(percent) || percent < 1 || percent > 100
+        || !Number.isInteger(maxDiscount) || maxDiscount < 1) {
+        showToast("Enter a whole-number coupon percentage from 1 to 100 and a positive maximum discount.");
+        return false;
+      }
+      const nextCoupon = {
+        enabled: $("coupon-enabled").checked,
+        code: "WELCOME10",
+        percent,
+        maxDiscount
+      };
+      try {
+        if (db) await saveSharedStorefront({
+          logo: brandLogo,
+          offer: offerSettings,
+          coupon: nextCoupon,
+          delivery: deliverySettings,
+          hero: heroSettings
+        });
+        else couponSettings = nextCoupon;
+        if (!storage.write("shanvi-coupon", couponSettings)) return false;
+        if (!couponSettings.enabled) coupon = false;
+        renderCart();
+        showManagerSaved(couponSettings.enabled
+          ? "Coupon settings saved for all customers."
+          : "Coupon disabled for all customers.");
+        return true;
+      } catch (error) {
+        showToast(error.message || "Could not save coupon settings.");
+        return false;
       }
     };
     $("save-delivery-settings").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const latitude = $("store-latitude").value.trim();
       const longitude = $("store-longitude").value.trim();
       const validLatitude = latitude === "" || (Number.isFinite(Number(latitude)) && Number(latitude) >= -90 && Number(latitude) <= 90);
       const validLongitude = longitude === "" || (Number.isFinite(Number(longitude)) && Number(longitude) >= -180 && Number(longitude) <= 180);
       if (!validLatitude || !validLongitude || Boolean(latitude) !== Boolean(longitude)) {
         showToast("Enter both valid map coordinates, or leave both empty.");
-        return;
+        return false;
       }
       const nextLocation = { latitude, longitude };
       try {
         if (db) await saveSharedStorefront({ logo: brandLogo, offer: offerSettings, delivery: nextLocation, hero: heroSettings });
         if (!db) deliverySettings = nextLocation;
-        if (!storage.write("shanvi-delivery", deliverySettings)) return;
+        if (!storage.write("shanvi-delivery", deliverySettings)) return false;
         deliveryFee = null;
         renderCart();
         showManagerSaved(db ? "Store delivery location shared with all customers." : "Store delivery location saved successfully on this device.");
+        return true;
       } catch (error) {
         showToast(error.message || "Could not save the store delivery location.");
+        return false;
       }
     };
     $("save-all-manager-changes").onclick = async () => {
@@ -3480,9 +3669,14 @@
       const button = $("save-all-manager-changes");
       button.disabled = true;
       try {
-        const hasProductChanges = Boolean($("p-edit-id").value || $("p-name").value.trim());
+        const hasProductChanges = Boolean(
+          $("p-edit-id").value
+          || $("p-name").value.trim()
+          || $("p-image").files.length
+        );
         if (hasProductChanges && !await saveProductForm()) return;
         for (const id of [
+          "save-coupon-settings",
           "save-brand-logo",
           "save-offer",
           "save-delivery-settings",
@@ -3494,7 +3688,7 @@
         ]) {
           const save = $(id).onclick;
           if (typeof save !== "function") throw new Error(`The ${id} save action is unavailable.`);
-          await save.call($(id));
+          if (await save.call($(id)) === false) return;
         }
         showManagerSaved("Save all changes finished. Check any section messages for validation or save errors.");
       } catch (error) {
@@ -3590,10 +3784,10 @@
     }
     $("product-form").addEventListener("submit", (event) => { void saveProductForm(event); });
     $("save-payment").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       if (db && !paymentSettingsReady) {
         showToast("Load the shared payment settings before changing them.");
-        return;
+        return false;
       }
       try {
         const upiPhone = $("upi-phone").value.trim();
@@ -3601,7 +3795,7 @@
           $("upi-phone").setCustomValidity("Enter a valid 10-digit payment phone number.");
           $("upi-phone").reportValidity();
           $("upi-phone").setCustomValidity("");
-          return;
+          return false;
         }
         const qrFile = $("qr-image").files[0];
         const qr = qrFile
@@ -3637,7 +3831,7 @@
           });
           if (error) throw new Error(`Could not share the payment phone number: ${error.message}`);
         }
-        if (!storage.write("shanvi-settings", next)) return;
+        if (!storage.write("shanvi-settings", next)) return false;
         settings = next;
         paymentSettingsReady = true;
         paymentSettingsError = false;
@@ -3647,7 +3841,11 @@
           : "";
         renderCart();
         showManagerSaved(db ? "Payment details saved and shared with all customers." : "Payment details saved successfully on this device.");
-      } catch (error) { showToast(error.message || "Could not save payment details."); }
+        return true;
+      } catch (error) {
+        showToast(error.message || "Could not save payment details.");
+        return false;
+      }
     };
     $("upi-phone").addEventListener("input", (event) => {
       event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
