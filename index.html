@@ -556,7 +556,7 @@
         <h3>Delivery charges</h3>
         <p class="small-note">Delivery is free when the discounted items subtotal is ₹100 or more. Orders below ₹100 have a flat ₹20 delivery charge. Customer location is not required.</p>
       </div>
-      <details class="admin-card manager-accordion" id="checkout-address-settings" open>
+      <details class="admin-card manager-accordion" id="checkout-address-settings">
         <summary>Checkout address fields</summary>
         <div class="manager-accordion-content">
           <p class="small-note">Choose which address fields customers must provide. Turn off State or PIN code if you do not need them. At least one address field must stay enabled. Changes are shared with all customers.</p>
@@ -3974,7 +3974,9 @@
           && activeElement.getClientRects().length
           ? activeElement.id
           : "",
-        openAccordions: [...document.querySelectorAll("#admin details[id][open]")].map((item) => item.id)
+        openAccordions: [...document.querySelectorAll("#admin details[id][open]")]
+          .map((item) => item.id)
+          .filter((id) => id !== "checkout-address-settings")
       };
       try {
         sessionStorage.setItem("shanvi-view-state", JSON.stringify(state));
@@ -4003,6 +4005,7 @@
     }
     if (Array.isArray(savedViewState.openAccordions)) {
       for (const id of savedViewState.openAccordions) {
+        if (id === "checkout-address-settings") continue;
         const accordion = typeof id === "string" ? $(id) : null;
         if (accordion instanceof HTMLDetailsElement) accordion.open = true;
       }
