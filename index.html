@@ -519,7 +519,7 @@
       <div id="manager-tools" hidden>
       <div class="admin-card">
         <h3>Save manager changes</h3>
-        <p class="small-note">Save pending product, storefront, payment, delivery, and customer contact changes together.</p>
+        <p class="small-note">Save pending product, storefront, payment, and customer contact changes together.</p>
         <button class="btn btn-primary" id="save-all-manager-changes" type="button">Save all changes</button>
       </div>
       <div class="admin-card">
@@ -549,14 +549,8 @@
         <button class="btn btn-primary" id="save-offer" type="button">Save offer</button>
       </div>
       <div class="admin-card">
-        <h3>Delivery area</h3>
-        <p class="small-note">Within 2 km of the store is free. Outside 2 km, or if customer location is unavailable, delivery is ₹20. Distance is a straight-line estimate using browser location permission.</p>
-        <div class="form-grid">
-          <div class="field"><label for="store-latitude">Store latitude</label><input id="store-latitude" type="number" min="-90" max="90" step="any" placeholder="e.g. 28.6139"></div>
-          <div class="field"><label for="store-longitude">Store longitude</label><input id="store-longitude" type="number" min="-180" max="180" step="any" placeholder="e.g. 77.2090"></div>
-        </div>
-        <button class="btn btn-soft" id="use-store-location" type="button">Use this device’s location</button>
-        <button class="btn btn-primary" id="save-delivery-settings" type="button">Save store location</button>
+        <h3>Delivery charges</h3>
+        <p class="small-note">Delivery is free when the discounted items subtotal is ₹100 or more. Orders below ₹100 have a flat ₹20 delivery charge. Customer location is not required.</p>
       </div>
       <details class="admin-card manager-accordion" id="checkout-address-settings" open>
         <summary>Checkout address fields</summary>
@@ -734,6 +728,9 @@
         apply: "Apply", couponHint: "Try coupon", couponDeal: "for {percent}% off (up to {maxDiscount}).",
         subtotal: "Items subtotal", couponSavings: "Coupon savings", delivery: "Delivery",
         deliveryArranged: "Arranged with store", total: "Total", deliveryDetails: "Delivery details",
+        deliveryPolicy: "Items subtotal ₹100 or more after coupon: free delivery. Below ₹100: ₹20 delivery charge.",
+        deliveryChargeFree: "Free · order ₹100 or more",
+        deliveryChargeBelowMinimum: "₹20 for orders below ₹100",
         fullName: "Full name", startLetter: "Start with a letter",
         nameTitle: "Start with a letter; numbers are not allowed.",
         mobile: "10-digit mobile number", near: "Near ...", landmark: "Landmark",
@@ -757,6 +754,9 @@
         cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
         codUnavailable: "Currently unavailable; the store manager has disabled COD.",
         back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "After paying, tap “I have completed payment” to enable order confirmation. This is your confirmation only; payment is not verified automatically and the store must check its account.",
+        paymentAssistance: "Payment help: check the store UPI ID/QR, pay exactly the total shown, then tap “I have completed payment”. If payment fails, contact the store for help.",
+        paymentAssistanceCod: "Cash on delivery is selected: confirm the order, then pay the delivery person when it arrives.",
+        paymentHelp: "Need help with payment?",
         continueToPay: "Continue to pay in UPI app", startQrPayment: "Start QR payment", qrPaymentStarted: "Open your UPI app, scan the QR code, then return here.",
         paymentFlowPending: "Pay using your UPI app, then tap “I have completed payment”. Payment is not verified automatically.",
         paymentFlowReturned: "You confirmed payment. The store must verify receipt in its payment account.",
@@ -832,6 +832,9 @@
         apply: "लागू करें", couponHint: "कूपन", couponDeal: "{percent}% छूट पाएँ ({maxDiscount} तक)।",
         subtotal: "सामान का कुल मूल्य", couponSavings: "कूपन की बचत", delivery: "डिलीवरी",
         deliveryArranged: "दुकान से तय करें", total: "कुल", deliveryDetails: "डिलीवरी की जानकारी",
+        deliveryPolicy: "₹100 या अधिक का सामान (कूपन के बाद): मुफ़्त डिलीवरी। ₹100 से कम: ₹20 डिलीवरी शुल्क।",
+        deliveryChargeFree: "मुफ़्त · ₹100 या अधिक की खरीदारी",
+        deliveryChargeBelowMinimum: "₹100 से कम की खरीदारी पर ₹20",
         fullName: "पूरा नाम", startLetter: "नाम अक्षर से शुरू करें",
         nameTitle: "नाम अक्षर से शुरू होना चाहिए; अंक न लिखें।",
         mobile: "10 अंकों का मोबाइल नंबर", near: "नज़दीक ...", landmark: "पहचान का स्थान",
@@ -855,6 +858,9 @@
         cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
         back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "भुगतान के बाद ऑर्डर की पुष्टि चालू करने के लिए “मैंने भुगतान कर दिया है” दबाएँ। यह केवल आपकी पुष्टि है; भुगतान अपने आप सत्यापित नहीं होता और दुकान अपने खाते में जाँच करेगी।",
+        paymentAssistance: "भुगतान में सहायता: सही दुकान UPI ID/QR जाँचें, कुल दिखाई गई राशि ही भेजें, फिर “मैंने भुगतान कर दिया है” दबाएँ। भुगतान न हो तो मदद के लिए दुकान से संपर्क करें।",
+        paymentAssistanceCod: "कैश ऑन डिलीवरी चुना है: ऑर्डर की पुष्टि करें और सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
+        paymentHelp: "भुगतान में मदद चाहिए?",
         continueToPay: "UPI ऐप में भुगतान जारी रखें", startQrPayment: "QR भुगतान शुरू करें", qrPaymentStarted: "UPI ऐप खोलें, QR कोड स्कैन करें, फिर यहाँ वापस आएँ।",
         paymentFlowPending: "UPI ऐप से भुगतान करें, फिर “मैंने भुगतान कर दिया है” दबाएँ। भुगतान अपने आप सत्यापित नहीं होता।",
         paymentFlowReturned: "आपने भुगतान की पुष्टि की है। दुकान अपने भुगतान खाते में जाँच करेगी।",
@@ -1961,8 +1967,6 @@
         $("coupon-enabled").checked = Boolean(couponSettings.enabled);
         $("coupon-percent").value = Number(couponSettings.percent) || 10;
         $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
-        $("store-latitude").value = deliverySettings.latitude || "";
-        $("store-longitude").value = deliverySettings.longitude || "";
         if (!heroFormDirty) fillHeroForm();
       }
     }
@@ -2086,7 +2090,8 @@
       }
       const subtotal = merchandiseSubtotal(items);
       const discount = currentDiscount(subtotal);
-      const total = subtotal - discount + (deliveryFee || 0);
+      const cartDeliveryFee = calculateDeliveryFee(subtotal, discount);
+      const total = subtotal - discount + cartDeliveryFee;
       const hasFreeGift = items.some((item) => item.isFreeGift);
       $("cart-content").innerHTML = `
         <div>${items.map((item) => `<div class="cart-line">
@@ -2096,10 +2101,11 @@
         </div>`).join("")}</div>
         <div class="coupon" ${couponSettings.enabled ? "" : "hidden"}><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon">${coupon ? "Remove" : tr("apply")}</button></div>
         <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}</div>
+        <p class="small-note">${tr("deliveryPolicy")}</p>
         <div class="summary">
           <div class="summary-row"><span>${tr("subtotal")}</span><strong>${money(subtotal)}</strong></div>
           ${discount ? `<div class="summary-row"><span>${tr("couponSavings")}</span><strong>−${money(discount)}</strong></div>` : ""}
-          <div class="summary-row"><span>${tr("delivery")}</span><strong>${deliveryFee === null ? tr("calculatedAtCheckout") : money(deliveryFee)}</strong></div>
+          <div class="summary-row"><span>${tr("delivery")}</span><strong>${money(cartDeliveryFee)}</strong></div>
           <div class="summary-row total"><span>${tr("total")}</span><span>${money(total)}</span></div>
         </div>
         ${db && orderBackendReady && checkoutAddressSettingsReady ? `
@@ -2144,13 +2150,8 @@
         continueToPayment();
       });
     }
-    function distanceInKm(from, to) {
-      const radians = (degrees) => degrees * Math.PI / 180;
-      const latitudeDelta = radians(to.latitude - from.latitude);
-      const longitudeDelta = radians(to.longitude - from.longitude);
-      const a = Math.sin(latitudeDelta / 2) ** 2
-        + Math.cos(radians(from.latitude)) * Math.cos(radians(to.latitude)) * Math.sin(longitudeDelta / 2) ** 2;
-      return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    function calculateDeliveryFee(subtotal, discount) {
+      return subtotal - discount >= 100 ? 0 : 20;
     }
     async function checkOrderBackend() {
       if (!db) return;
@@ -2163,34 +2164,6 @@
       }
       orderBackendReady = true;
       renderCart();
-    }
-    function calculateDeliveryFee() {
-      if (!String(deliverySettings.latitude).trim() || !String(deliverySettings.longitude).trim()) return Promise.resolve(20);
-      const storeLat = Number(deliverySettings.latitude);
-      const storeLng = Number(deliverySettings.longitude);
-      if (!Number.isFinite(storeLat) || !Number.isFinite(storeLng)) return Promise.resolve(20);
-      if (!navigator.geolocation) return Promise.resolve(20);
-      return new Promise((resolve) => {
-        let settled = false;
-        const finish = (fee) => {
-          if (settled) return;
-          settled = true;
-          resolve(fee);
-        };
-        try {
-          navigator.geolocation.getCurrentPosition(
-            (position) => finish(distanceInKm(
-              { latitude: storeLat, longitude: storeLng },
-              { latitude: position.coords.latitude, longitude: position.coords.longitude }
-            ) > 2 ? 20 : 0),
-            () => finish(20),
-            { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
-          );
-        } catch {
-          finish(20);
-        }
-        window.setTimeout(() => finish(20), 8500);
-      });
     }
     function decodeApplicationServerKey(value) {
       const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
@@ -2844,7 +2817,7 @@
       const discount = currentDiscount(subtotal);
       const button = $("place-order");
       button.disabled = true;
-      deliveryFee = await calculateDeliveryFee();
+      deliveryFee = calculateDeliveryFee(subtotal, discount);
       const total = subtotal - discount + deliveryFee;
       const addressLabels = {
         landmark: language === "hi" ? "पहचान का स्थान" : "Landmark",
@@ -2908,6 +2881,7 @@
         <div class="drawer-head"><h2>${tr("payment")}</h2><button class="close" id="payment-back" aria-label="${tr("backBasket")}">←</button></div>
         <p class="small-note">${tr("order")} ${escapeHtml(checkoutDraft.id)} · ${checkoutDraft.items.length} ${tr("itemTypes")}</p>
         <div class="summary"><div class="summary-row"><span>${tr("delivery")}</span><strong>${money(checkoutDraft.deliveryFee)}</strong></div><div class="summary-row"><span>${tr("total")}</span><strong>${money(checkoutDraft.total)}</strong></div><div class="summary-row"><span>${tr("deliverTo")}</span><span style="max-width:65%;text-align:right">${escapeHtml(checkoutDraft.address)}</span></div></div>
+        <div class="payment-box"><strong>${tr("paymentHelp")}</strong><p>${selectedPayment === "cod" ? tr("paymentAssistanceCod") : tr("paymentAssistance")}</p><button class="btn btn-soft" id="open-payment-help" type="button">${tr("helpTitle")}</button></div>
         ${!paymentSettingsReady ? `<p class="payment-box">${paymentSettingsError ? "Could not load the store's payment settings. Please close checkout and try again." : "Loading the store's payment options…"}</p>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_id" ${selectedPayment === "upi_id" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("upiId")}</strong><small>${tr("enterYourUpi")}</small></span></label>
         ${selectedPayment === "upi_id" ? `<div class="payment-box">
@@ -2921,6 +2895,7 @@
         ${(selectedPayment === "upi_id" || selectedPayment === "upi_qr") ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentConfirmed ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
+      $("open-payment-help").onclick = () => $("help-open").click();
       $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => radio.addEventListener("change", () => {
         selectedPayment = radio.value;
         checkoutDraft.paymentFlowReturned = false;
@@ -3324,8 +3299,6 @@
       $("offer-enabled").checked = Boolean(offerSettings.enabled);
       $("offer-threshold").value = Number(offerSettings.threshold) || 100;
       $("offer-product").value = offerSettings.giftProductId || "";
-      $("store-latitude").value = deliverySettings.latitude || "";
-      $("store-longitude").value = deliverySettings.longitude || "";
       fillHeroForm();
       $("admin-login-card").hidden = isAuthorizedManager;
       $("manager-tools").hidden = !isAuthorizedManager;
@@ -3837,30 +3810,6 @@
         return false;
       }
     };
-    $("save-delivery-settings").onclick = async () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
-      const latitude = $("store-latitude").value.trim();
-      const longitude = $("store-longitude").value.trim();
-      const validLatitude = latitude === "" || (Number.isFinite(Number(latitude)) && Number(latitude) >= -90 && Number(latitude) <= 90);
-      const validLongitude = longitude === "" || (Number.isFinite(Number(longitude)) && Number(longitude) >= -180 && Number(longitude) <= 180);
-      if (!validLatitude || !validLongitude || Boolean(latitude) !== Boolean(longitude)) {
-        showToast("Enter both valid map coordinates, or leave both empty.");
-        return false;
-      }
-      const nextLocation = { latitude, longitude };
-      try {
-        if (db) await saveSharedStorefront({ logo: brandLogo, offer: offerSettings, delivery: nextLocation, hero: heroSettings });
-        if (!db) deliverySettings = nextLocation;
-        if (!storage.write("shanvi-delivery", deliverySettings)) return false;
-        deliveryFee = null;
-        renderCart();
-        showManagerSaved(db ? "Store delivery location shared with all customers." : "Store delivery location saved successfully on this device.");
-        return true;
-      } catch (error) {
-        showToast(error.message || "Could not save the store delivery location.");
-        return false;
-      }
-    };
     $("save-all-manager-changes").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
       const button = $("save-all-manager-changes");
@@ -3876,7 +3825,6 @@
           "save-coupon-settings",
           "save-brand-logo",
           "save-offer",
-          "save-delivery-settings",
           "save-hero",
           "save-payment",
           "save-checkout-address-fields",
@@ -3893,27 +3841,6 @@
       } finally {
         button.disabled = false;
       }
-    };
-    $("use-store-location").onclick = () => {
-      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return; }
-      if (!navigator.geolocation) {
-        showToast("Location is not supported by this browser.");
-        return;
-      }
-      const button = $("use-store-location");
-      button.disabled = true;
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          $("store-latitude").value = coords.latitude.toFixed(6);
-          $("store-longitude").value = coords.longitude.toFixed(6);
-          button.disabled = false;
-        },
-        () => {
-          button.disabled = false;
-          showToast("Could not read this device’s location. Check location permission.");
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
     };
     $("p-image-remove").onclick = () => {
       $("p-image").value = "";
