@@ -25,9 +25,17 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
    npx supabase functions deploy get-customer-order --no-verify-jwt --project-ref zhrdeemyofcxxigqazgz
    ```
 
-11. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
+11. Run `supabase/customer-accounts.sql` to add secure customer-to-order links.
 
-12. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
+12. Deploy the customer account function:
+
+   ```sh
+   npx supabase functions deploy customer-order-account --no-verify-jwt --project-ref zhrdeemyofcxxigqazgz
+   ```
+
+13. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
+
+14. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
 
    ```sql
    insert into public.store_managers (user_id)
@@ -35,10 +43,10 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
    on conflict (user_id) do nothing;
    ```
 
-13. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password.
+15. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password.
 
 
-Customers can open **Profile** to see their order details; while Profile is open, order statuses refresh automatically about every 12 seconds, including accepted and rejected updates. Customers can copy an order ID/details or open a prefilled WhatsApp message to the store at `+91 97989 87872`. New order IDs use `SNVGS-<last 4 phone digits>-<unique suffix>` so the manager can recognize the customer without exposing the full phone number in the ID. In **Manager → Customer orders**, search by any part of the customer's phone number or order ID; phone matching is partial and searches all matching orders. Since customer sign-in is not enabled, order history and its private status-check token are kept in that browser only; order history is not shared across devices or browsers. The manager can save or change the customer-facing phone number in **Manager → Help & contact**, and customers can call it from **Help**. That contact, catalog, product images, offer, logo, delivery, and banner settings are shared through Supabase after the required SQL setup.
+Customers can open **Order & Profile** to see their order details and optionally sign in with their 10-digit mobile number and a password to sync linked orders across browsers and devices. To create an account or reset its password, use **Create/reset password & sync** in Profile on the browser where the customer placed an order; the private order token saved in that browser verifies ownership. This also links eligible past orders from that browser. New orders placed while signed in are linked automatically. A phone number alone never grants access to order history. Customers can copy an order ID/details or open a prefilled WhatsApp message to the store at `+91 97989 87872`. New order IDs use `SNVGS-<last 4 phone digits>-<unique suffix>` so the manager can recognize the customer without exposing the full phone number in the ID. In **Manager → Customer orders**, search by any part of the customer's phone number or order ID; phone matching is partial and searches all matching orders. The manager can save or change the customer-facing phone number in **Manager → Help & contact**, and customers can call it from **Help**. That contact, catalog, product images, offer, logo, delivery, and banner settings are shared through Supabase after the required SQL setup.
 
 The publishable key in `supabase-config.js` is designed to be public; the database row-level security policies enforce access. Never share or publish your Supabase database password or service-role key. The order database works without push notifications; enabling phone push alerts requires the separate VAPID/Edge Function steps below.
 

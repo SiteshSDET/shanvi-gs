@@ -196,6 +196,15 @@
     .order-contact-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
     .profile-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 18px; }
     .profile-toolbar .small-note { margin: 0; }
+    .customer-account-card { margin: 10px 0 16px; padding: 14px; border: 1px solid #dce7dc; border-radius: 13px; background: #f6faf5; }
+    .customer-account-card h3 { margin: 0 0 6px; color: var(--green-dark); font-size: 15px; }
+    .customer-account-card > p { margin: 0 0 12px; }
+    .customer-account-form { display: grid; gap: 9px; }
+    .customer-account-form .field { margin: 0; }
+    .customer-account-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .customer-account-actions .btn { flex: 1 1 140px; }
+    .customer-account-session { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .customer-account-session[hidden] { display: none; }
     #refresh-customer-orders { flex: 0 0 auto; min-height: 44px; padding: 10px 16px; font-size: 13px; font-weight: 800; }
     .profile-refresh-spinner { display: inline-block; width: 15px; height: 15px; margin-right: 8px; vertical-align: -3px; border: 2px solid #ffffff80; border-top-color: #fff; border-radius: 50%; animation: profile-refresh-spin .7s linear infinite; }
     @keyframes profile-refresh-spin { to { transform: rotate(360deg); } }
@@ -520,6 +529,23 @@
   <div class="overlay" id="profile-overlay" role="dialog" aria-modal="true" aria-label="Customer profile">
     <aside class="drawer">
       <div class="drawer-head"><h2 id="profile-heading">My profile & orders</h2><button class="close" id="profile-close" aria-label="Close profile">×</button></div>
+      <section class="customer-account-card" id="customer-account-card">
+        <h3 id="customer-account-title">Sync orders across devices</h3>
+        <p class="small-note" id="customer-account-help">Sign in with your mobile number and password to access linked orders on this browser.</p>
+        <form class="customer-account-form" id="customer-account-form">
+          <div class="field"><label id="customer-account-phone-label" for="customer-account-phone">Mobile number</label><input id="customer-account-phone" type="tel" inputmode="numeric" autocomplete="username" maxlength="10" pattern="[0-9]{10}" required></div>
+          <div class="field"><label id="customer-account-password-label" for="customer-account-password">Password</label><input id="customer-account-password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></div>
+          <div class="customer-account-actions">
+            <button class="btn btn-primary" id="customer-account-sign-in" type="button">Sign in</button>
+            <button class="btn btn-soft" id="customer-account-create" type="button">Create account & sync orders</button>
+          </div>
+        </form>
+        <div class="customer-account-session" id="customer-account-session" hidden>
+          <strong id="customer-account-signed-in"></strong>
+          <button class="btn btn-soft" id="customer-account-sign-out" type="button">Sign out</button>
+        </div>
+        <p class="small-note" id="customer-account-status" role="status" aria-live="polite"></p>
+      </section>
       <div class="profile-toolbar"><p class="small-note" id="profile-sync-status" role="status" aria-live="polite"></p><button class="btn btn-primary" id="refresh-customer-orders" type="button">↻ Refresh orders</button></div>
       <div id="customer-orders" aria-live="polite"></div>
     </aside>
@@ -742,6 +768,20 @@
         search: "Search products",
         cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
         profile: "Order & Profile", help: "Help", profileTitle: "My profile & orders",
+        customerAccountTitle: "Sync your orders across devices",
+        customerAccountHelp: "Sign in to see linked orders on any device. Create or reset your password on the browser where you placed an order.",
+        customerAccountPhone: "Mobile number", customerAccountPassword: "Password",
+        customerSignIn: "Sign in", customerCreateAccount: "Create/reset password & sync",
+        customerSignOut: "Sign out", customerSignedIn: "Signed in as",
+        customerAccountPhoneInvalid: "Enter the 10-digit mobile number for your customer account.",
+        customerAccountPasswordInvalid: "Enter a password with at least 8 characters.",
+        customerAccountOrderRequired: "To create an account, use this browser where you placed at least one order. Existing orders are verified using their private order tokens.",
+        customerAccountLoginSuccess: "Signed in. Your linked orders are synced.",
+        customerAccountCreateSuccess: "Account ready and orders synced.",
+        customerAccountSyncFailed: "Your account is signed in, but orders could not be synced. Tap Refresh orders to try again.",
+        customerAccountSignedOut: "Signed out. Orders saved on this browser are still available here.",
+        customerAccountLoadFailed: "Could not load your account orders. Try refreshing.",
+        customerAccountPhoneMismatch: "Checkout mobile number must match your signed-in customer account.",
         refreshOrders: "Refresh orders", refreshingOrders: "Refreshing orders…", profileOffline: "You appear to be offline. Reconnect and refresh again.",
         noTrackedOrders: "No online-tracked orders are saved in this browser. Orders from another device cannot be refreshed here without customer sign-in.",
         orderStatusesCurrent: "Your saved order statuses are up to date.",
@@ -854,6 +894,20 @@
         search: "सामान खोजें",
         cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
         profile: "ऑर्डर और प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर",
+        customerAccountTitle: "अपने ऑर्डर दूसरे डिवाइस पर भी देखें",
+        customerAccountHelp: "जुड़े ऑर्डर देखने के लिए साइन इन करें। ऑर्डर वाले ब्राउज़र पर पासवर्ड बनाएँ या रीसेट करें।",
+        customerAccountPhone: "मोबाइल नंबर", customerAccountPassword: "पासवर्ड",
+        customerSignIn: "साइन इन करें", customerCreateAccount: "पासवर्ड बनाएँ/बदलें और सिंक करें",
+        customerSignOut: "साइन आउट", customerSignedIn: "साइन इन:",
+        customerAccountPhoneInvalid: "अपने ग्राहक अकाउंट का 10 अंकों का मोबाइल नंबर लिखें।",
+        customerAccountPasswordInvalid: "कम से कम 8 अक्षरों का पासवर्ड लिखें।",
+        customerAccountOrderRequired: "अकाउंट बनाने के लिए उसी ब्राउज़र का उपयोग करें जहाँ कम से कम एक ऑर्डर किया था। पुराने ऑर्डर निजी ऑर्डर टोकन से सत्यापित होंगे।",
+        customerAccountLoginSuccess: "साइन इन हो गया। आपके जुड़े ऑर्डर सिंक हो गए हैं।",
+        customerAccountCreateSuccess: "अकाउंट तैयार है और ऑर्डर सिंक हो गए।",
+        customerAccountSyncFailed: "अकाउंट में साइन इन है, लेकिन ऑर्डर सिंक नहीं हो पाए। फिर कोशिश करने के लिए ऑर्डर अपडेट करें दबाएँ।",
+        customerAccountSignedOut: "साइन आउट हो गया। इस ब्राउज़र में सेव ऑर्डर यहाँ उपलब्ध रहेंगे।",
+        customerAccountLoadFailed: "अकाउंट के ऑर्डर लोड नहीं हुए। फिर कोशिश करें।",
+        customerAccountPhoneMismatch: "चेकआउट का मोबाइल नंबर साइन-इन अकाउंट से मेल खाना चाहिए।",
         refreshOrders: "ऑर्डर अपडेट करें", refreshingOrders: "ऑर्डर अपडेट हो रहे हैं…", profileOffline: "इंटरनेट उपलब्ध नहीं है। कनेक्ट करके फिर अपडेट करें।",
         noTrackedOrders: "इस ब्राउज़र में ऑनलाइन ट्रैक किए गए ऑर्डर सेव नहीं हैं। ग्राहक लॉगिन के बिना दूसरे डिवाइस के ऑर्डर अपडेट नहीं हो सकते।",
         orderStatusesCurrent: "आपके सेव किए गए ऑर्डर की स्थिति नवीनतम है।",
@@ -980,6 +1034,9 @@
     const supabaseConfig = window.STORE_CONFIG || {};
     const backendReady = Boolean(supabaseConfig.url && supabaseConfig.anonKey && window.supabase?.createClient);
     const db = backendReady ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey) : null;
+    const customerAuthDb = backendReady ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+      auth: { storageKey: "shanvi-customer-auth" }
+    }) : null;
     let orderBackendReady = false;
     let products = storage.read("shanvi-products", defaultProducts);
     let language = storage.read("shanvi-language", "en") === "hi" ? "hi" : "en";
@@ -990,6 +1047,10 @@
     let storeCallEnabled = true;
     let customerOrders = storage.read("shanvi-customer-orders", []);
     if (!Array.isArray(customerOrders)) customerOrders = [];
+    let customerDeviceOrders = customerOrders;
+    let customerAccountPhone = "";
+    let customerAccountActionInProgress = false;
+    let customerAccountLoadSequence = 0;
     const expandedCustomerOrderGroups = new Set();
     const expandedCustomerOrderDetails = new Set();
     const verifiedCustomerOrderStatuses = new Map();
@@ -1134,10 +1195,18 @@
       $("help-open").textContent = tr("help");
       $("profile-heading").textContent = tr("profileTitle");
       $("help-heading").textContent = tr("helpTitle");
+      $("customer-account-title").textContent = tr("customerAccountTitle");
+      $("customer-account-help").textContent = tr("customerAccountHelp");
+      $("customer-account-phone-label").textContent = tr("customerAccountPhone");
+      $("customer-account-password-label").textContent = tr("customerAccountPassword");
+      $("customer-account-sign-in").textContent = tr("customerSignIn");
+      $("customer-account-create").textContent = tr("customerCreateAccount");
+      $("customer-account-sign-out").textContent = tr("customerSignOut");
       $("refresh-customer-orders").textContent = `↻ ${tr("refreshOrders")}`;
       $("profile-overlay").setAttribute("aria-label", tr("profileTitle"));
       $("help-overlay").setAttribute("aria-label", tr("helpTitle"));
       if ($("profile-overlay").classList.contains("open")) renderCustomerOrders();
+      updateCustomerAccountUi();
       renderCustomerHelp();
       updateBrandLogo();
       $("cart-heading").textContent = tr("basket");
@@ -1236,6 +1305,170 @@
     }
     function customerOrderWhatsAppUrl(order) {
       return `https://wa.me/919798987872?text=${encodeURIComponent(customerOrderShareText(order))}`;
+    }
+    function customerAuthEmail(phone) {
+      return `customer${phone}@customers.shanvi.invalid`;
+    }
+    async function customerFunctionErrorMessage(error, fallback) {
+      if (error?.context && typeof error.context.json === "function") {
+        const responseBody = await error.context.json();
+        if (typeof responseBody?.error === "string") return responseBody.error;
+      }
+      return error?.message || fallback;
+    }
+    function updateCustomerAccountUi() {
+      $("customer-account-card").hidden = !customerAuthDb;
+      $("customer-account-form").hidden = Boolean(customerAccountPhone);
+      $("customer-account-session").hidden = !customerAccountPhone;
+      $("customer-account-sign-in").disabled = !customerAuthDb || customerAccountActionInProgress;
+      $("customer-account-create").disabled = !customerAuthDb || customerAccountActionInProgress;
+      $("customer-account-sign-out").disabled = customerAccountActionInProgress;
+      if (customerAccountPhone) {
+        $("customer-account-signed-in").textContent = `${tr("customerSignedIn")} ${customerAccountPhone}`;
+        $("customer-account-phone").value = customerAccountPhone;
+      }
+    }
+    function setCustomerRefreshBusy(busy) {
+      const refreshButton = $("refresh-customer-orders");
+      refreshButton.disabled = busy;
+      refreshButton.setAttribute("aria-busy", String(busy));
+      refreshButton.innerHTML = busy
+        ? `<span class="profile-refresh-spinner" aria-hidden="true"></span>${tr("refreshingOrders")}`
+        : `↻ ${tr("refreshOrders")}`;
+      if (busy) $("profile-sync-status").textContent = tr("refreshingOrders");
+    }
+    async function loadLinkedCustomerOrders() {
+      if (!customerAuthDb || !customerAccountPhone) throw new Error(tr("customerAccountLoadFailed"));
+      const requestedPhone = customerAccountPhone;
+      const requestSequence = ++customerAccountLoadSequence;
+      const { data, error } = await customerAuthDb.functions.invoke("customer-order-account", {
+        body: { action: "list" }
+      });
+      if (error) throw new Error(await customerFunctionErrorMessage(error, tr("customerAccountLoadFailed")));
+      if (!Array.isArray(data?.orders)) throw new Error(tr("customerAccountLoadFailed"));
+      if (requestSequence !== customerAccountLoadSequence || requestedPhone !== customerAccountPhone) return 0;
+
+      const deviceOrdersByReference = new Map(
+        customerDeviceOrders.map((order) => [order.id || order.reference, order]),
+      );
+      const linkedOrders = data.orders.map((row) => {
+        if (typeof row.reference !== "string" || typeof row.customer_phone !== "string") {
+          throw new Error(tr("customerAccountLoadFailed"));
+        }
+        const deviceOrder = deviceOrdersByReference.get(row.reference);
+        const items = Array.isArray(row.items) ? row.items : [];
+        const subtotal = items.reduce((sum, item) =>
+          sum + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
+        const status = typeof row.status === "string" ? row.status : "Awaiting manager approval";
+        verifiedCustomerOrderStatuses.set(row.reference, status);
+        return {
+          ...deviceOrder,
+          id: row.reference,
+          reference: row.reference,
+          name: row.customer_name || deviceOrder?.name || "",
+          phone: row.customer_phone,
+          address: row.delivery_note || "",
+          items,
+          subtotal,
+          total: Number(row.total) || 0,
+          deliveryFee: Number(row.delivery_fee) || 0,
+          discount: Number(row.discount) || 0,
+          paymentMethod: row.payment_method,
+          paymentConfirmed: row.payment_confirmed === true,
+          rejectionReason: row.rejection_reason || "",
+          status,
+          createdAt: row.created_at || deviceOrder?.createdAt || "",
+          customerStatusToken: deviceOrder?.customerStatusToken,
+          customerPushEnabled: deviceOrder?.customerPushEnabled === true
+        };
+      });
+      const linkedReferences = new Set(linkedOrders.map((order) => order.id));
+      const localAccountOrders = customerDeviceOrders.filter((order) =>
+        order.phone === customerAccountPhone
+        && !linkedReferences.has(order.id || order.reference)
+      );
+      customerOrders = [...linkedOrders, ...localAccountOrders]
+        .sort((first, second) => Date.parse(second.createdAt || "") - Date.parse(first.createdAt || ""))
+        .slice(0, 100);
+      renderCustomerOrders();
+      return linkedOrders.length;
+    }
+    async function customerAccountAction(action) {
+      if (customerAccountActionInProgress || !customerAuthDb) return;
+      const phone = $("customer-account-phone").value.trim();
+      const password = $("customer-account-password").value;
+      if (!/^[0-9]{10}$/.test(phone)) {
+        $("customer-account-status").textContent = tr("customerAccountPhoneInvalid");
+        $("customer-account-phone").focus();
+        return;
+      }
+      if (password.length < 8 || password.length > 128) {
+        $("customer-account-status").textContent = tr("customerAccountPasswordInvalid");
+        $("customer-account-password").focus();
+        return;
+      }
+      customerAccountActionInProgress = true;
+      $("customer-account-sign-in").disabled = true;
+      $("customer-account-create").disabled = true;
+      $("customer-account-status").textContent = tr("refreshingOrders");
+      try {
+        if (action === "register") {
+          const orders = customerDeviceOrders
+            .filter((order) => order.customerStatusToken && (order.id || order.reference))
+            .map((order) => ({ reference: order.id || order.reference, token: order.customerStatusToken }));
+          if (!orders.length) throw new Error(tr("customerAccountOrderRequired"));
+          const { data, error } = await customerAuthDb.functions.invoke("customer-order-account", {
+            body: { action: "register", phone, password, orders }
+          });
+          if (error) throw new Error(await customerFunctionErrorMessage(error, tr("customerAccountLoadFailed")));
+          if (data?.registered !== true) throw new Error(tr("customerAccountLoadFailed"));
+        }
+        const { data: signInData, error: signInError } = await customerAuthDb.auth.signInWithPassword({
+          email: customerAuthEmail(phone),
+          password
+        });
+        if (signInError) throw signInError;
+        if (signInData.user?.app_metadata?.customer_phone !== phone
+          || signInData.user.app_metadata?.customer_account !== true) {
+          await customerAuthDb.auth.signOut();
+          throw new Error(tr("customerAccountLoadFailed"));
+        }
+        if (customerAccountPhone !== phone) verifiedCustomerOrderStatuses.clear();
+        customerAccountPhone = phone;
+        updateCustomerAccountUi();
+        await loadLinkedCustomerOrders();
+        $("customer-account-status").textContent = action === "register"
+          ? tr("customerAccountCreateSuccess")
+          : tr("customerAccountLoginSuccess");
+        if ($("cart-overlay").classList.contains("open")) renderCart();
+      } catch (error) {
+        $("customer-account-status").textContent = error.message || tr("customerAccountLoadFailed");
+      } finally {
+        customerAccountActionInProgress = false;
+        updateCustomerAccountUi();
+      }
+    }
+    async function restoreCustomerAccount(session) {
+      const user = session?.user;
+      const nextPhone = user?.app_metadata?.customer_account === true
+        && typeof user.app_metadata.customer_phone === "string"
+        ? user.app_metadata.customer_phone
+        : "";
+      if (customerAccountPhone !== nextPhone) verifiedCustomerOrderStatuses.clear();
+      customerAccountPhone = nextPhone;
+      updateCustomerAccountUi();
+      if (!customerAccountPhone) {
+        customerOrders = customerDeviceOrders;
+        renderCustomerOrders();
+        return;
+      }
+      try {
+        await loadLinkedCustomerOrders();
+      } catch (error) {
+        if (customerAccountPhone === nextPhone) {
+          $("customer-account-status").textContent = error.message || tr("customerAccountLoadFailed");
+        }
+      }
     }
     async function copyCustomerOrderText(value) {
       try {
@@ -1351,6 +1584,21 @@
         return false;
       }
       if (customerStatusRefreshInProgress) return;
+      if (customerAccountPhone) {
+        customerStatusRefreshInProgress = true;
+        setCustomerRefreshBusy(true);
+        try {
+          await loadLinkedCustomerOrders();
+          $("profile-sync-status").textContent = tr("orderStatusesCurrent");
+          return true;
+        } catch (error) {
+          $("profile-sync-status").textContent = error.message || tr("customerAccountLoadFailed");
+          return false;
+        } finally {
+          customerStatusRefreshInProgress = false;
+          setCustomerRefreshBusy(false);
+        }
+      }
       const ordersToCheck = customerOrders.filter((order) =>
         order.customerStatusToken
         && (includeTerminal || !["Completed", "Rejected"].includes(order.status))
@@ -1363,11 +1611,7 @@
         return false;
       }
       customerStatusRefreshInProgress = true;
-      const refreshButton = $("refresh-customer-orders");
-      refreshButton.disabled = true;
-      refreshButton.setAttribute("aria-busy", "true");
-      refreshButton.innerHTML = `<span class="profile-refresh-spinner" aria-hidden="true"></span>${tr("refreshingOrders")}`;
-      $("profile-sync-status").textContent = tr("refreshingOrders");
+      setCustomerRefreshBusy(true);
       renderCustomerOrders();
       let updated = 0;
       let failed = 0;
@@ -1418,7 +1662,7 @@
             console.warn(`Could not sync order ${order.id || order.reference}`, error);
           }
         }));
-        if (updated && !storage.write("shanvi-customer-orders", customerOrders)) {
+        if (updated && !storage.write("shanvi-customer-orders", customerDeviceOrders)) {
           previousOrderState.forEach((previous, order) => {
             order.status = previous.status;
             order.rejectionReason = previous.rejectionReason;
@@ -1442,9 +1686,7 @@
         $("profile-sync-status").textContent = tr("orderStatusSyncFailed");
       } finally {
         customerStatusRefreshInProgress = false;
-        refreshButton.disabled = false;
-        refreshButton.setAttribute("aria-busy", "false");
-        refreshButton.textContent = `↻ ${tr("refreshOrders")}`;
+        setCustomerRefreshBusy(false);
       }
     }
     function renderCustomerHelp() {
@@ -2287,6 +2529,11 @@
         const field = $(id);
         if (field) field.value = value;
       }
+      const customerPhoneField = $("customer-phone");
+      if (customerPhoneField) {
+        customerPhoneField.readOnly = Boolean(customerAccountPhone);
+        if (customerAccountPhone) customerPhoneField.value = customerAccountPhone;
+      }
       $("cart-content").querySelectorAll("[data-qty]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.qty, Number(button.dataset.step))));
       $("cart-content").querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.remove, -(cart[button.dataset.remove] || 0))));
       $("apply-coupon").onclick = () => {
@@ -2447,7 +2694,9 @@
         if (data?.registered) {
           registrationSucceeded = true;
           order.customerPushEnabled = true;
-          storage.write("shanvi-customer-orders", customerOrders);
+          const deviceOrder = customerDeviceOrders.find((item) => (item.id || item.reference) === order.id);
+          if (deviceOrder) deviceOrder.customerPushEnabled = true;
+          storage.write("shanvi-customer-orders", customerDeviceOrders);
           button.textContent = tr("orderPushEnabled");
           status.textContent = data.status === "Awaiting manager approval"
             ? tr("approvalNotificationsOn")
@@ -2988,6 +3237,10 @@
         showToast("At least one delivery address field must be enabled by the manager.");
         return;
       }
+      if (customerAccountPhone && $("customer-phone").value.trim() !== customerAccountPhone) {
+        showToast(tr("customerAccountPhoneMismatch"));
+        return;
+      }
       const items = cartProducts();
       if (!items.length) { showToast(tr("emptyOrder")); return; }
       const subtotal = merchandiseSubtotal(items);
@@ -3186,12 +3439,26 @@
         showToast(`${tr("orderSaveError")}: ${error.message || (language === "hi" ? "कृपया फिर कोशिश करें।" : "Please try again.")}`);
         return;
       }
+      let customerOrderLinkError = false;
+      if (customerAuthDb && customerAccountPhone === order.phone) {
+        try {
+          const { data, error } = await customerAuthDb.functions.invoke("customer-order-account", {
+            body: { action: "link", reference: order.id, token: order.customerStatusToken }
+          });
+          customerOrderLinkError = Boolean(error) || data?.linked !== true;
+          if (error) console.error("Order was placed but could not be linked to the customer account", error);
+        } catch (error) {
+          customerOrderLinkError = true;
+          console.error("Order was placed but could not be linked to the customer account", error);
+        }
+      }
       renderProducts();
       renderAdminProducts();
       cart = {};
       coupon = false;
       const profileOrder = {
         id: order.id,
+        phone: order.phone,
         status: order.status,
         createdAt: order.createdAt,
         items: order.items.map((item) => ({
@@ -3208,9 +3475,13 @@
         paymentConfirmed: false,
         customerStatusToken: order.customerStatusToken
       };
-      customerOrders = [...customerOrders.filter((item) => item.id !== order.id), profileOrder].slice(-30);
-      storage.write("shanvi-customer-orders", customerOrders);
+      customerDeviceOrders = [...customerDeviceOrders.filter((item) => item.id !== order.id), profileOrder].slice(-30);
+      customerOrders = customerAccountPhone === order.phone
+        ? [...customerOrders.filter((item) => item.id !== order.id), profileOrder].slice(-100)
+        : customerDeviceOrders;
+      storage.write("shanvi-customer-orders", customerDeviceOrders);
       if ($("profile-overlay").classList.contains("open")) renderCustomerOrders();
+      if (customerOrderLinkError) $("customer-account-status").textContent = tr("customerAccountSyncFailed");
       checkoutDraft = null;
       storage.write("shanvi-cart", cart);
       deliveryFee = null;
@@ -3481,6 +3752,41 @@
       renderCustomerOrders();
       $("profile-overlay").classList.add("open");
     };
+    $("customer-account-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      void customerAccountAction("login");
+    });
+    $("customer-account-sign-in").onclick = () => { void customerAccountAction("login"); };
+    $("customer-account-create").onclick = () => { void customerAccountAction("register"); };
+    $("customer-account-phone").addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+    $("customer-account-sign-out").onclick = async () => {
+      if (!customerAuthDb) return;
+      const { error } = await customerAuthDb.auth.signOut();
+      if (error) {
+        $("customer-account-status").textContent = error.message || tr("customerAccountLoadFailed");
+        return;
+      }
+      customerAccountPhone = "";
+      customerOrders = customerDeviceOrders;
+      verifiedCustomerOrderStatuses.clear();
+      updateCustomerAccountUi();
+      renderCustomerOrders();
+      $("customer-account-status").textContent = tr("customerAccountSignedOut");
+      if ($("cart-overlay").classList.contains("open")) renderCart();
+    };
+    if (customerAuthDb) {
+      customerAuthDb.auth.onAuthStateChange((_event, session) => {
+        setTimeout(() => {
+          const nextPhone = session?.user?.app_metadata?.customer_account === true
+            && typeof session.user.app_metadata.customer_phone === "string"
+            ? session.user.app_metadata.customer_phone
+            : "";
+          if (nextPhone !== customerAccountPhone) void restoreCustomerAccount(session);
+        }, 0);
+      });
+    }
     $("refresh-customer-orders").onclick = () => {
       if (!navigator.onLine) {
         $("profile-sync-status").textContent = tr("profileOffline");
