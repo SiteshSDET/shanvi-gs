@@ -585,6 +585,201 @@
     .customer-order-progress[data-rejected="true"] { background-color: #fff0ed; color: #913d30; }
     .toast { background-color: #1d543b; }
     .toast.centered.success { background-color: #176b47; border-color: #b8efcf; }
+    .section-heading h2 { color: #183e2b; }
+    .section-heading p { color: #526b5b; }
+    .product { border-color: #c9d9cc; box-shadow: 0 3px 12px #183e2b0b; }
+    .product:hover { border-color: #78a887; box-shadow: 0 12px 28px #183e2b1b; }
+    .product-image { background-color: #e8f0e8; }
+    .category-chip { border-color: #c6d6ca; }
+    #refresh-catalog {
+      background-color: #e5f1fb;
+      border: 1px solid #a9c9e2;
+      color: #24577a;
+      box-shadow: 0 3px 9px #285c8012;
+      font-weight: 800;
+    }
+    #refresh-catalog:hover { background-color: #d2e7f6; border-color: #77a9ce; }
+    #refresh-manager-products, #refresh-orders, #load-more-orders {
+      background-color: #e8f2fc;
+      border: 1px solid #b9cfe4;
+      color: #315d7d;
+      font-weight: 750;
+    }
+    #refresh-manager-products:hover, #refresh-orders:hover, #load-more-orders:hover { background-color: #d8e9f7; }
+    #cart-content > p.small-note:has(+ .summary) {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border: 1px solid #e8cb77;
+      border-left: 4px solid #d39a22;
+      border-radius: 10px 10px 0 0;
+      background-color: #fff7dc;
+      color: #684b12;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+    #cart-content > p.small-note:has(+ .summary) + .summary {
+      margin-top: 0;
+      border: 1px solid #e8cb77;
+      border-top: 0;
+      border-radius: 0 0 14px 14px;
+      background-color: #fffdf5;
+    }
+    #cart-content > p.small-note:has(+ .summary) + .summary > .summary-row:nth-last-child(2) {
+      margin-right: -4px;
+      margin-left: -4px;
+      padding: 9px 6px;
+      border-radius: 7px;
+      background-color: #fff4cf;
+      color: #684b12;
+      font-weight: 800;
+    }
+    #cart-content > p.small-note:has(+ .summary) + .summary > .summary-row.total {
+      border-top-color: #dfd2a8;
+      color: #183e2b;
+    }
+    .drawer:has(#confirm-payment) { background-color: #f0f5fb; }
+    .drawer:has(#confirm-payment) .drawer-head {
+      background-color: #e7eff9f5;
+      border-bottom-color: #cbd9e9;
+    }
+    .drawer:has(#confirm-payment) .drawer-head h2 { color: #244d70; }
+    .drawer:has(#confirm-payment) > .payment-box,
+    #cart-content:has(#confirm-payment) > .payment-box {
+      border: 1px solid #bfd2e6;
+      background-color: #e5f0fb;
+      color: #244b69;
+    }
+    #cart-content:has(#confirm-payment) > .summary {
+      border: 1px solid #b9cfe4;
+      background-color: #fff;
+      box-shadow: 0 4px 14px #25496b0d;
+    }
+    #cart-content:has(#confirm-payment) > .summary > .summary-row:first-child {
+      margin-right: -4px;
+      margin-left: -4px;
+      padding: 9px 6px;
+      border-radius: 7px;
+      background-color: #eaf4fc;
+      color: #244b69;
+      font-weight: 800;
+    }
+    #cart-content:has(#confirm-payment) > .summary > .summary-row:nth-child(2) {
+      border-top-color: #d5e2ee;
+      color: #183e2b;
+      font-weight: 800;
+    }
+    #cart-content:has(#confirm-payment) .payment-choice {
+      border-color: #c5d4e3;
+      background-color: #fff;
+      box-shadow: 0 2px 8px #25496b0a;
+    }
+    #cart-content:has(#confirm-payment) .payment-choice:hover { border-color: #7ea6c7; }
+    #cart-content:has(#confirm-payment) .payment-choice:has(input[value="upi_id"]) { border-left: 4px solid #4086bc; }
+    #cart-content:has(#confirm-payment) .payment-choice:has(input[value="upi_qr"]) { border-left: 4px solid #8067b1; }
+    #cart-content:has(#confirm-payment) .payment-choice:has(input[value="cod"]) { border-left: 4px solid #43845a; }
+    #cart-content:has(#confirm-payment) .payment-choice:has(input:checked) {
+      border-color: #5688b0;
+      background-color: #eaf4fc;
+      box-shadow: 0 0 0 2px #5688b026;
+    }
+    #cart-content:has(#confirm-payment) .payment-choice:has(input[value="upi_qr"]:checked) {
+      border-color: #8a72ba;
+      background-color: #f4f0fb;
+      box-shadow: 0 0 0 2px #8a72ba26;
+    }
+    #cart-content:has(#confirm-payment) .payment-choice:has(input[value="cod"]:checked) {
+      border-color: #5e9a6e;
+      background-color: #eef8ef;
+      box-shadow: 0 0 0 2px #5e9a6e26;
+    }
+    #cart-content:has(#confirm-payment) .payment-box img {
+      border: 1px solid #c8d7e7;
+      background-color: #fff;
+      padding: 8px;
+    }
+    #cart-content:has(#confirm-payment) .payment-actions .btn-primary,
+    #place-order { box-shadow: 0 5px 13px #1d543b26; }
+    #manager-tools > .admin-card:has(#save-all-manager-changes) {
+      background-color: #eaf5ed;
+      border-color: #a9cdb0;
+      box-shadow: 0 5px 16px #28613a12;
+    }
+    #manager-tools > .admin-card:has(#save-all-manager-changes) h3 { color: #205b35; }
+    #manager-tools > .admin-card:has(#save-coupon-settings) { background-color: #fffaf0; border-color: #ead7a8; }
+    #manager-tools > .admin-card:has(#save-brand-logo) { background-color: #f7f4fc; border-color: #d9cdec; }
+    #manager-tools > .admin-card:has(#save-offer) { background-color: #fff7ea; border-color: #edcf9c; }
+    #manager-tools > .admin-card:has(#save-delivery-settings) { background-color: #edf8f7; border-color: #acd3cc; }
+    #manager-tools > .admin-card:has(#save-checkout-address-fields) { background-color: #eef5fc; border-color: #bfd2e6; }
+    #manager-tools > .admin-card:has(#enable-order-notifications) { background-color: #f4f0fb; border-color: #d6c9eb; }
+    #manager-tools > .admin-card:has(#save-hero) { background-color: #fff9ec; border-color: #ead7a8; }
+    #manager-tools > .admin-card:has(#product-submit) { background-color: #f0f7ef; border-color: #bfd6b9; }
+    #manager-tools > .admin-card:has(#save-payment) { background-color: #eef5fc; border-color: #bfd2e6; }
+    #manager-tools > .admin-card:has(#save-help-phone) { background-color: #eff7f8; border-color: #bdd9dc; }
+    #manager-tools > .admin-card:has(#refresh-orders) { background-color: #f4f7fb; border-color: #c9d6e4; }
+    .admin-card, .order-card, .manager-category-accordion { box-shadow: 0 3px 12px #183e2b09; }
+    .admin-card h3 { color: #214f36; }
+    .admin-card .small-note { color: #536b5c; }
+    .admin .field label { color: #294a36; }
+    .admin .field input, .admin .field select, .admin .field textarea {
+      border-color: #c9d8cd;
+      background-color: #fff;
+      color: #20332a;
+    }
+    .admin .field input:focus, .admin .field select:focus, .admin .field textarea:focus {
+      border-color: #55916a;
+      box-shadow: 0 0 0 3px #55916a20;
+    }
+    .payment-choice { border-color: #cfddd2; }
+    .payment-choice:hover { border-color: #8eae96; }
+    .admin-card > .btn-soft, .admin-card .manager-order-search .btn-soft { border: 1px solid #c6d8ca; }
+    .manager-accordion { border-color: #bfcebf; }
+    .manager-accordion > summary { background-color: #f0f6f0; }
+    .manager-accordion[open] > summary { background-color: #e5f0e6; }
+    .manager-category-accordion { border-color: #c9d8cc; }
+    .manager-category-accordion > summary { background-color: #eaf2eb; }
+    .manager-category-accordion[open] > summary { background-color: #deebdf; }
+    .manager-category-products { background-color: #fbfdfb; }
+    .admin-product {
+      border: 1px solid #d7e1d8;
+      background-color: #fff;
+      box-shadow: 0 2px 6px #183e2b08;
+    }
+    .admin-product-actions .btn-soft { border: 1px solid #bed2c2; }
+    .admin-product-actions .remove { border: 1px solid #e7c5bf; border-radius: 8px; background-color: #fff1ee; padding: 7px 10px; }
+    .admin-product-actions .remove:hover { background-color: #f9ded8; }
+    .product-photo-preview, .hero-preview, .brand-logo-preview {
+      border: 1px solid #c9d8cc;
+      background-color: #e8f0e8;
+    }
+    .image-adjustments { border: 1px solid #c9d8cc; background-color: #f0f6f0; color: #345641; }
+    .notification-help { border: 1px solid #c8d6e5; background-color: #eef4fa; color: #344e67; }
+    .notification-help summary { color: #315d7d; }
+    #admin-orders .order-card { border-color: #c8d6e2; background-color: #fff; }
+    #admin-orders .order-card h4 { color: #254e6b; }
+    #admin-orders .order-card-section { border-top-color: #d7e2eb; }
+    #admin-orders .order-card-section > strong { color: #315d7d; }
+    #admin-orders .order-line:last-of-type {
+      margin-top: 5px;
+      padding-top: 8px;
+      border-top: 1px solid #d7e2eb;
+      color: #203f59;
+      font-weight: 800;
+    }
+    #admin-orders .order-status-actions [data-order-action="approve"],
+    #admin-orders .order-status-actions [data-order-action="approve-cod"] { border: 1px solid #b5d3bb; }
+    #admin-orders .order-status-actions [data-order-action="Delivered"] { border: 1px solid #bed2e3; }
+    #admin-orders .order-status-actions [data-order-action="Completed"] { border: 1px solid #34734a; }
+    #admin-orders .order-status-actions [data-order-action="show-rejection-form"],
+    #admin-orders [data-show-delete-order] { border: 1px solid #e5c2bc; background-color: #fff3f0; color: #963d35; }
+    #admin-orders [data-show-delete-order]:hover { background-color: #f9e2dd; }
+    #admin-orders .admin-product { border-color: #c9d8cc; }
+    .order-filters button { box-shadow: 0 2px 5px #183e2b0a; }
+    .order-filters button:focus-visible, .admin button:focus-visible, #refresh-catalog:focus-visible {
+      outline: 3px solid #6d9fc4;
+      outline-offset: 2px;
+    }
+    .manager-save-status.visible { border-color: #89bd94; box-shadow: 0 5px 15px #28613a12; }
   </style>
 </head>
 <body>
