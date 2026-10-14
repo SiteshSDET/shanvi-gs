@@ -197,6 +197,9 @@
     .profile-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 18px; }
     .profile-toolbar .small-note { margin: 0; }
     #refresh-customer-orders { flex: 0 0 auto; min-height: 44px; padding: 10px 16px; font-size: 13px; font-weight: 800; }
+    .profile-refresh-spinner { display: inline-block; width: 15px; height: 15px; margin-right: 8px; vertical-align: -3px; border: 2px solid #ffffff80; border-top-color: #fff; border-radius: 50%; animation: profile-refresh-spin .7s linear infinite; }
+    @keyframes profile-refresh-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .profile-refresh-spinner { animation-duration: 1.5s; } }
     .profile-order-group { margin: 12px 0; border: 1px solid var(--line); border-radius: 14px; background: #f8faf7; overflow: hidden; }
     .profile-order-group[data-customer-order-group="in-progress"] { border-color: #e7c96e; background: #fffdf5; }
     .profile-order-group[data-customer-order-group="pending"] { border-color: #e8b5ae; background: #fff8f7; }
@@ -741,6 +744,7 @@
         profile: "Order & Profile", help: "Help", profileTitle: "My profile & orders",
         refreshOrders: "Refresh orders", refreshingOrders: "Refreshing orders…", profileOffline: "You appear to be offline. Reconnect and refresh again.",
         noTrackedOrders: "No online-tracked orders are saved in this browser. Orders from another device cannot be refreshed here without customer sign-in.",
+        orderStatusesCurrent: "Your saved order statuses are up to date.",
         orderRefreshUpdated: "Checked {checked} orders; updated {updated} status(es).",
         orderRefreshCurrent: "Checked {checked} orders; all statuses are current.",
         orderRefreshPartial: "Refreshed {checked} orders; {failed} could not be checked.",
@@ -852,6 +856,7 @@
         profile: "ऑर्डर और प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर",
         refreshOrders: "ऑर्डर अपडेट करें", refreshingOrders: "ऑर्डर अपडेट हो रहे हैं…", profileOffline: "इंटरनेट उपलब्ध नहीं है। कनेक्ट करके फिर अपडेट करें।",
         noTrackedOrders: "इस ब्राउज़र में ऑनलाइन ट्रैक किए गए ऑर्डर सेव नहीं हैं। ग्राहक लॉगिन के बिना दूसरे डिवाइस के ऑर्डर अपडेट नहीं हो सकते।",
+        orderStatusesCurrent: "आपके सेव किए गए ऑर्डर की स्थिति नवीनतम है।",
         orderRefreshUpdated: "{checked} ऑर्डर जाँचे; {updated} की स्थिति अपडेट हुई।",
         orderRefreshCurrent: "{checked} ऑर्डर जाँचे; सभी की स्थिति नवीनतम है।",
         orderRefreshPartial: "{checked} ऑर्डर अपडेट हुए; {failed} की स्थिति नहीं जाँची जा सकी।",
@@ -1213,8 +1218,8 @@
       const reference = order.id || order.reference;
       const verifiedStatus = verifiedCustomerOrderStatuses.get(reference);
       if (verifiedStatus) return verifiedStatus;
-      if (!db && (order.status === "Completed" || order.status === "Rejected")) return order.status;
-      return "Awaiting manager approval";
+      const knownStatuses = ["Awaiting manager approval", "Awaiting store confirmation", "COD order placed", "Awaiting UPI payment verification", "Pending", "Approved", "Delivered", "Completed", "Rejected"];
+      return knownStatuses.includes(order.status) ? order.status : "Awaiting manager approval";
     }
     function customerOrderShareText(order) {
       const reference = order.id || order.reference;
@@ -1351,17 +1356,18 @@
         && (includeTerminal || !["Completed", "Rejected"].includes(order.status))
       );
       if (!ordersToCheck.length) {
-        $("profile-sync-status").textContent = customerOrders.length
-          ? tr("noTrackedOrders")
-          : tr("noCustomerOrders");
+        const hasTrackedOrders = customerOrders.some((order) => order.customerStatusToken);
+        $("profile-sync-status").textContent = hasTrackedOrders
+          ? tr("orderStatusesCurrent")
+          : customerOrders.length ? tr("noTrackedOrders") : tr("noCustomerOrders");
         return false;
       }
       customerStatusRefreshInProgress = true;
       const refreshButton = $("refresh-customer-orders");
       refreshButton.disabled = true;
-      refreshButton.textContent = tr("refreshingOrders");
-      $("profile-sync-status").textContent = "";
-      ordersToCheck.forEach((order) => verifiedCustomerOrderStatuses.delete(order.id || order.reference));
+      refreshButton.setAttribute("aria-busy", "true");
+      refreshButton.innerHTML = `<span class="profile-refresh-spinner" aria-hidden="true"></span>${tr("refreshingOrders")}`;
+      $("profile-sync-status").textContent = tr("refreshingOrders");
       renderCustomerOrders();
       let updated = 0;
       let failed = 0;
@@ -1437,6 +1443,7 @@
       } finally {
         customerStatusRefreshInProgress = false;
         refreshButton.disabled = false;
+        refreshButton.setAttribute("aria-busy", "false");
         refreshButton.textContent = `↻ ${tr("refreshOrders")}`;
       }
     }
@@ -3479,7 +3486,7 @@
         $("profile-sync-status").textContent = tr("profileOffline");
         return;
       }
-      void refreshCustomerOrderStatuses({ includeTerminal: true });
+      void refreshCustomerOrderStatuses();
     };
     $("profile-close").onclick = () => {
       $("profile-overlay").classList.remove("open");
