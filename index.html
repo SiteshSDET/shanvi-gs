@@ -335,13 +335,14 @@
       .search-wrap { width: 100%; }
       .search-wrap input { min-height: 40px; padding-top: 9px; padding-bottom: 9px; border-radius: 12px; }
       main { padding: 14px 13px 38px; }
-      .hero { min-height: 190px; padding: 18px 16px; border-radius: 19px; }
+      .hero { min-height: 160px; padding: 12px 16px; border-radius: 19px; }
       .hero-copy { max-width: 76%; }
-      h1 { max-width: 330px; margin: 7px 0; font-size: clamp(25px, 8vw, 34px); }
+      .hero-copy .eyebrow { display: none; }
+      h1 { max-width: 330px; margin: 4px 0; font-size: clamp(22px, 7vw, 29px); }
       .hero:before { right: -14px; bottom: 0; font-size: 104px; opacity: .45; }
       .hero:after { width: 230px; height: 230px; top: 55px; right: -120px; }
-      .hero p { max-width: min(280px, 100%); margin-bottom: 10px; font-size: 12px; line-height: 1.4; }
-      .hero .btn { min-height: 36px; padding: 8px 12px; font-size: 12px; }
+      .hero p { display: -webkit-box; max-width: min(280px, 100%); margin-bottom: 7px; overflow: hidden; font-size: 11px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+      .hero .btn { min-height: 32px; padding: 6px 10px; font-size: 11px; }
       .section-heading { margin: 30px 0 13px; }
       .section-heading h2 { font-size: 25px; }
       #refresh-catalog { min-height: 34px; padding: 6px 8px; font-size: 10px; }
@@ -748,7 +749,7 @@
         cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
         codUnavailable: "Currently unavailable; the store manager has disabled COD.",
         placeOrderForVerification: "Place order for payment verification",
-        back: "Back", confirmOrder: "Place order for payment verification", verifyUpiNote: "Pay the exact total using the store UPI ID or QR. Your order will be marked payment pending until the manager checks the store account and accepts it. Refresh Profile to see the payment status.",
+        back: "Back", confirmOrder: "Place order for payment verification", verifyUpiNote: "Pay the exact total using the store UPI ID or QR. Your order will be marked payment pending until the manager checks the store account and accepts it. Open Order & Profile to see the payment status.",
         paymentAssistance: "UPI ID: copy the store ID, open your UPI app, paste it as the recipient, and enter the exact total shown. QR: screenshot this QR and scan it from your payment app if supported, or scan it with another phone. After paying, place the order for manager verification. Do not submit an order before paying.",
         paymentAssistanceCod: "Cash on delivery is selected: confirm the order, then pay the delivery person when it arrives.",
         paymentHelp: "Need help with payment?",
@@ -854,7 +855,7 @@
         cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
         placeOrderForVerification: "भुगतान जाँच के लिए ऑर्डर भेजें",
-        back: "वापस", confirmOrder: "भुगतान जाँच के लिए ऑर्डर भेजें", verifyUpiNote: "दुकान की UPI ID या QR से सटीक कुल राशि का भुगतान करें। मैनेजर दुकान के खाते में जाँचकर ऑर्डर स्वीकार करने तक भुगतान लंबित रहेगा। भुगतान की स्थिति देखने के लिए Profile रीफ़्रेश करें।",
+        back: "वापस", confirmOrder: "भुगतान जाँच के लिए ऑर्डर भेजें", verifyUpiNote: "दुकान की UPI ID या QR से सटीक कुल राशि का भुगतान करें। मैनेजर दुकान के खाते में जाँचकर ऑर्डर स्वीकार करने तक भुगतान लंबित रहेगा। भुगतान की स्थिति देखने के लिए 'ऑर्डर और प्रोफ़ाइल' खोलें।",
         paymentAssistance: "UPI ID: दुकान की ID कॉपी करें, UPI ऐप खोलें और प्राप्तकर्ता में पेस्ट करें; दिखाई गई पूरी राशि डालें। QR: स्क्रीनशॉट लेकर भुगतान ऐप में फ़ोटो से स्कैन करें, या दूसरे फ़ोन से स्कैन करें। भुगतान के बाद मैनेजर की जाँच के लिए ऑर्डर भेजें। भुगतान किए बिना ऑर्डर न भेजें।",
         paymentAssistanceCod: "कैश ऑन डिलीवरी चुना है: ऑर्डर की पुष्टि करें और सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         paymentHelp: "भुगतान में मदद चाहिए?",
