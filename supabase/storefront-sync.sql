@@ -33,7 +33,8 @@ alter table public.products
     'Electrical & Electronics',
     'Clothing',
     'Grocery',
-    'Other'
+    'Other',
+    'Ornaments'
   ));
 
 alter table public.products replica identity full;

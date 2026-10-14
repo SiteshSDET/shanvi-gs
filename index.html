@@ -270,13 +270,18 @@
     .offer-banner { position: relative; display: grid; grid-template-columns: 58px 1fr auto; align-items: center; gap: 15px; margin: 27px 0 -10px; padding: 19px 24px; border: 1px solid #edc763; border-radius: 20px; overflow: hidden; background: linear-gradient(105deg,#fff0bc 0%,#fff9e8 45%,#ffedcc 100%); color: #70430c; box-shadow: 0 12px 28px #b66d221a; }
     .offer-banner:after { content: ""; position: absolute; width: 210px; height: 210px; top: -145px; right: 12%; border-radius: 50%; background: #ffffff80; animation: offer-shine 4s ease-in-out infinite alternate; pointer-events: none; }
     .offer-gift-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 17px; background: linear-gradient(145deg,#ffb33c,#f77744); font-size: 30px; box-shadow: 0 7px 16px #c85d3240; }
+    .offer-gift-icon { animation: offer-gift-bounce 1.6s ease-in-out infinite; }
     .offer-copy { position: relative; z-index: 1; }
     .offer-kicker { display: block; color: #a34c20; font-size: 10px; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
-    .offer-title { display: block; margin-top: 3px; color: #57320e; font: 700 clamp(17px,2.3vw,24px) Georgia,serif; }
+    .offer-title { display: block; margin-top: 3px; color: #57320e; font: 700 clamp(17px,2.3vw,24px) Georgia,serif; animation: offer-waiting 1.8s ease-in-out infinite alternate; transform-origin: left center; }
     .offer-description { display: block; margin-top: 4px; color: #765627; font-size: 12px; }
     .offer-badge { position: relative; z-index: 1; padding: 9px 13px; border: 1px solid #eb9c46; border-radius: 999px; background: #fffaf0; color: #a34c20; font-size: 11px; font-weight: 850; white-space: nowrap; }
+    @keyframes offer-waiting { from { transform: scale(1); text-shadow: 0 0 0 #f6ba47; } to { transform: scale(1.035); text-shadow: 0 2px 14px #eda83370; } }
+    @keyframes offer-gift-bounce { 0%, 100% { transform: translateY(0) rotate(0); } 45% { transform: translateY(-5px) rotate(-5deg); } 70% { transform: translateY(0) rotate(4deg); } }
     @keyframes offer-shine { from { transform: translateX(-15px) scale(.8); opacity: .25; } to { transform: translateX(30px) scale(1.1); opacity: .75; } }
     .offer-banner[hidden] { display: none; }
+    .hero[hidden] { display: none; }
+    @media (prefers-reduced-motion: reduce) { .offer-title, .offer-gift-icon, .offer-banner:after { animation: none !important; } }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
     .admin-products { display: grid; gap: 8px; }
     .admin-product { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px; background: #f8f8f5; border-radius: 9px; font-size: 13px; }
@@ -587,6 +592,7 @@
       <div class="admin-card">
         <h3>Festival banner</h3>
         <p class="small-note">Change the festival title, message, and background photo. This preview matches how the banner crops on the customer storefront.</p>
+        <label class="payment-choice"><input id="hero-enabled" type="checkbox" checked><span><strong>Show festival banner to customers</strong><small>Turn this off to temporarily hide the banner without deleting its content.</small></span></label>
         <div class="field"><label for="hero-eyebrow-input">Small heading</label><input id="hero-eyebrow-input" maxlength="70" placeholder="e.g. Shubh Navratri"></div>
         <div class="field"><label for="hero-title-input">Main heading</label><input id="hero-title-input" maxlength="100" placeholder="e.g. Celebrate the festival of lights"></div>
         <div class="field"><label for="hero-description-input">Message</label><input id="hero-description-input" maxlength="180" placeholder="A short message for your customers"></div>
@@ -708,7 +714,7 @@
         footer: "· Made for everyday needs",
         allItems: "All items", kids: "Kids", gifts: "Gifts", stationery: "Stationery",
         puja: "Puja", household: "Gharelu Samaan", electronics: "Electrical & Electronics",
-        snacks: "Snacks", beauty: "Beauty & Personal Care", clothing: "Clothing", grocery: "Grocery", other: "Other",
+        snacks: "Snacks", beauty: "Beauty & Personal Care", clothing: "Clothing", grocery: "Grocery", other: "Other", ornaments: "Ornaments",
         search: "Search products",
         cart: "Cart", manager: "Manager", add: "Add +", soldOut: "Sold out", off: "off",
         profile: "Order & Profile", help: "Help", profileTitle: "My profile & orders",
@@ -818,7 +824,7 @@
         footer: "· रोज़मर्रा की ज़रूरतों के लिए",
         allItems: "सभी सामान", kids: "बच्चों के सामान", gifts: "उपहार", stationery: "स्टेशनरी",
         puja: "पूजा सामग्री", household: "घरेलू सामान", electronics: "इलेक्ट्रिकल और इलेक्ट्रॉनिक्स",
-        snacks: "नाश्ता", beauty: "ब्यूटी और व्यक्तिगत देखभाल", clothing: "कपड़े", grocery: "किराना", other: "अन्य",
+        snacks: "नाश्ता", beauty: "ब्यूटी और व्यक्तिगत देखभाल", clothing: "कपड़े", grocery: "किराना", other: "अन्य", ornaments: "आभूषण",
         search: "सामान खोजें",
         cart: "कार्ट", manager: "मैनेजर", add: "जोड़ें +", soldOut: "स्टॉक खत्म", off: "छूट",
         profile: "ऑर्डर और प्रोफ़ाइल", help: "मदद", profileTitle: "मेरी प्रोफ़ाइल और ऑर्डर",
@@ -920,7 +926,7 @@
     };
     const categories = [
       "All items", "Kids", "Gifts", "Stationery", "Puja", "Gharelu Samaan",
-      "Snacks", "Beauty & Personal Care", "Electrical & Electronics", "Clothing", "Grocery", "Other"
+      "Snacks", "Beauty & Personal Care", "Electrical & Electronics", "Clothing", "Grocery", "Other", "Ornaments"
     ];
     const defaultProducts = [
       { id: "p1", name: "Rainbow Art & Craft Kit", category: "Kids", price: 249, mrp: 299, image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=700&q=80" },
@@ -981,6 +987,7 @@
     let loadedStoreHelpSignature = "";
     let loadedCheckoutAddressSignature = "";
     const defaultHero = {
+      enabled: true,
       eyebrow: "A warm hello from your local store",
       title: "Everyday finds.\nThoughtfully picked.",
       description: "From little gifts to everyday essentials, find a bit of everything for your home and family.",
@@ -989,6 +996,7 @@
     let heroSettings = { ...defaultHero, ...storage.read("shanvi-hero", {}) };
     let heroDraftImage = heroSettings.image;
     let heroFormDirty = false;
+    let couponFormDirty = false;
     let sharedStorefrontLoadSequence = 0;
     let productImageDraft = "";
     let productImageAspectRatio = 133;
@@ -1076,7 +1084,7 @@
       "All items": "allItems", "Kids": "kids", "Gifts": "gifts", "Stationery": "stationery",
       "Puja": "puja", "Gharelu Samaan": "household", "Electronics": "electronics",
       "Electrical & Electronics": "electronics", "Snacks": "snacks",
-      "Beauty & Personal Care": "beauty", "Clothing": "clothing", "Grocery": "grocery", "Other": "other"
+      "Beauty & Personal Care": "beauty", "Clothing": "clothing", "Grocery": "grocery", "Other": "other", "Ornaments": "ornaments"
     };
     function translatedCategory(category) {
       const key = categoryTranslationKey[category];
@@ -1580,6 +1588,7 @@
       return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
     }
     function renderHero() {
+      $("festival-hero").hidden = heroSettings.enabled === false;
       $("hero-eyebrow").textContent = heroSettings.eyebrow === defaultHero.eyebrow ? tr("heroEyebrow") : heroSettings.eyebrow;
       $("hero-title").textContent = heroSettings.title === defaultHero.title ? tr("heroTitle") : heroSettings.title;
       $("hero-description").textContent = heroSettings.description === defaultHero.description ? tr("heroDescription") : heroSettings.description;
@@ -1610,6 +1619,7 @@
     }
     function fillHeroForm() {
       heroDraftImage = heroSettings.image;
+      $("hero-enabled").checked = heroSettings.enabled !== false;
       $("hero-eyebrow-input").value = heroSettings.eyebrow;
       $("hero-title-input").value = heroSettings.title.replace(/\n/g, " ");
       $("hero-description-input").value = heroSettings.description;
@@ -2032,18 +2042,17 @@
       brandLogoDraft = brandLogo;
       offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...(value.offer || {}) };
       const previousCoupon = couponSettings;
+      const incomingCoupon = value.coupon || {};
       couponSettings = {
-        ...(value.coupon || {}),
-        enabled: true,
-        code: String(value.coupon?.code || "WELCOME10").trim().toUpperCase(),
-        percent: 10,
-        maxDiscount: 100
+        enabled: incomingCoupon.enabled !== false,
+        code: String(incomingCoupon.code || "WELCOME10").trim().toUpperCase(),
+        percent: Number(incomingCoupon.percent) || 10,
+        maxDiscount: Number(incomingCoupon.maxDiscount) || 100
       };
       if (previousCoupon.code !== couponSettings.code
         || previousCoupon.percent !== couponSettings.percent
         || previousCoupon.maxDiscount !== couponSettings.maxDiscount
         || previousCoupon.enabled !== couponSettings.enabled) coupon = false;
-      coupon = false;
       deliverySettings = { latitude: "", longitude: "", ...(value.delivery || {}) };
       heroSettings = { ...defaultHero, ...(value.hero || {}) };
       if (!heroFormDirty) heroDraftImage = heroSettings.image;
@@ -2056,10 +2065,12 @@
         $("offer-enabled").checked = Boolean(offerSettings.enabled);
         $("offer-threshold").value = Number(offerSettings.threshold) || 100;
         $("offer-product").value = offerSettings.giftProductId || "";
-        $("coupon-enabled").checked = Boolean(couponSettings.enabled);
-        $("coupon-code-manager").value = couponSettings.code;
-        $("coupon-percent").value = Number(couponSettings.percent) || 10;
-        $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
+        if (!couponFormDirty) {
+          $("coupon-enabled").checked = Boolean(couponSettings.enabled);
+          $("coupon-code-manager").value = couponSettings.code;
+          $("coupon-percent").value = Number(couponSettings.percent) || 10;
+          $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
+        }
         if (!heroFormDirty) fillHeroForm();
       }
     }
@@ -2067,6 +2078,7 @@
       const hero = value.hero === heroSettings && heroFormDirty
         ? {
           ...heroSettings,
+          enabled: $("hero-enabled").checked,
           eyebrow: $("hero-eyebrow-input").value.trim() || defaultHero.eyebrow,
           title: $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " "),
           description: $("hero-description-input").value.trim() || defaultHero.description,
@@ -2193,7 +2205,7 @@
           <div><strong>${item.isFreeGift ? tr("free") : money(item.price * item.quantity)}</strong>${item.isFreeGift ? "" : `<button class="remove" data-remove="${escapeAttr(item.id)}">${tr("remove")}</button>`}</div>
         </div>`).join("")}</div>
         <div class="coupon" ${couponSettings.enabled ? "" : "hidden"}><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" autocomplete="off" autocapitalize="characters" maxlength="20" value="${coupon ? escapeAttr(couponSettings.code) : escapeAttr(preservedCheckoutValues["coupon-code"] || "")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon" type="button" ${coupon ? "disabled" : ""}>${coupon ? tr("applied") : tr("apply")}</button></div>
-        <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> <button class="btn btn-soft" id="copy-coupon" type="button">${tr("copyCoupon")}</button> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}${coupon ? ` <button class="btn btn-quiet" id="remove-coupon" type="button">${tr("removeCoupon")}</button>` : ""}</div>
+        <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> <button class="btn btn-soft" id="copy-coupon" type="button">${tr("copyCoupon")}</button> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}${coupon ? ` <button class="btn btn-danger" id="remove-coupon" type="button">${tr("removeCoupon")}</button>` : ""}</div>
         <p class="small-note">${tr("deliveryPolicy")}</p>
         <div class="summary">
           <div class="summary-row"><span>${tr("subtotal")}</span><strong>${money(subtotal)}</strong></div>
@@ -2219,6 +2231,7 @@
             : "This public catalog is currently browse-only. Online orders will be enabled after the store connects its secure order service."}</p>
           <button class="btn btn-primary full" id="place-order" disabled>Online ordering unavailable</button>`}`;
       for (const [id, value] of Object.entries(preservedCheckoutValues)) {
+        if (id === "coupon-code" && coupon) continue;
         const field = $(id);
         if (field) field.value = value;
       }
@@ -3279,6 +3292,10 @@
         : "Alerts are not enabled yet. Tap Enable browser alerts and allow the browser permission prompt.";
       $("manager-alert-phone").value = managerAlertPhone;
       $("coupon-code-manager").value = couponSettings.code;
+      $("coupon-enabled").checked = Boolean(couponSettings.enabled);
+      $("coupon-percent").value = Number(couponSettings.percent) || 10;
+      $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
+      couponFormDirty = false;
       $("store-help-phone").value = storeHelpPhone;
       $("store-call-enabled").checked = storeCallEnabled;
       $("upi-id").value = settings.upi || "";
@@ -3530,6 +3547,7 @@
     $("save-hero").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const next = {
+        enabled: $("hero-enabled").checked,
         eyebrow: $("hero-eyebrow-input").value.trim() || defaultHero.eyebrow,
         title: $("hero-title-input").value.trim() || defaultHero.title.replace("\n", " "),
         description: $("hero-description-input").value.trim() || defaultHero.description,
@@ -3551,6 +3569,11 @@
         return false;
       }
     };
+    $("hero-enabled").addEventListener("change", () => { heroFormDirty = true; });
+    ["coupon-enabled", "coupon-code-manager", "coupon-percent", "coupon-limit"].forEach((id) => {
+      $(id).addEventListener("input", () => { couponFormDirty = true; });
+      $(id).addEventListener("change", () => { couponFormDirty = true; });
+    });
     $("admin-category-filter").addEventListener("change", renderAdminProducts);
     document.querySelectorAll("[data-order-filter]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -3809,6 +3832,7 @@
         });
         else couponSettings = nextCoupon;
         if (!storage.write("shanvi-coupon", couponSettings)) return false;
+        couponFormDirty = false;
         if (!couponSettings.enabled) coupon = false;
         renderCart();
         showManagerSaved(couponSettings.enabled
@@ -3991,6 +4015,7 @@
       event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
     });
     $("coupon-code-manager").addEventListener("input", (event) => {
+      couponFormDirty = true;
       event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
     });
     $("language-toggle").onclick = () => {
