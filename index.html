@@ -528,8 +528,9 @@
       </div>
       <div class="admin-card">
         <h3>Coupon code</h3>
-        <label class="payment-choice"><input id="coupon-enabled" type="checkbox"><span><strong>Enable customer coupon</strong><small>Customers can apply the WELCOME10 discount in their cart.</small></span></label>
+        <label class="payment-choice"><input id="coupon-enabled" type="checkbox"><span><strong>Enable customer coupon</strong><small>Customers can apply the coupon code you set below in their cart.</small></span></label>
         <div class="form-grid">
+          <div class="field"><label for="coupon-code-manager">Coupon code</label><input id="coupon-code-manager" type="text" maxlength="20" autocapitalize="characters" autocomplete="off" placeholder="e.g. NEW50"></div>
           <div class="field"><label for="coupon-percent">Discount percent</label><input id="coupon-percent" type="number" min="1" max="100" step="1" value="10"></div>
           <div class="field"><label for="coupon-limit">Maximum discount (₹)</label><input id="coupon-limit" type="number" min="1" step="1" value="100"></div>
         </div>
@@ -736,7 +737,10 @@
         upiEasy: "Easy UPI payment", upiSub: "Pay directly using your favorite UPI app",
         basket: "Your basket", emptyBasket: "Your basket is waiting for something lovely.",
         continueShopping: "Continue shopping", remove: "Remove", coupon: "Coupon code",
-        apply: "Apply", couponHint: "Try coupon", couponDeal: "for {percent}% off (up to {maxDiscount}).",
+        apply: "Apply", applied: "Applied", removeCoupon: "Remove", copyCoupon: "Copy code", couponCopied: "Coupon code copied",
+        couponCopyFailed: "Could not copy the coupon code. Please select and copy it.",
+        couponCelebration: "Coupon {code} applied!", invalidCoupon: "That coupon code is not valid",
+        couponHint: "Try coupon", couponDeal: "for {percent}% off (up to {maxDiscount}).",
         subtotal: "Items subtotal", couponSavings: "Coupon savings", delivery: "Delivery",
         deliveryArranged: "Arranged with store", total: "Total", deliveryDetails: "Delivery details",
         deliveryPolicy: "Items subtotal ₹100 or more after coupon: free delivery. Below ₹100: ₹20 delivery charge.",
@@ -774,7 +778,7 @@
         paymentCustomerNotMarkedPaid: "Payment pending — the store will verify it before accepting the order.",
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
-        itemsEach: "each", invalidCoupon: "That coupon code is not valid", couponApplied: "WELCOME10 applied",
+        itemsEach: "each",
         added: "Added to your basket", selectPayment: "Please select a payment method.",
         freeGift: "Free gift", free: "FREE", freeGiftAdded: "Your qualifying order includes this free gift.",
         calculatedAtCheckout: "Calculated at checkout", outOfStock: "That quantity is not in stock.",
@@ -843,7 +847,10 @@
         upiEasy: "आसान UPI भुगतान", upiSub: "अपने पसंदीदा UPI ऐप से भुगतान करें",
         basket: "आपका कार्ट", emptyBasket: "आपका कार्ट खाली है। इसमें कुछ सामान जोड़ें।",
         continueShopping: "खरीदारी जारी रखें", remove: "हटाएँ", coupon: "कूपन कोड",
-        apply: "लागू करें", couponHint: "कूपन", couponDeal: "{percent}% छूट पाएँ ({maxDiscount} तक)।",
+        apply: "लागू करें", applied: "लागू हुआ", removeCoupon: "हटाएँ", copyCoupon: "कोड कॉपी करें", couponCopied: "कूपन कोड कॉपी हो गया",
+        couponCopyFailed: "कूपन कोड कॉपी नहीं हुआ। कृपया कोड चुनकर कॉपी करें।",
+        couponCelebration: "कूपन {code} लागू हुआ!", invalidCoupon: "यह कूपन कोड मान्य नहीं है",
+        couponHint: "कूपन", couponDeal: "{percent}% छूट पाएँ ({maxDiscount} तक)।",
         subtotal: "सामान का कुल मूल्य", couponSavings: "कूपन की बचत", delivery: "डिलीवरी",
         deliveryArranged: "दुकान से तय करें", total: "कुल", deliveryDetails: "डिलीवरी की जानकारी",
         deliveryPolicy: "₹100 या अधिक का सामान (कूपन के बाद): मुफ़्त डिलीवरी। ₹100 से कम: ₹20 डिलीवरी शुल्क।",
@@ -881,7 +888,7 @@
         paymentCustomerNotMarkedPaid: "भुगतान लंबित — ऑर्डर स्वीकार करने से पहले दुकान भुगतान की जाँच करेगी।",
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
-        itemsEach: "प्रति सामान", invalidCoupon: "यह कूपन कोड मान्य नहीं है", couponApplied: "WELCOME10 लागू हुआ",
+        itemsEach: "प्रति सामान",
         added: "कार्ट में जोड़ दिया", selectPayment: "कृपया भुगतान का तरीका चुनें।",
         freeGift: "मुफ़्त उपहार", free: "मुफ़्त", freeGiftAdded: "आपके योग्य ऑर्डर में यह मुफ़्त उपहार शामिल है।",
         calculatedAtCheckout: "चेकआउट पर तय होगा", outOfStock: "इतना स्टॉक उपलब्ध नहीं है।",
@@ -2024,8 +2031,19 @@
       brandLogo = typeof value.logo === "string" ? value.logo : "";
       brandLogoDraft = brandLogo;
       offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...(value.offer || {}) };
-      couponSettings = { enabled: true, code: "WELCOME10", percent: 10, maxDiscount: 100, ...(value.coupon || {}) };
-      if (!couponSettings.enabled) coupon = false;
+      const previousCoupon = couponSettings;
+      couponSettings = {
+        ...(value.coupon || {}),
+        enabled: true,
+        code: String(value.coupon?.code || "WELCOME10").trim().toUpperCase(),
+        percent: 10,
+        maxDiscount: 100
+      };
+      if (previousCoupon.code !== couponSettings.code
+        || previousCoupon.percent !== couponSettings.percent
+        || previousCoupon.maxDiscount !== couponSettings.maxDiscount
+        || previousCoupon.enabled !== couponSettings.enabled) coupon = false;
+      coupon = false;
       deliverySettings = { latitude: "", longitude: "", ...(value.delivery || {}) };
       heroSettings = { ...defaultHero, ...(value.hero || {}) };
       if (!heroFormDirty) heroDraftImage = heroSettings.image;
@@ -2039,6 +2057,7 @@
         $("offer-threshold").value = Number(offerSettings.threshold) || 100;
         $("offer-product").value = offerSettings.giftProductId || "";
         $("coupon-enabled").checked = Boolean(couponSettings.enabled);
+        $("coupon-code-manager").value = couponSettings.code;
         $("coupon-percent").value = Number(couponSettings.percent) || 10;
         $("coupon-limit").value = Number(couponSettings.maxDiscount) || 100;
         if (!heroFormDirty) fillHeroForm();
@@ -2173,8 +2192,8 @@
           <div><strong>${escapeHtml(item.name)}</strong><small>${item.isFreeGift ? tr("freeGift") : `${money(item.price)} ${tr("itemsEach")}`}</small>${item.isFreeGift ? "" : `<div class="quantity"><button data-qty="${escapeAttr(item.id)}" data-step="-1" aria-label="${language === "hi" ? "मात्रा घटाएँ" : "Decrease quantity"}">−</button><span>${item.quantity}</span><button data-qty="${escapeAttr(item.id)}" data-step="1" aria-label="${language === "hi" ? "मात्रा बढ़ाएँ" : "Increase quantity"}" ${Number.isFinite(Number(item.stock)) && item.quantity >= Number(item.stock) ? "disabled" : ""}>+</button></div>`}</div>
           <div><strong>${item.isFreeGift ? tr("free") : money(item.price * item.quantity)}</strong>${item.isFreeGift ? "" : `<button class="remove" data-remove="${escapeAttr(item.id)}">${tr("remove")}</button>`}</div>
         </div>`).join("")}</div>
-        <div class="coupon" ${couponSettings.enabled ? "" : "hidden"}><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon">${coupon ? "Remove" : tr("apply")}</button></div>
-        <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}</div>
+        <div class="coupon" ${couponSettings.enabled ? "" : "hidden"}><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" autocomplete="off" autocapitalize="characters" maxlength="20" value="${coupon ? escapeAttr(couponSettings.code) : escapeAttr(preservedCheckoutValues["coupon-code"] || "")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon" type="button" ${coupon ? "disabled" : ""}>${coupon ? tr("applied") : tr("apply")}</button></div>
+        <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> <button class="btn btn-soft" id="copy-coupon" type="button">${tr("copyCoupon")}</button> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}${coupon ? ` <button class="btn btn-quiet" id="remove-coupon" type="button">${tr("removeCoupon")}</button>` : ""}</div>
         <p class="small-note">${tr("deliveryPolicy")}</p>
         <div class="summary">
           <div class="summary-row"><span>${tr("subtotal")}</span><strong>${money(subtotal)}</strong></div>
@@ -2207,15 +2226,23 @@
       $("cart-content").querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.remove, -(cart[button.dataset.remove] || 0))));
       $("apply-coupon").onclick = () => {
         const code = $("coupon-code").value.trim().toUpperCase();
-        if (coupon) {
-          coupon = false;
-          showToast("Coupon removed.");
-          renderCart();
-          return;
-        }
         coupon = couponSettings.enabled && code === String(couponSettings.code).toUpperCase();
-        if (coupon) showCouponCelebration(`${code} applied successfully!`);
-        else showToast(couponSettings.enabled ? tr("invalidCoupon") : "Coupons are currently unavailable.");
+        if (coupon) showCouponCelebration(formatTranslation("couponCelebration", { code }));
+        else showToast(tr("invalidCoupon"));
+        renderCart();
+      };
+      $("copy-coupon").onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(couponSettings.code);
+          $("coupon-code").value = couponSettings.code;
+          showToast(tr("couponCopied"));
+        } catch (error) {
+          showToast(tr("couponCopyFailed"));
+        }
+      };
+      const removeCouponButton = $("remove-coupon");
+      if (removeCouponButton) removeCouponButton.onclick = () => {
+        coupon = false;
         renderCart();
       };
       const checkoutForm = $("checkout-form");
@@ -3251,6 +3278,7 @@
         ? "Browser alerts are enabled on this device."
         : "Alerts are not enabled yet. Tap Enable browser alerts and allow the browser permission prompt.";
       $("manager-alert-phone").value = managerAlertPhone;
+      $("coupon-code-manager").value = couponSettings.code;
       $("store-help-phone").value = storeHelpPhone;
       $("store-call-enabled").checked = storeCallEnabled;
       $("upi-id").value = settings.upi || "";
@@ -3752,8 +3780,14 @@
     };
     $("save-coupon-settings").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
+      const code = $("coupon-code-manager").value.trim().toUpperCase();
       const percent = Number($("coupon-percent").value);
       const maxDiscount = Number($("coupon-limit").value);
+      if (!/^[A-Z0-9]{3,20}$/.test(code)) {
+        showToast("Coupon code must be 3–20 letters or numbers.");
+        $("coupon-code-manager").focus();
+        return false;
+      }
       if (!Number.isInteger(percent) || percent < 1 || percent > 100
         || !Number.isInteger(maxDiscount) || maxDiscount < 1) {
         showToast("Enter a whole-number coupon percentage from 1 to 100 and a positive maximum discount.");
@@ -3761,7 +3795,7 @@
       }
       const nextCoupon = {
         enabled: $("coupon-enabled").checked,
-        code: "WELCOME10",
+        code,
         percent,
         maxDiscount
       };
@@ -3955,6 +3989,9 @@
     };
     $("upi-phone").addEventListener("input", (event) => {
       event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+    $("coupon-code-manager").addEventListener("input", (event) => {
+      event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
     });
     $("language-toggle").onclick = () => {
       language = language === "en" ? "hi" : "en";
