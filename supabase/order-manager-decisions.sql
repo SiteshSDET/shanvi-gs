@@ -3,4 +3,4 @@ alter table public.orders
     check (rejection_reason is null or char_length(rejection_reason) between 1 and 300);
 
 comment on column public.orders.payment_confirmed is
-  'Customer confirmed paying through external UPI/QR; not gateway-verified.';
+  'True only when a payment gateway confirms a captured payment.';

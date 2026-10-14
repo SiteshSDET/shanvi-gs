@@ -18,8 +18,18 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
 6. Run `supabase/order-payment-confirmation.sql` to finalize checkout columns and policies. Checkout remains disabled until all required order columns and policies are installed.
 7. Run `supabase/order-manager-decisions.sql` to add the reason field used for declined orders.
 8. Run `supabase/order-manager-delete.sql` to enable the manager-only permanent order deletion action.
-9. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
-10. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
+9. Run `supabase/razorpay-payments.sql` **after the other order SQL files**. It creates private payment-attempt storage and restricts public order creation to COD; prepaid orders can only be inserted by the payment-verification function.
+10. In Razorpay, enable UPI and automatic capture for the account. In **Edge Functions → Secrets**, set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` using the matching keys from your Razorpay account. Use test keys first; never put the secret in the storefront or share it in chat.
+11. Deploy both payment functions:
+
+   ```sh
+   npx supabase functions deploy create-razorpay-order --no-verify-jwt --project-ref zhrdeemyofcxxigqazgz
+   npx supabase functions deploy verify-razorpay-payment --no-verify-jwt --project-ref zhrdeemyofcxxigqazgz
+   ```
+
+12. In **Authentication → Users**, add a manager account using an email address you can access and a new password. Do not reuse the old demo password. Copy the new user's UUID.
+
+13. In SQL Editor, run the following after replacing the placeholder with that user's UUID:
 
    ```sql
    insert into public.store_managers (user_id)
@@ -27,13 +37,13 @@ The site is deployed at `https://siteshsdet.github.io/shanvi-gs/`. It uses proje
    on conflict (user_id) do nothing;
    ```
 
-11. Redeploy the customer order status function so customers can see a manager's rejection reason:
+14. Redeploy the customer order status function so customers can see a manager's rejection reason:
 
    ```sh
    npx supabase functions deploy get-customer-order --no-verify-jwt --project-ref zhrdeemyofcxxigqazgz
    ```
 
-12. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password. Place a test order from a second device and check **Customer orders**.
+15. Reload the live site. Tap the **Shanvi General Store** name six times within four seconds to open Manager, then sign in using that Supabase user's email/password. Test payments with Razorpay test credentials before switching to live keys.
 
 Customers can open **Profile** to see their order details; while Profile is open, order statuses refresh automatically about every 12 seconds, including accepted and rejected updates. Customers can copy an order ID/details or open a prefilled WhatsApp message to the store at `+91 97989 87872`. New order IDs use `SNVGS-<last 4 phone digits>-<unique suffix>` so the manager can recognize the customer without exposing the full phone number in the ID. In **Manager → Customer orders**, search by any part of the customer's phone number or order ID; phone matching is partial and searches all matching orders. Since customer sign-in is not enabled, order history and its private status-check token are kept in that browser only; order history is not shared across devices or browsers. The manager can save or change the customer-facing phone number in **Manager → Help & contact**, and customers can call it from **Help**. That contact, catalog, product images, offer, logo, delivery, and banner settings are shared through Supabase after the required SQL setup.
 
@@ -45,9 +55,9 @@ Open Manager by tapping the **Shanvi General Store** name six times within four 
 
 Use **Festival banner** to set the small heading, main headline, customer message, and background photo. The live preview shows the banner's center-crop; a wide landscape **16:6** image, ideally **1600 × 600 px**, gives the best fit. The customer-page photo uses a gentle animated zoom/pan with animated festival sparkles, with a dark overlay for readable text. Product and banner photos are resized locally before upload to Supabase Storage. In the product editor, use **Remove product photo** to clear the current/selected photo; an item without a photo uses its category placeholder. Banner, product details, logo, and free-item offer are shared with customers' devices; all configured storefronts require the `storefront-sync.sql` migration.
 
-In **Payment details**, set a store UPI ID, choose a QR image, and toggle COD. Saving these settings shares them through Supabase with all customers; after this update, save payment details once from Manager to publish the values (the older version kept them only in the manager's browser). For UPI ID orders, customers enter their UPI ID and tap **Continue to pay in UPI app**. For QR orders, they tap **Start QR payment** and scan the code. After paying, they tap **I have completed payment**; only then is **Confirm order** enabled. This button records the customer's statement, not verified payment. The manager must check the payment account before accepting. Managers can accept a UPI order as **Cash on delivery** if appropriate. The included UPI ID and QR are sample data for demonstration only; do not send money to them. Replace them with the store's real payment details before using payment options.
+In **Payment details**, COD can be enabled or disabled. Customers choosing prepaid UPI see Razorpay secure checkout, where they can pay using a UPI app or Razorpay's QR flow; they can optionally enter their UPI ID or mobile number as a payment reference. The order is saved only after the server validates Razorpay's signature and confirms the captured amount, currency, and payment method. The public database policy does not allow customers to insert prepaid orders directly. Razorpay account keys and the deployed Edge Functions are required for prepaid checkout; if they are not configured, COD remains available. Store UPI/QR values retained in older settings are informational and are not the verified payment route. Managers can accept a verified UPI order as **Cash on delivery** if appropriate.
 
-An order appears in **Customer orders** only after it is successfully saved. UPI orders require the customer to confirm payment before submission; this does not prove payment succeeded. The manager must verify payment manually. With Supabase configured, orders remain **Awaiting manager approval** until an authorized manager accepts them.
+An order appears in **Customer orders** only after it is successfully saved. Razorpay UPI orders are inserted by the server only after the provider reports the exact payment as captured and its signature is verified. COD orders are inserted only when COD is enabled. With Supabase configured, orders remain **Awaiting manager approval** until an authorized manager accepts them.
 
 The customer Profile shows **Pending** in red, **In Progress** in yellow after the manager accepts the order, **Completed** in green, and rejected orders with the manager's reason. Customer status changes are checked when the customer taps **Refresh orders**. The Manager order list is at the bottom of the manager tools. Its **Pending**, **Completed**, **Rejected**, and **All** filters separate orders by status. The manager can **Accept** with the original payment method, **Accept as COD**, or **Reject** and provide a reason. Accepted orders can then be marked **Delivered** and **Complete**. Managers can permanently delete an order using **Delete order**, then explicitly confirm **Delete** or choose **Cancel**. Status changes are saved in Supabase when connected, or in this browser in local/demo mode.
 
@@ -66,7 +76,7 @@ Push alerts need an online Supabase project and an HTTPS deployment; they cannot
 
 HTML, CSS, and browser JavaScript cannot securely synchronize customer orders between different phones or deliver push notifications while the manager page is closed. That requires an online backend.
 
-The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback. UPI payments currently open the customer's UPI app (or display a QR); checkout explains how to check the recipient, pay the exact shown total, and confirm payment. Customers must confirm they paid before placing an order, and the store must still verify the payment manually. This is not a payment-gateway integration or automatic payment confirmation. Managers can accept an order as COD instead or reject it with a reason, which appears in the customer's Profile after the updated status function is deployed.
+The public site requires Supabase for checkout and manager sign-in; orders are not saved locally as a fallback. Prepaid UPI orders require the Razorpay Edge Functions, server-side secrets, and `razorpay-payments.sql` migration described above. Customers cannot submit a prepaid order by claiming they paid. Managers can accept a verified UPI order as COD instead or reject it with a reason, which appears in the customer's Profile after the updated status function is deployed.
 
 ### Cross-device manager push setup
 

@@ -684,6 +684,7 @@
   <div class="coupon-success" id="coupon-success" role="status" aria-live="polite" hidden></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="supabase-config.js"></script>
   <script>
     const translations = {
@@ -741,11 +742,10 @@
         pinTitle: "Enter a 6-digit PIN code.", continuePayment: "Continue to payment",
         payment: "Payment", backBasket: "Back to basket", order: "Order",
         paymentPhoneLabel: "Payment phone number",
-        itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay by UPI ID",
-        enterYourUpi: "Enter the UPI ID you will pay from.", yourUpi: "Your UPI ID",
-        upiExample: "Example: 9876543210@upi", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
-        payStoreAt: "Pay the store at:", copyUpi: "Copy store UPI ID",
-        markPaymentReturned: "I have completed payment",
+        itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay securely with UPI or QR",
+        enterYourUpi: "Choose a UPI app or scan a verified payment QR in Razorpay secure checkout.", yourUpi: "Your UPI ID or mobile number (optional)",
+        upiExample: "Optional payment reference only; e.g. 9876543210@upi or 9876543210.", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
+        payStoreAt: "Store UPI ID (reference only; pay through secure checkout):", copyUpi: "Copy store UPI ID",
         storeUpiMissing: "Store UPI ID payment is not configured.",
         qr: "Scan UPI QR code", scanQr: "Scan the store QR code with your UPI app.",
         qrMissing: "Not configured yet; ask the store to add its QR code.",
@@ -754,15 +754,15 @@
         qrNotConfigured: "QR payment is not configured.",
         cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
         codUnavailable: "Currently unavailable; the store manager has disabled COD.",
-        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "After paying, tap “I have completed payment” to enable order confirmation. This is your confirmation only; payment is not verified automatically and the store must check its account.",
-        paymentAssistance: "Payment help: check the store UPI ID/QR, pay exactly the total shown, then tap “I have completed payment”. If payment fails, contact the store for help.",
+        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "The order is saved only after Razorpay securely verifies payment. Do not pay outside this checkout.",
+        paymentAssistance: "Use secure checkout to pay the exact total. The order is saved only after Razorpay confirms payment. If payment fails, try again or contact the store.",
         paymentAssistanceCod: "Cash on delivery is selected: confirm the order, then pay the delivery person when it arrives.",
         paymentHelp: "Need help with payment?",
-        continueToPay: "Continue to pay in UPI app", startQrPayment: "Start QR payment", qrPaymentStarted: "Open your UPI app, scan the QR code, then return here.",
-        paymentFlowPending: "Pay using your UPI app, then tap “I have completed payment”. Payment is not verified automatically.",
-        paymentFlowReturned: "You confirmed payment. The store must verify receipt in its payment account.",
-        paymentCustomerMarkedPaid: "Customer confirmed payment — verify receipt in the payment account.",
-        paymentCustomerNotMarkedPaid: "Customer has not confirmed payment.",
+        continueToPay: "Continue to pay with UPI", startQrPayment: "Pay with UPI or QR", qrPaymentStarted: "Complete payment in Razorpay checkout.",
+        paymentFlowPending: "Complete payment in Razorpay checkout. The order is saved after payment verification.",
+        paymentFlowReturned: "Payment verified successfully.",
+        paymentCustomerMarkedPaid: "Payment verified by Razorpay.",
+        paymentCustomerNotMarkedPaid: "Payment is not verified.",
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
         itemsEach: "each", invalidCoupon: "That coupon code is not valid", couponApplied: "WELCOME10 applied",
@@ -845,11 +845,10 @@
         pinTitle: "6 अंकों का पिन कोड लिखें।", continuePayment: "भुगतान पर जाएँ",
         payment: "भुगतान", backBasket: "कार्ट पर वापस जाएँ", order: "ऑर्डर",
         paymentPhoneLabel: "भुगतान फ़ोन नंबर",
-        itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI ID से भुगतान",
-        enterYourUpi: "जिस UPI ID से भुगतान करेंगे, वह लिखें।", yourUpi: "आपकी UPI ID",
-        upiExample: "उदाहरण: 9876543210@upi", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
-        payStoreAt: "दुकान को यहाँ भुगतान करें:", copyUpi: "दुकान की UPI ID कॉपी करें",
-        markPaymentReturned: "मैंने भुगतान कर दिया है",
+        itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI या QR से सुरक्षित भुगतान",
+        enterYourUpi: "Razorpay सुरक्षित भुगतान में UPI ऐप चुनें या सत्यापित QR स्कैन करें।", yourUpi: "आपकी UPI ID या मोबाइल नंबर (वैकल्पिक)",
+        upiExample: "केवल भुगतान संदर्भ के लिए वैकल्पिक; जैसे 9876543210@upi या 9876543210।", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
+        payStoreAt: "दुकान की UPI ID (केवल जानकारी; सुरक्षित चेकआउट से भुगतान करें):", copyUpi: "दुकान की UPI ID कॉपी करें",
         storeUpiMissing: "दुकान की UPI ID अभी सेट नहीं है।",
         qr: "UPI QR कोड स्कैन करें", scanQr: "अपने UPI ऐप से दुकान का QR कोड स्कैन करें।",
         qrMissing: "अभी सेट नहीं है; दुकान से QR कोड जोड़ने को कहें।",
@@ -858,15 +857,15 @@
         qrNotConfigured: "QR भुगतान अभी सेट नहीं है।",
         cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
-        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "भुगतान के बाद ऑर्डर की पुष्टि चालू करने के लिए “मैंने भुगतान कर दिया है” दबाएँ। यह केवल आपकी पुष्टि है; भुगतान अपने आप सत्यापित नहीं होता और दुकान अपने खाते में जाँच करेगी।",
-        paymentAssistance: "भुगतान में सहायता: सही दुकान UPI ID/QR जाँचें, कुल दिखाई गई राशि ही भेजें, फिर “मैंने भुगतान कर दिया है” दबाएँ। भुगतान न हो तो मदद के लिए दुकान से संपर्क करें।",
+        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "ऑर्डर तभी सेव होगा जब Razorpay भुगतान की सुरक्षित पुष्टि करेगा। इस चेकआउट के बाहर भुगतान न करें।",
+        paymentAssistance: "सटीक कुल राशि के भुगतान के लिए सुरक्षित चेकआउट बटन दबाएँ। Razorpay से भुगतान की पुष्टि होने के बाद ही ऑर्डर सेव होगा। भुगतान न हो तो फिर कोशिश करें या दुकान से संपर्क करें।",
         paymentAssistanceCod: "कैश ऑन डिलीवरी चुना है: ऑर्डर की पुष्टि करें और सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         paymentHelp: "भुगतान में मदद चाहिए?",
-        continueToPay: "UPI ऐप में भुगतान जारी रखें", startQrPayment: "QR भुगतान शुरू करें", qrPaymentStarted: "UPI ऐप खोलें, QR कोड स्कैन करें, फिर यहाँ वापस आएँ।",
-        paymentFlowPending: "UPI ऐप से भुगतान करें, फिर “मैंने भुगतान कर दिया है” दबाएँ। भुगतान अपने आप सत्यापित नहीं होता।",
-        paymentFlowReturned: "आपने भुगतान की पुष्टि की है। दुकान अपने भुगतान खाते में जाँच करेगी।",
-        paymentCustomerMarkedPaid: "ग्राहक ने भुगतान की पुष्टि की — भुगतान खाते में जाँचें।",
-        paymentCustomerNotMarkedPaid: "ग्राहक ने भुगतान की पुष्टि नहीं की है।",
+        continueToPay: "UPI से भुगतान जारी रखें", startQrPayment: "UPI या QR से भुगतान करें", qrPaymentStarted: "Razorpay चेकआउट में भुगतान पूरा करें।",
+        paymentFlowPending: "Razorpay चेकआउट में भुगतान करें। भुगतान सत्यापित होने पर ऑर्डर सेव होगा।",
+        paymentFlowReturned: "भुगतान सफलतापूर्वक सत्यापित हुआ।",
+        paymentCustomerMarkedPaid: "Razorpay द्वारा भुगतान सत्यापित।",
+        paymentCustomerNotMarkedPaid: "भुगतान सत्यापित नहीं है।",
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
         itemsEach: "प्रति सामान", invalidCoupon: "यह कूपन कोड मान्य नहीं है", couponApplied: "WELCOME10 लागू हुआ",
@@ -981,7 +980,6 @@
     let activeCategory = "All items";
     let coupon = false;
     let checkoutDraft = null;
-    let paymentReturnListenersInstalled = false;
     let selectedPayment = "upi";
     let isAuthorizedManager = false;
     let managerRealtimeChannel = null;
@@ -1105,7 +1103,6 @@
         const payerInput = $("customer-upi-id");
         if (payerInput && checkoutDraft) {
           checkoutDraft.payerUpiId = payerInput.value.trim();
-          updatePaymentFlowControls();
         }
       }
     }
@@ -2164,7 +2161,7 @@
     async function checkOrderBackend() {
       if (!db) return;
       const { error } = await db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, status, customer_status_token_hash")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, razorpay_payment_id, status, customer_status_token_hash")
         .limit(0);
       if (error) {
         console.warn("Shared ordering is not ready yet", error.message);
@@ -2390,7 +2387,7 @@
       }
       $("load-more-orders").hidden = true;
       let ordersQuery = db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, rejection_reason, status, created_at")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, razorpay_payment_id, rejection_reason, status, created_at")
         .order("created_at", { ascending: false });
       if (managerOrderSearch) {
         ordersQuery = ordersQuery.or(`reference.ilike.%${managerOrderSearch}%,customer_phone.ilike.%${managerOrderSearch}%`);
@@ -2526,6 +2523,7 @@
       const isOpen = group === "pending" && !isAccepted && !isDelivered;
       const createdAt = order.created_at || order.createdAt;
       const payerUpi = order.payer_upi_id || order.payerUpiId || "";
+      const razorpayPaymentId = order.razorpay_payment_id || "";
       const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
       const rejectionReason = order.rejection_reason || order.rejectionReason || "";
       const paymentConfirmed = order.payment_confirmed === true || order.paymentConfirmed === true;
@@ -2548,7 +2546,8 @@
           ${discount ? `<div class="order-line"><span>Discount</span><span>−${money(discount)}</span></div>` : ""}
           <div class="order-line"><span>Delivery</span><span>${money(delivery)}</span></div>
           <div class="order-line"><strong>Total</strong><strong>${money(total)}</strong></div>
-          <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer UPI ID: ${escapeHtml(payerUpi)}` : ""}</p>
+          <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer payment reference: ${escapeHtml(payerUpi)}` : ""}</p>
+          ${razorpayPaymentId ? `<p class="small-note">Razorpay payment ID: ${escapeHtml(razorpayPaymentId)}</p>` : ""}
           ${paymentConfirmation ? `<p class="small-note"><strong>${escapeHtml(paymentConfirmation)}</strong></p>` : ""}
           ${rejectionReason ? `<p class="small-note"><strong>Rejection reason:</strong> ${escapeHtml(rejectionReason)}</p>` : ""}
         </section>
@@ -2879,12 +2878,7 @@
       if (!checkoutDraft) { renderCart(); return; }
       const codAvailable = paymentSettingsReady && settings.cod_enabled === true;
       const canPayUpiId = Boolean(settings.upi);
-      const canPayQr = Boolean(settings.qr);
       if (selectedPayment === "upi") selectedPayment = "upi_id";
-      const paymentReady = selectedPayment === "cod" ? codAvailable
-        : selectedPayment === "upi_id" ? canPayUpiId && /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(checkoutDraft.payerUpiId || "")
-        : selectedPayment === "upi_qr" ? canPayQr
-        : false;
       $("cart-content").innerHTML = `
         <div class="drawer-head"><h2>${tr("payment")}</h2><button class="close" id="payment-back" aria-label="${tr("backBasket")}">←</button></div>
         <p class="small-note">${tr("order")} ${escapeHtml(checkoutDraft.id)} · ${checkoutDraft.items.length} ${tr("itemTypes")}</p>
@@ -2893,150 +2887,139 @@
         ${!paymentSettingsReady ? `<p class="payment-box">${paymentSettingsError ? "Could not load the store's payment settings. Please close checkout and try again." : "Loading the store's payment options…"}</p>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_id" ${selectedPayment === "upi_id" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("upiId")}</strong><small>${tr("enterYourUpi")}</small></span></label>
         ${selectedPayment === "upi_id" ? `<div class="payment-box">
-          <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" placeholder="9876543210@upi" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" pattern="[A-Za-z0-9._-]+@[A-Za-z0-9.-]+" title="${language === "hi" ? "इस तरह UPI ID लिखें: 9876543210@upi" : "Enter a UPI ID such as 9876543210@upi"}" required><small class="small-note">${tr("upiExample")}</small></div>
-          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button>${settings.show_upi_phone && settings.upi_phone ? `<p class="small-note">${tr("paymentPhoneLabel")}: <strong>${escapeHtml(settings.upi_phone)}</strong></p>` : ""}<button class="btn btn-soft full" id="open-upi" type="button" style="margin-top:10px">${tr("continueToPay")}</button>` : tr("storeUpiMissing")}
+          <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" inputmode="text" placeholder="9876543210@upi or 9876543210" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" maxlength="100"><small class="small-note">${tr("upiExample")}</small></div>
+          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button>${settings.show_upi_phone && settings.upi_phone ? `<p class="small-note">${tr("paymentPhoneLabel")}: <strong>${escapeHtml(settings.upi_phone)}</strong></p>` : ""}` : ""}
+          ${checkoutDraft.razorpayVerified ? "" : `<button class="btn btn-primary full" id="open-upi" type="button" style="margin-top:10px">${checkoutDraft.razorpayProof ? "Retry payment verification" : tr("continueToPay")}</button>`}
         </div>` : ""}
-        <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("qr")}</strong><small>${canPayQr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
-        ${selectedPayment === "upi_qr" ? `<div class="payment-box">${canPayQr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}.</p><button class="btn btn-soft full" id="start-qr-payment" type="button">${tr("startQrPayment")}</button>` : tr("qrNotConfigured")}</div>` : ""}
         <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
-        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button>${selectedPayment === "upi_id" || selectedPayment === "upi_qr" ? `<button class="btn btn-soft" id="mark-payment-return" type="button">${tr("markPaymentReturned")}</button>` : ""}<button class="btn btn-primary full" id="confirm-payment" ${paymentReady && (selectedPayment === "cod" || checkoutDraft.paymentConfirmed) ? "" : "disabled"}>${tr("confirmOrder")}</button></div>
-        ${(selectedPayment === "upi_id" || selectedPayment === "upi_qr") ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentConfirmed ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button>${selectedPayment === "cod" || checkoutDraft.paymentConfirmed ? `<button class="btn btn-primary full" id="confirm-payment">${tr("confirmOrder")}</button>` : ""}</div>
+        ${selectedPayment === "upi_id" ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentConfirmed ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
       $("open-payment-help").onclick = () => $("help-open").click();
-      $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => radio.addEventListener("change", () => {
+      $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => {
+        radio.disabled = checkoutDraft.razorpayVerified === true;
+        radio.addEventListener("change", () => {
         selectedPayment = radio.value;
-        checkoutDraft.paymentFlowReturned = false;
         checkoutDraft.paymentConfirmed = false;
-        checkoutDraft.paymentLaunchPending = false;
-        checkoutDraft.paymentAppWasHidden = false;
         renderPaymentPage();
-      }));
+        });
+      });
       const payerUpiInput = $("customer-upi-id");
       if (payerUpiInput) payerUpiInput.addEventListener("input", () => {
-        const payerUpiId = payerUpiInput.value.trim();
-        if (payerUpiId !== checkoutDraft.payerUpiId) {
-          checkoutDraft.paymentFlowReturned = false;
-          checkoutDraft.paymentConfirmed = false;
-          checkoutDraft.paymentLaunchPending = false;
-          checkoutDraft.paymentAppWasHidden = false;
-        }
-        checkoutDraft.payerUpiId = payerUpiId;
-        updatePaymentFlowControls();
+        checkoutDraft.payerUpiId = payerUpiInput.value.trim();
       });
       const openUpiButton = $("open-upi");
       if (openUpiButton) openUpiButton.onclick = () => {
-        if (!paymentReadyForUpiId()) {
-          showToast(tr("invalidPayerUpi"));
-          return;
-        }
-        launchUpiPaymentApp();
-      };
-      const startQrPaymentButton = $("start-qr-payment");
-      if (startQrPaymentButton) startQrPaymentButton.onclick = () => {
-        if (settings.upi) {
-          launchUpiPaymentApp();
-          return;
-        }
-        checkoutDraft.paymentFlowReturned = false;
-        checkoutDraft.paymentConfirmed = false;
-        checkoutDraft.paymentLaunchPending = true;
-        checkoutDraft.paymentAppWasHidden = false;
-        updatePaymentFlowControls();
-        showToast("Scan this QR from another device, then return here and confirm that you paid.");
-      };
-      const returnedButton = $("mark-payment-return");
-      if (returnedButton) returnedButton.onclick = () => {
-        checkoutDraft.paymentFlowReturned = true;
-        checkoutDraft.paymentConfirmed = true;
-        checkoutDraft.paymentLaunchPending = false;
-        checkoutDraft.paymentAppWasHidden = false;
-        updatePaymentFlowControls();
+        if (checkoutDraft.razorpayProof) void verifyRazorpayPayment(openUpiButton);
+        else void startRazorpayCheckout(openUpiButton);
       };
       const copyButton = $("copy-upi");
       if (copyButton) copyButton.onclick = async () => {
         try { await navigator.clipboard.writeText(settings.upi); showToast(tr("upiCopied")); }
         catch (error) { showToast(tr("copyUnavailable")); }
       };
-      $("confirm-payment").onclick = saveOrder;
-      installPaymentReturnListeners();
-      updatePaymentFlowControls();
+      const confirmButton = $("confirm-payment");
+      if (confirmButton) confirmButton.onclick = saveOrder;
     }
-    function launchUpiPaymentApp() {
-      if (!checkoutDraft || !settings.upi) {
-        showToast("The store UPI ID is not configured. Scan the QR code from another device.");
+    async function startRazorpayCheckout(button) {
+      if (!checkoutDraft || !db || typeof window.Razorpay !== "function") {
+        showToast("Secure payment checkout is not available. Please reload or choose cash on delivery.");
         return;
       }
-      checkoutDraft.paymentFlowReturned = false;
-      checkoutDraft.paymentConfirmed = false;
-      checkoutDraft.paymentLaunchPending = true;
-      checkoutDraft.paymentAppWasHidden = false;
-      updatePaymentFlowControls();
-      const upiLink = `upi://pay?${new URLSearchParams({
-        pa: settings.upi,
-        pn: "Shanvi General Store",
-        am: checkoutDraft.total.toFixed(2),
-        cu: "INR",
-        tn: checkoutDraft.id
-      })}`;
-      window.location.href = upiLink;
-    }
-    function updatePaymentFlowControls() {
-      const confirmButton = $("confirm-payment");
-      if (!confirmButton || !checkoutDraft) return;
-      const detailsReady = selectedPayment === "cod" ? paymentSettingsReady && settings.cod_enabled === true
-        : selectedPayment === "upi_id" ? paymentReadyForUpiId()
-          : selectedPayment === "upi_qr" ? Boolean(settings.qr)
-            : false;
-      confirmButton.disabled = !detailsReady
-        || (selectedPayment !== "cod" && checkoutDraft.paymentConfirmed !== true);
-      const openUpiButton = $("open-upi");
-      if (openUpiButton) openUpiButton.disabled = !paymentReadyForUpiId();
-      const flowStatus = $("payment-flow-status");
-      if (flowStatus) {
-        flowStatus.textContent = checkoutDraft.paymentConfirmed
-          ? tr("paymentFlowReturned")
-          : tr("paymentFlowPending");
+      const payerReference = checkoutDraft.payerUpiId || "";
+      if (payerReference && !(/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(payerReference) || /^[0-9]{10}$/.test(payerReference))) {
+        showToast("Enter a valid UPI ID or 10-digit mobile number, or leave it blank.");
+        return;
+      }
+      button.disabled = true;
+      try {
+        const { data, error } = await db.functions.invoke("create-razorpay-order", {
+          body: {
+            reference: checkoutDraft.id,
+            name: checkoutDraft.name,
+            phone: checkoutDraft.phone,
+            address: checkoutDraft.address,
+            statusTokenHash: checkoutDraft.customerStatusTokenHash,
+            couponApplied: coupon,
+            expectedTotal: checkoutDraft.total,
+            payerReference: checkoutDraft.payerUpiId || "",
+            items: checkoutDraft.items.map((item) => ({
+              productId: item.productId || item.id,
+              quantity: item.quantity,
+              isFreeGift: Boolean(item.isFreeGift)
+            }))
+          }
+        });
+        if (error) throw new Error(error.message || "Could not start secure payment.");
+        if (!data?.orderId || !data?.keyId || !Number.isInteger(data.amount)
+          || data.amount !== checkoutDraft.total * 100) {
+          throw new Error("Secure payment setup returned an invalid order.");
+        }
+        const payment = new window.Razorpay({
+          key: data.keyId,
+          amount: data.amount,
+          currency: "INR",
+          name: "Shanvi General Store",
+          description: `Order ${checkoutDraft.id}`,
+          order_id: data.orderId,
+          prefill: { name: checkoutDraft.name, contact: checkoutDraft.phone },
+          notes: { reference: checkoutDraft.id },
+          method: { upi: true },
+          theme: { color: "#236b4a" },
+          modal: {
+            ondismiss: () => {
+              button.disabled = false;
+              if (checkoutDraft) showToast("Payment was not completed. You can try again.");
+            }
+          },
+          handler: async (response) => {
+            checkoutDraft.razorpayProof = response;
+            const verifyButton = $("open-upi");
+            if (verifyButton) verifyButton.textContent = "Verify payment";
+            await verifyRazorpayPayment(verifyButton || button);
+          }
+        });
+        payment.on("payment.failed", (response) => {
+          button.disabled = false;
+          showToast(response.error?.description || "Payment failed. Please try again.");
+        });
+        payment.open();
+      } catch (error) {
+        button.disabled = false;
+        showToast(error.message || "Could not start secure payment.");
       }
     }
-    function installPaymentReturnListeners() {
-      if (paymentReturnListenersInstalled) return;
-      paymentReturnListenersInstalled = true;
-      const recordAppReturn = () => {
-        if (
-          !checkoutDraft
-          || document.visibilityState !== "visible"
-          || checkoutDraft.paymentLaunchPending !== true
-          || checkoutDraft.paymentAppWasHidden !== true
-        ) return;
-        checkoutDraft.paymentFlowReturned = true;
-        checkoutDraft.paymentLaunchPending = false;
-        checkoutDraft.paymentAppWasHidden = false;
-        updatePaymentFlowControls();
-      };
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden" && checkoutDraft?.paymentLaunchPending) {
-          checkoutDraft.paymentAppWasHidden = true;
-        } else {
-          recordAppReturn();
+    async function verifyRazorpayPayment(button) {
+      if (!checkoutDraft?.razorpayProof || !db) return;
+      button.disabled = true;
+      try {
+        const proof = checkoutDraft.razorpayProof;
+        const { data, error } = await db.functions.invoke("verify-razorpay-payment", {
+          body: {
+            orderId: proof.razorpay_order_id,
+            paymentId: proof.razorpay_payment_id,
+            signature: proof.razorpay_signature
+          }
+        });
+        if (error) throw new Error(error.message || "Could not verify payment.");
+        if (data?.verified !== true || data?.reference !== checkoutDraft.id) {
+          throw new Error("Payment is not confirmed yet. Do not pay again; retry verification shortly.");
         }
-      });
-      window.addEventListener("pagehide", () => {
-        if (checkoutDraft?.paymentLaunchPending) checkoutDraft.paymentAppWasHidden = true;
-      });
-      window.addEventListener("pageshow", recordAppReturn);
-      window.addEventListener("focus", recordAppReturn);
-    }
-    function paymentReadyForUpiId() {
-      return Boolean(settings.upi && /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(checkoutDraft?.payerUpiId || ""));
+        checkoutDraft.paymentConfirmed = true;
+        checkoutDraft.razorpayVerified = true;
+        selectedPayment = "upi_id";
+        renderPaymentPage();
+        showToast("Payment verified. Confirm to place your order.");
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = "Retry payment verification";
+        showToast(`${error.message || "Payment could not be verified."} Do not pay again.`);
+      }
     }
     async function saveOrder() {
       if (!checkoutDraft) return;
       if (!db || !orderBackendReady) {
-        showToast("Online ordering is unavailable until the store backend is configured.");
-        return;
-      }
-      if (!db) {
         showToast("Online ordering is unavailable until the store backend is configured.");
         return;
       }
@@ -3055,30 +3038,47 @@
         renderPaymentPage();
         return;
       }
-      if (selectedPayment === "upi_id" && !paymentReadyForUpiId()) {
-        showToast(tr("invalidPayerUpi"));
-        renderPaymentPage();
-        return;
-      }
-      if (selectedPayment === "upi_qr" && !settings.qr) {
-        showToast(tr("invalidQr"));
-        renderPaymentPage();
-        return;
-      }
-      if ((selectedPayment === "upi_id" || selectedPayment === "upi_qr") && checkoutDraft.paymentConfirmed !== true) {
+      const button = $("confirm-payment");
+      if (!button || button.disabled) return;
+      button.disabled = true;
+      if (selectedPayment === "upi_id" && checkoutDraft.razorpayVerified !== true) {
+        button.disabled = false;
         showToast(tr("paymentFlowPending"));
-        updatePaymentFlowControls();
         return;
+      }
+      if (selectedPayment === "upi_id") {
+        const proof = checkoutDraft.razorpayProof;
+        if (!proof?.razorpay_order_id || !proof?.razorpay_payment_id || !proof?.razorpay_signature) {
+          button.disabled = false;
+          showToast(tr("paymentFlowPending"));
+          return;
+        }
+        let verification;
+        try {
+          verification = await db.functions.invoke("verify-razorpay-payment", {
+            body: {
+              orderId: proof.razorpay_order_id,
+              paymentId: proof.razorpay_payment_id,
+              signature: proof.razorpay_signature
+            }
+          });
+        } catch (error) {
+          button.disabled = false;
+          showToast(error.message || "Payment verification is not complete. Do not pay again.");
+          return;
+        }
+        if (verification.error || verification.data?.verified !== true || verification.data?.reference !== checkoutDraft.id) {
+          button.disabled = false;
+          showToast(verification.error?.message || "Payment verification is not complete. Do not pay again.");
+          return;
+        }
       }
       const draft = checkoutDraft;
       const paymentLabels = {
         cod: language === "hi" ? "कैश ऑन डिलीवरी" : "Cash on delivery",
-        upi_id: "UPI ID",
-        upi_qr: language === "hi" ? "UPI QR कोड" : "UPI QR code"
+        upi_id: language === "hi" ? "UPI या QR (Razorpay)" : "UPI or QR (Razorpay)"
       };
-      const order = { ...draft, paymentMethod: selectedPayment, paymentConfirmed: selectedPayment !== "cod" && draft.paymentConfirmed === true, status: db ? "Awaiting manager approval" : (selectedPayment === "cod" ? "COD order placed" : "Awaiting UPI payment verification") };
-      const button = $("confirm-payment");
-      button.disabled = true;
+      const order = { ...draft, paymentMethod: selectedPayment, paymentConfirmed: selectedPayment === "upi_id" && draft.razorpayVerified === true, status: "Awaiting manager approval" };
       const previousProducts = products;
       const quantitiesByProduct = new Map();
       order.items.forEach((item) => {
@@ -3089,13 +3089,13 @@
         Number.isFinite(Number(product.stock))
         && (quantitiesByProduct.get(product.id) || 0) > Number(product.stock)
       );
-      if (insufficientProduct) {
+      if (insufficientProduct && order.paymentMethod === "cod") {
         button.disabled = false;
         showToast(`${tr("outOfStock")} ${insufficientProduct.name}`);
         return;
       }
       const nextProducts = products.map((product) => Number.isFinite(Number(product.stock))
-        ? { ...product, stock: Number(product.stock) - (quantitiesByProduct.get(product.id) || 0) }
+        ? { ...product, stock: Math.max(0, Number(product.stock) - (quantitiesByProduct.get(product.id) || 0)) }
         : product);
       if (!storage.write("shanvi-products", nextProducts)) {
         button.disabled = false;
@@ -3108,7 +3108,7 @@
         renderProducts();
         renderAdminProducts();
       };
-      if (db) {
+      if (selectedPayment === "cod") {
         try {
           const { error } = await db.from("orders").insert({
             reference: order.id,
@@ -3141,9 +3141,6 @@
           showToast(`${tr("orderSaveError")}: ${error.message || (language === "hi" ? "कृपया फिर कोशिश करें।" : "Please try again.")}`);
           return;
         }
-      } else {
-        const orders = storage.read("shanvi-orders", []);
-        if (!storage.write("shanvi-orders", [...orders, order])) { rollbackInventory(); button.disabled = false; return; }
       }
       renderProducts();
       renderAdminProducts();
