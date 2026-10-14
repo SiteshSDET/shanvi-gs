@@ -785,7 +785,7 @@
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
         itemsEach: "each",
-        added: "Added to your basket", selectPayment: "Please select a payment method.",
+        added: "Added {product} to cart", selectPayment: "Please select a payment method.",
         freeGift: "Free gift", free: "FREE", freeGiftAdded: "Your qualifying order includes this free gift.",
         calculatedAtCheckout: "Calculated at checkout", outOfStock: "That quantity is not in stock.",
         stockLeft: "left",
@@ -895,7 +895,7 @@
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
         itemsEach: "प्रति सामान",
-        added: "कार्ट में जोड़ दिया", selectPayment: "कृपया भुगतान का तरीका चुनें।",
+        added: "{product} कार्ट में जोड़ दिया", selectPayment: "कृपया भुगतान का तरीका चुनें।",
         freeGift: "मुफ़्त उपहार", free: "मुफ़्त", freeGiftAdded: "आपके योग्य ऑर्डर में यह मुफ़्त उपहार शामिल है।",
         calculatedAtCheckout: "चेकआउट पर तय होगा", outOfStock: "इतना स्टॉक उपलब्ध नहीं है।",
         stockLeft: "बाकी",
@@ -2148,7 +2148,7 @@
       storage.write("shanvi-cart", cart);
       renderCart();
       renderProducts();
-      if (amount > 0) showToast(tr("added"));
+      if (amount > 0 && product) showToast(formatTranslation("added", { product: product.name }));
     }
     function cartProducts() {
       const items = Object.entries(cart).map(([id, quantity]) => {
