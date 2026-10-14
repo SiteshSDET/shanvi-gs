@@ -219,7 +219,6 @@ Deno.serve(async (request) => {
         amount,
         currency: "INR",
         receipt: reference,
-        expire_by: Math.floor(expiresAt.getTime() / 1000),
         notes: { reference },
       }),
     });
