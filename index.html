@@ -314,6 +314,8 @@
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     .toast.centered { top: 50%; bottom: auto; transform: translate(-50%, calc(-50% + 14px)) scale(.94); padding: 16px 24px; border-radius: 14px; font-size: 17px; font-weight: 750; box-shadow: 0 12px 36px #0004; }
     .toast.centered.show { transform: translate(-50%, -50%) scale(1); animation: toast-flash .35s ease-out; }
+    .toast.centered.success { display: flex; align-items: center; gap: 12px; padding: 20px 26px; border: 1px solid #b8efcf; border-radius: 18px; background: linear-gradient(135deg, #176b47, #104b36); box-shadow: 0 18px 50px #0a382c55, 0 0 0 6px #ffffff26; font-size: 19px; }
+    .toast.centered.success::before { content: "✓"; display: grid; flex: 0 0 38px; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #e6fff0; color: #176b47; font-size: 23px; font-weight: 900; }
     @keyframes toast-flash { 0% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
     @media (max-width: 850px) {
@@ -1144,11 +1146,12 @@
       }
     }
 
-    function showToast(message, centered = false) {
+    function showToast(message, centered = false, success = false) {
       const toast = $("toast");
       toast.textContent = message;
       toast.classList.remove("show");
       toast.classList.toggle("centered", centered);
+      toast.classList.toggle("success", success);
       void toast.offsetWidth;
       toast.classList.add("show");
       clearTimeout(showToast.timer);
@@ -3021,7 +3024,7 @@
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("qr")}</strong><small>${settings.qr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
         ${selectedPayment === "upi_qr" ? `<div class="payment-box">${settings.qr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}.</p><p class="small-note">${tr("qrPaymentStarted")}</p>` : tr("qrNotConfigured")}</div>` : ""}
         <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
-        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentAvailable ? "" : "disabled"}>${selectedPayment === "cod" ? tr("confirmOrder") : tr("placeOrderForVerification")}</button></div>
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentSettingsReady && (!selectedPayment || paymentAvailable) ? "" : "disabled"}>${selectedPayment === "cod" ? tr("confirmOrder") : tr("placeOrderForVerification")}</button></div>
         ${selectedPayment === "upi_id" || selectedPayment === "upi_qr" ? `<p class="small-note">${tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
@@ -3176,7 +3179,7 @@
       const customerNotifyButton = $("customer-approval-notify");
       if (customerNotifyButton) customerNotifyButton.onclick = () => registerCustomerOrderPush(order);
       $("cart-count").textContent = "0";
-      showToast(tr("thankYouToast"), true);
+      showToast(tr("thankYouToast"), true, true);
     }
     function closeCart() { $("cart-overlay").classList.remove("open"); }
     function renderAdminProducts() {
