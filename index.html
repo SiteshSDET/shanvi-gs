@@ -106,16 +106,28 @@
     .product-image[role="button"] { cursor: zoom-in; }
     .product-image[role="button"]:focus-visible { outline: 3px solid var(--green); outline-offset: -3px; }
     .product-image img { width: 100%; height: 100%; display: block; }
-    .image-viewer { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom)); background: #101713ef; }
+    .image-viewer { position: fixed; inset: 0; z-index: 50; overflow-y: auto; background: #101713ef; }
     .image-viewer[hidden] { display: none; }
-    .image-viewer-close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #ffffffeb; color: #1d3023; font-size: 26px; cursor: pointer; }
-    .image-viewer-frame { max-width: 92vw; max-height: 84vh; overflow: hidden; border-radius: 12px; background: #fff; box-shadow: 0 20px 70px #0008; }
-    .image-viewer-frame img { display: block; width: 100%; height: 100%; }
-    .image-viewer-caption { position: absolute; bottom: max(12px, env(safe-area-inset-bottom)); max-width: 90vw; color: white; font-size: 14px; text-align: center; text-shadow: 0 1px 5px #000; }
+    .product-detail-panel { width: min(100%, 900px); min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: white; }
+    .product-detail-media { position: relative; display: grid; place-items: center; height: min(58vh, 620px); min-height: 300px; overflow: hidden; background: #171d19; }
+    .product-detail-media img { display: block; width: 100%; height: 100%; }
+    .image-viewer-close { position: absolute; z-index: 2; top: max(14px, env(safe-area-inset-top)); right: 14px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #ffffffeb; color: #1d3023; font-size: 26px; cursor: pointer; box-shadow: 0 2px 12px #0005; }
+    .product-detail-content { padding: 22px clamp(18px, 5vw, 42px) max(28px, env(safe-area-inset-bottom)); }
+    .product-detail-category { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .product-detail-title { margin: 7px 52px 10px 0; color: var(--ink); font: 700 clamp(24px, 5vw, 34px) Georgia, serif; }
+    .product-detail-description { margin: 0 0 12px; color: #56645a; line-height: 1.6; }
+    .product-detail-attributes, .product-detail-stock { margin: 8px 0; color: var(--muted); font-size: 13px; }
+    .product-detail-price { margin: 16px 0; color: var(--green-dark); font-size: 25px; font-weight: 800; }
+    .product-detail-price .mrp { font-size: 15px; }
+    .product-detail-add { min-height: 50px; font-size: 15px; }
+    .product-detail-add:disabled { opacity: .6; cursor: not-allowed; }
     .discount { position: absolute; top: 12px; left: 12px; background: #fff4e9; color: #a95120; padding: 6px 9px; font-size: 11px; border-radius: 7px; font-weight: 750; }
     .product-info { padding: 15px; }
+    .product-info { cursor: pointer; }
     .product-category { color: var(--green); font-size: 10px; letter-spacing: .11em; text-transform: uppercase; font-weight: 750; }
     .product h3 { margin: 6px 0 12px; font-size: 15px; }
+    .product-title-trigger { border: 0; padding: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+    .product-title-trigger:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 2px; }
     .product-bottom { display: flex; justify-content: space-between; align-items: center; gap: 7px; }
     .price { font-weight: 750; font-size: 16px; }
     .mrp { color: #9aa29d; text-decoration: line-through; font-size: 12px; font-weight: 450; margin-left: 5px; }
@@ -698,10 +710,14 @@
   </div>
   <div class="toast" id="toast" role="status"></div>
   <div class="coupon-success" id="coupon-success" role="status" aria-live="polite" hidden></div>
-  <div class="image-viewer" id="image-viewer" role="dialog" aria-modal="true" aria-label="Product image" hidden>
-    <button class="image-viewer-close" id="image-viewer-close" type="button" aria-label="Close product image">×</button>
-    <div class="image-viewer-frame" id="image-viewer-frame"><img id="image-viewer-image" alt=""></div>
-    <p class="image-viewer-caption" id="image-viewer-caption"></p>
+  <div class="image-viewer" id="image-viewer" role="dialog" aria-modal="true" aria-label="Product details" hidden>
+    <section class="product-detail-panel">
+      <div class="product-detail-media">
+        <img id="image-viewer-image" alt="">
+        <button class="image-viewer-close" id="image-viewer-close" type="button" aria-label="Close product details">×</button>
+      </div>
+      <div class="product-detail-content" id="product-detail-content"></div>
+    </section>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -742,7 +758,8 @@
         orderIdLabel: "Order ID", orderStatusLabel: "Status", orderItemsLabel: "Items", orderTotalLabel: "Total",
         orderStatusSyncFailed: "Could not refresh order status. Please try again.",
         noProducts: "No products found. Try another search or section.",
-        viewProductImage: "View product image", closeProductImage: "Close product image",
+        viewProductDetails: "View product details", closeProductDetails: "Close product details",
+        addToCart: "Add to cart",
         picked: "Picked with care", pickedSub: "Useful little things, all in one place",
         local: "Local and friendly", localSub: "Your neighborhood store is here to help",
         upiEasy: "Easy UPI payment", upiSub: "Pay directly using your favorite UPI app",
@@ -852,7 +869,8 @@
         orderIdLabel: "ऑर्डर ID", orderStatusLabel: "स्थिति", orderItemsLabel: "सामान", orderTotalLabel: "कुल",
         orderStatusSyncFailed: "ऑर्डर की स्थिति अपडेट नहीं हो पाई। फिर कोशिश करें।",
         noProducts: "कोई सामान नहीं मिला। दूसरी खोज या श्रेणी चुनें।",
-        viewProductImage: "सामान की तस्वीर देखें", closeProductImage: "तस्वीर बंद करें",
+        viewProductDetails: "सामान का विवरण देखें", closeProductDetails: "विवरण बंद करें",
+        addToCart: "कार्ट में जोड़ें",
         picked: "ध्यान से चुना गया", pickedSub: "घर की ज़रूरत की चीज़ें, एक ही जगह",
         local: "आपकी अपनी दुकान", localSub: "आपकी आस-पड़ोस की दुकान मदद के लिए यहाँ है",
         upiEasy: "आसान UPI भुगतान", upiSub: "अपने पसंदीदा UPI ऐप से भुगतान करें",
@@ -1690,9 +1708,9 @@
       $("products").innerHTML = visible.length ? visible.map((product) => {
         const discount = product.mrp > product.price ? Math.round((1 - product.price / product.mrp) * 100) : 0;
         const imageAspectRatio = boundedImageValue(product.imageAspectRatio, 133, 50, 200);
-        return `<article class="product">
-          <div class="product-image" style="aspect-ratio:${imageAspectRatio / 100}" data-product-image-view="${escapeAttr(product.id)}" role="button" tabindex="0" aria-label="${escapeAttr(`${tr("viewProductImage")}: ${product.name}`)}"><img src="${escapeAttr(product.image || fallbackImage(product.category))}" alt="" style="${escapeAttr(productImageStyle(product))}" loading="lazy">${discount ? `<span class="discount">${discount}% ${tr("off")}</span>` : ""}</div>
-          <div class="product-info"><span class="product-category">${escapeHtml(translatedCategory(product.category))}</span><h3>${escapeHtml(product.name)}</h3>
+        return `<article class="product" data-product-card="${escapeAttr(product.id)}">
+          <div class="product-image" style="aspect-ratio:${imageAspectRatio / 100}" data-product-image-view="${escapeAttr(product.id)}" role="button" tabindex="0" aria-label="${escapeAttr(`${tr("viewProductDetails")}: ${product.name}`)}"><img src="${escapeAttr(product.image || fallbackImage(product.category))}" alt="" style="${escapeAttr(productImageStyle(product))}" loading="lazy">${discount ? `<span class="discount">${discount}% ${tr("off")}</span>` : ""}</div>
+          <div class="product-info"><span class="product-category">${escapeHtml(translatedCategory(product.category))}</span><h3><button class="product-title-trigger" data-product-open="${escapeAttr(product.id)}" type="button">${escapeHtml(product.name)}</button></h3>
             ${product.description ? `<p class="small-note">${escapeHtml(product.description)}</p>` : ""}
             ${product.size || product.dimensions ? `<p class="small-note">${[product.size, product.dimensions].filter(Boolean).map(escapeHtml).join(" · ")}</p>` : ""}
             <div class="product-bottom"><div><div class="price">${money(product.price)}${product.mrp > product.price ? `<span class="mrp">${money(product.mrp)}</span>` : ""}</div>${Number.isFinite(Number(product.stock)) ? `<small class="small-note">${Math.max(0, Number(product.stock))} ${tr("stockLeft")}</small>` : ""}</div><button class="add-btn" data-add="${escapeAttr(product.id)}" ${Number.isFinite(Number(product.stock)) && Number(product.stock) <= 0 ? "disabled" : ""}>${Number.isFinite(Number(product.stock)) && Number(product.stock) <= 0 ? tr("soldOut") : tr("add")}</button></div>
@@ -1700,46 +1718,64 @@
         </article>`;
       }).join("") : `<div class="empty">${tr("noProducts")}</div>`;
       $("products").querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => changeQuantity(button.dataset.add, 1)));
+      $("products").querySelectorAll("[data-product-open]").forEach((button) => button.addEventListener("click", () => {
+        openProductDetails(button.dataset.productOpen, button);
+      }));
+      $("products").querySelectorAll("[data-product-card]").forEach((card) => {
+        card.addEventListener("click", (event) => {
+          if (event.target.closest("button, [data-product-image-view]")) return;
+          openProductDetails(card.dataset.productCard, card.querySelector("[data-product-image-view]"));
+        });
+      });
       $("products").querySelectorAll("[data-product-image-view]").forEach((image) => {
-        image.addEventListener("click", () => openProductImage(image.dataset.productImageView, image));
+        image.addEventListener("click", () => openProductDetails(image.dataset.productImageView, image));
         image.addEventListener("keydown", (event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
-            openProductImage(image.dataset.productImageView, image);
+            openProductDetails(image.dataset.productImageView, image);
           }
         });
       });
       updateCustomerOffer();
     }
     let productImageViewerTrigger = null;
-    let productImageViewerRatio = 1.33;
-    function sizeProductImageViewer() {
-      if ($("image-viewer").hidden) return;
-      const width = Math.min(window.innerWidth * .92, window.innerHeight * .84 * productImageViewerRatio);
-      $("image-viewer-frame").style.width = `${width}px`;
-      $("image-viewer-frame").style.height = `${width / productImageViewerRatio}px`;
-    }
-    function openProductImage(productId, trigger) {
+    function openProductDetails(productId, trigger) {
       const product = products.find((item) => String(item.id) === String(productId));
       if (!product) return;
       const viewer = $("image-viewer");
       const image = $("image-viewer-image");
-      productImageViewerRatio = boundedImageValue(product.imageAspectRatio, 133, 50, 200) / 100;
+      const outOfStock = Number.isFinite(Number(product.stock)) && Number(product.stock) <= 0;
       image.src = product.image || fallbackImage(product.category);
       image.alt = product.name;
       image.style.cssText = productImageStyle(product);
-      $("image-viewer-caption").textContent = product.name;
-      viewer.setAttribute("aria-label", `${tr("viewProductImage")}: ${product.name}`);
-      $("image-viewer-close").setAttribute("aria-label", tr("closeProductImage"));
+      $("product-detail-content").innerHTML = `
+        <span class="product-detail-category">${escapeHtml(translatedCategory(product.category))}</span>
+        <h2 class="product-detail-title">${escapeHtml(product.name)}</h2>
+        ${product.description ? `<p class="product-detail-description">${escapeHtml(product.description)}</p>` : ""}
+        ${product.size || product.dimensions ? `<p class="product-detail-attributes">${[product.size, product.dimensions].filter(Boolean).map(escapeHtml).join(" · ")}</p>` : ""}
+        <p class="product-detail-price">${money(product.price)}${product.mrp > product.price ? `<span class="mrp">${money(product.mrp)}</span>` : ""}</p>
+        ${Number.isFinite(Number(product.stock)) ? `<p class="product-detail-stock">${Math.max(0, Number(product.stock))} ${tr("stockLeft")}</p>` : ""}
+        <button class="btn btn-primary full product-detail-add" id="product-detail-add" type="button" ${outOfStock ? "disabled" : ""}>${outOfStock ? tr("soldOut") : tr("addToCart")}</button>`;
+      viewer.setAttribute("aria-label", `${tr("viewProductDetails")}: ${product.name}`);
+      $("image-viewer-close").setAttribute("aria-label", tr("closeProductDetails"));
       productImageViewerTrigger = trigger;
       viewer.hidden = false;
-      sizeProductImageViewer();
+      viewer.scrollTop = 0;
+      document.body.style.overflow = "hidden";
       $("image-viewer-close").focus();
+      if (!outOfStock) {
+        $("product-detail-add").onclick = () => {
+          changeQuantity(product.id, 1);
+          closeProductDetails();
+        };
+      }
     }
-    function closeProductImage() {
+    function closeProductDetails() {
       $("image-viewer").hidden = true;
       $("image-viewer-image").removeAttribute("src");
+      document.body.style.overflow = "";
       if (productImageViewerTrigger?.isConnected) productImageViewerTrigger.focus();
+      else $("cart-open").focus();
       productImageViewerTrigger = null;
     }
     function escapeHtml(value) {
@@ -3407,13 +3443,12 @@
       return canvas.toDataURL("image/jpeg", .82);
     }
     $("search").addEventListener("input", renderProducts);
-    $("image-viewer-close").addEventListener("click", closeProductImage);
+    $("image-viewer-close").addEventListener("click", closeProductDetails);
     $("image-viewer").addEventListener("click", (event) => {
-      if (event.target === $("image-viewer")) closeProductImage();
+      if (event.target === $("image-viewer")) closeProductDetails();
     });
-    window.addEventListener("resize", sizeProductImageViewer);
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !$("image-viewer").hidden) closeProductImage();
+      if (event.key === "Escape" && !$("image-viewer").hidden) closeProductDetails();
     });
     $("cart-content").addEventListener("input", (event) => {
       if (event.target.id === "customer-phone" || event.target.id === "address-pin") {
