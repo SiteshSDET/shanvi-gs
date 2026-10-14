@@ -780,6 +780,340 @@
       outline-offset: 2px;
     }
     .manager-save-status.visible { border-color: #89bd94; box-shadow: 0 5px 15px #28613a12; }
+    .brand {
+      gap: 12px;
+      padding: 5px 9px 5px 5px;
+      border-radius: 16px;
+      background: linear-gradient(120deg, #fff7e9, #f2f8ee 62%, #edf6f1);
+    }
+    .brand-mark {
+      border: 1px solid #d8e8d8;
+      box-shadow: 0 4px 10px #244d7012;
+    }
+    .brand-name {
+      background-image: linear-gradient(100deg, #b55220 0%, #8f3d75 44%, #276d4c 100%);
+      font-size: 20px;
+      letter-spacing: -.035em;
+    }
+    .brand small {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #526a58;
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: .1em;
+    }
+    .brand small::before {
+      width: 17px;
+      height: 2px;
+      border-radius: 9px;
+      background: linear-gradient(90deg, #e39a46, #43845a);
+      content: "";
+    }
+    #cart-open {
+      border: 1px solid #9fc5aa;
+      background: linear-gradient(135deg, #e6f4e9, #d8ecdf);
+      color: #205b35;
+      box-shadow: 0 3px 9px #28613a14;
+    }
+    #profile-open {
+      border: 1px solid #b9cde0;
+      background: linear-gradient(135deg, #edf5fc, #e1edf8);
+      color: #315d7d;
+    }
+    #help-open {
+      border: 1px solid #ead2a5;
+      background: linear-gradient(135deg, #fff8e9, #fff0d5);
+      color: #795216;
+    }
+    #cart-open:hover, #profile-open:hover, #help-open:hover { filter: saturate(1.12); }
+    .hero {
+      border: 1px solid #d2e2d2;
+      background: linear-gradient(118deg, #f1f7e9 0%, #e2efe2 55%, #f9edda 100%);
+      box-shadow: 0 16px 38px #234d3012;
+    }
+    .hero-copy { max-width: 570px; }
+    .hero-copy .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border: 1px solid #c5dcc8;
+      border-radius: 999px;
+      background: #ffffffb8;
+      color: #28613a;
+      letter-spacing: .12em;
+    }
+    .hero-copy .eyebrow::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d58a43;
+      box-shadow: 0 0 0 3px #d58a4326;
+      content: "";
+    }
+    .hero-copy h1 { color: #183e2b; text-shadow: 0 2px 0 #ffffff75; }
+    .hero-copy p { color: #455d4c; }
+    .hero:not(.has-photo) .btn-primary { box-shadow: 0 7px 17px #1d543b2b; }
+    .drawer-head {
+      padding: 12px 14px;
+      border: 1px solid #d6e3d8;
+      border-radius: 14px;
+      background: linear-gradient(120deg, #f0f7ef, #edf4fb);
+      box-shadow: 0 4px 13px #183e2b0b;
+    }
+    .drawer-head h2 { color: #214f36; }
+    .drawer-head .close {
+      border: 1px solid #c8d8cd;
+      background: #fff;
+      color: #315d45;
+      box-shadow: 0 2px 7px #183e2b10;
+    }
+    #help-overlay .drawer { background: linear-gradient(180deg, #f5f8fc, #f4f7f3); }
+    #help-overlay .drawer-head { border-color: #c6d7e5; background: linear-gradient(120deg, #eaf3fb, #f5f0fb); }
+    #customer-help-contact {
+      padding: 20px;
+      border: 1px solid #bfd2e6;
+      border-left: 5px solid #648eae;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #f5f9ff, #e8f2fb);
+      box-shadow: 0 9px 24px #315d7d16;
+      color: #294b63;
+      line-height: 1.7;
+    }
+    #profile-overlay .drawer { background: linear-gradient(180deg, #f4f8f4, #f2f5f8); }
+    #profile-overlay .drawer-head { border-color: #c6d8cc; background: linear-gradient(120deg, #eaf5eb, #eef3fa); }
+    .profile-toolbar {
+      padding: 10px;
+      border: 1px solid #ccdbd0;
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: 0 3px 10px #183e2b0a;
+    }
+    .profile-toolbar .small-note { color: #526b5b; }
+    #refresh-customer-orders {
+      border: 1px solid #28613a;
+      background: linear-gradient(135deg, #34794c, #205b35);
+      box-shadow: 0 4px 11px #28613a24;
+    }
+    .profile-order-group { border-width: 1px; box-shadow: 0 4px 12px #183e2b09; }
+    .profile-order-group > summary { min-height: 62px; padding: 12px 15px; }
+    .profile-order-group > summary::after {
+      border: 1px solid #c8d9cd;
+      background: #fff;
+      box-shadow: 0 2px 5px #183e2b0b;
+    }
+    .profile-order-group-content { padding: 0 12px 10px; }
+    .customer-order-details { border-color: #cbd9ce; box-shadow: 0 3px 10px #183e2b0a; }
+    .customer-order-details > summary { min-height: 58px; padding: 10px 14px; background: #fff; }
+    .customer-order-details[open] > summary { background: #f7faf7; }
+    .customer-order-details > summary::after {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 50%;
+      background: #e8f1e9;
+      color: #28613a;
+    }
+    .customer-order-details-content {
+      display: grid;
+      gap: 11px;
+      padding: 12px;
+      border-top-color: #d8e3da;
+      background: #f8faf8;
+    }
+    .customer-order-timeline-card, .customer-order-items-card, .customer-order-cost-card {
+      padding: 13px;
+      border: 1px solid #d4e0d6;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 8px #183e2b08;
+    }
+    .customer-order-timeline-card .small-note { margin: 0; color: #63756a; }
+    .customer-order-timeline-card .customer-order-progress { margin-bottom: 2px; }
+    .customer-order-items-card > strong {
+      display: block;
+      margin-bottom: 7px;
+      color: #28583c;
+      font-size: 12px;
+    }
+    .customer-order-items-card ul { margin: 0; padding-left: 19px; color: #344b3b; }
+    .customer-order-items-card li + li { margin-top: 4px; }
+    .customer-order-cost-card {
+      border-color: #c7d9cb;
+      background: linear-gradient(145deg, #fff, #f5faf5);
+    }
+    .customer-order-cost-card > .small-note:first-child {
+      margin: 0 0 9px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #dce7de;
+      color: #526b5b;
+    }
+    .customer-order-cost-card .summary-row { margin: 8px 0; }
+    .customer-order-cost-card .summary-row.total {
+      margin: 10px -4px 8px;
+      padding: 10px 5px 0;
+      border-top-color: #cbdccf;
+      color: #1d543b;
+    }
+    .customer-order-payment { margin: 8px 0 0; color: #315d7d; }
+    .customer-order-payment-status {
+      margin: 8px 0 0;
+      padding: 9px 10px;
+      border: 1px solid #e8d49a;
+      border-radius: 8px;
+      background: #fff8e5;
+      color: #75580d;
+    }
+    .customer-order-actions .btn {
+      border: 1px solid #c6d8ca;
+      background: #f0f6f1;
+      color: #28583c;
+    }
+    .customer-order-actions a.btn { text-decoration: none; }
+    .customer-order-actions .btn:hover { background: #e1eee4; }
+    .admin {
+      background:
+        radial-gradient(ellipse at top left, #e8f2e9 0, transparent 36%),
+        linear-gradient(155deg, #f5f8f4, #edf2f7);
+    }
+    .admin-top {
+      border-bottom: 1px solid #c9d9cd;
+      background: linear-gradient(110deg, #f3f8f2f5, #eef3faf5);
+      box-shadow: 0 5px 18px #183e2b0a;
+    }
+    .admin-top .eyebrow {
+      display: inline-block;
+      margin-bottom: 4px;
+      padding: 5px 9px;
+      border: 1px solid #c7dbcb;
+      border-radius: 999px;
+      background: #e6f1e8;
+      color: #28613a;
+      font-size: 9px;
+    }
+    .admin-top h2 {
+      color: #1e4c34;
+      letter-spacing: -.035em;
+    }
+    #manager-close {
+      border: 1px solid #bdd0df;
+      background: #edf4fa;
+      color: #315d7d;
+      font-weight: 750;
+    }
+    #admin-login-card {
+      border-color: #bbd2c1;
+      background: linear-gradient(145deg, #fff, #f0f7f1);
+      box-shadow: 0 10px 28px #183e2b11;
+    }
+    #admin-login-card h3 { color: #205b35; font: 700 22px Georgia, serif; }
+    #manager-tools > .manager-accordion > summary { font-size: 15px; }
+    #manager-tools > .admin-card:not(.manager-accordion) h3 { font-size: 17px; }
+    .order-success-heading {
+      justify-content: center;
+      margin-bottom: 12px;
+      border-color: #c4dbc9;
+      background: linear-gradient(110deg, #e8f5eb, #fff8e9);
+      text-align: center;
+    }
+    .order-success-heading h2 { color: #205b35; }
+    .order-success-welcome {
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      margin: 12px 0;
+      padding: 24px 16px 20px;
+      border: 1px solid #acd1b5;
+      border-radius: 18px;
+      background: radial-gradient(circle at 50% 0, #e2f7e8, #f6fbf6 70%);
+      box-shadow: 0 9px 24px #28613a14;
+      text-align: center;
+    }
+    .order-success-check {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      place-items: center;
+      border: 4px solid #d8f0de;
+      border-radius: 50%;
+      background: #34794c;
+      color: #fff;
+      font-size: 27px;
+      font-weight: 900;
+      box-shadow: 0 5px 13px #28613a30;
+    }
+    .order-success-welcome h3 {
+      margin: 6px 0 0;
+      color: #205b35;
+      font: 700 26px Georgia, serif;
+    }
+    .order-success-welcome p { margin: 0; color: #62756a; font-size: 13px; font-weight: 650; }
+    .order-confirmation-card {
+      margin: 11px 0;
+      padding: 15px;
+      border: 1px solid #d2dfd4;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 4px 13px #183e2b0b;
+    }
+    .order-confirmation-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 9px 0;
+      color: #65766a;
+      font-size: 12px;
+    }
+    .order-confirmation-row + .order-confirmation-row { border-top: 1px solid #edf1ed; }
+    .order-confirmation-row strong { color: #214f36; text-align: right; overflow-wrap: anywhere; }
+    .order-confirmation-row:nth-child(2) strong { color: #176b47; font-size: 17px; }
+    .order-confirmation-status {
+      border-color: #bfd4e5;
+      background: linear-gradient(145deg, #f5f9fd, #eaf3fb);
+      color: #294b63;
+      line-height: 1.6;
+    }
+    .order-confirmation-status > strong { color: #315d7d; }
+    .order-confirmation-status .small-note { margin-bottom: 0; color: #516b80; }
+    .order-confirmation-actions { display: grid; grid-template-columns: 1fr 1fr; margin: 12px 0; }
+    .order-confirmation-actions .btn {
+      min-height: 44px;
+      border: 1px solid #c6d8ca;
+      background: #f0f6f1;
+      box-shadow: 0 2px 7px #183e2b08;
+    }
+    .order-confirmation-actions .btn:last-child { grid-column: 1 / -1; }
+    #customer-approval-notify {
+      border: 1px solid #b9cfe4;
+      background: #eaf4fc;
+      color: #315d7d;
+    }
+    .order-confirmation-continue {
+      min-height: 50px;
+      margin-top: 8px;
+      background: linear-gradient(110deg, #34794c, #205b35);
+      box-shadow: 0 6px 16px #28613a2b;
+      font-size: 14px;
+    }
+    @media (max-width: 520px) {
+      .brand { gap: 8px; padding: 3px 6px 3px 3px; background: transparent; }
+      .brand-name { font-size: 17px; }
+      .brand small { letter-spacing: .07em; }
+      .hero { border-radius: 17px; box-shadow: 0 8px 20px #234d3010; }
+      .hero-copy .eyebrow { display: none; }
+      .hero-copy h1 { text-shadow: 0 1px 0 #ffffff75; }
+      .drawer-head { padding: 9px 10px; }
+      .profile-toolbar { align-items: stretch; flex-direction: column; }
+      #refresh-customer-orders { width: 100%; }
+      .customer-order-details-content { padding: 10px; }
+      .customer-order-timeline-card, .customer-order-items-card, .customer-order-cost-card { padding: 11px; }
+      .order-confirmation-actions { grid-template-columns: 1fr; }
+      .order-confirmation-actions .btn:last-child { grid-column: auto; }
+      .admin-top { background: linear-gradient(110deg, #f3f8f2f5, #eef3faf5); }
+    }
   </style>
 </head>
 <body>
@@ -1626,8 +1960,10 @@
         return `<details class="customer-order-details" data-customer-order-id="${escapeAttr(reference)}" ${expandedCustomerOrderDetails.has(reference) ? "open" : ""}>
           <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${status === "Completed" ? "completed" : status === "Approved" || status === "Delivered" ? "in-progress" : "pending"}">${escapeHtml(customerOrderStatusLabel(status))}</span></summary>
           <div class="customer-order-details-content">
-            <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
-            <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
+            <div class="customer-order-timeline-card">
+              <p class="small-note">${order.createdAt ? escapeHtml(new Date(order.createdAt).toLocaleString()) : ""}</p>
+              <div class="customer-order-progress" ${rejected ? 'data-rejected="true"' : ""} aria-label="${escapeAttr(customerOrderStatusLabel(status))}">${rejected ? tr("orderStatusRejected") : [tr("orderStepPlaced"), tr("orderStepAccepted"), tr("orderStepDelivered"), tr("orderStepCompleted")].map((step, index) => `<span class="customer-order-step ${index <= progress ? "is-complete" : ""}">${step}</span>`).join("")}</div>
+            </div>
             ${rejected && order.rejectionReason ? `<p class="small-note"><strong>${tr("rejectionReason")}:</strong> ${escapeHtml(order.rejectionReason)}</p>` : ""}
             <div class="customer-order-actions">
               <button class="btn btn-soft" type="button" data-copy-customer-order-id="${escapeAttr(reference)}">${tr("copyOrderId")}</button>
@@ -1636,15 +1972,19 @@
               ${db && order.customerStatusToken ? `<button class="btn btn-soft" type="button" data-enable-customer-order-push="${escapeAttr(reference)}" ${order.customerPushEnabled ? "disabled" : ""}>${order.customerPushEnabled ? tr("orderPushEnabled") : tr("enableOrderPush")}</button>` : ""}
             </div>
             ${db && order.customerStatusToken ? `<p class="small-note" data-customer-order-push-status="${escapeAttr(reference)}"></p>` : ""}
-            <strong>${tr("orderItems")}</strong>
-            <ul>${items.map((item) => `<li>${escapeHtml(item.name)} × ${Number(item.quantity) || 1} — ${money(Number(item.price) || 0)}</li>`).join("")}</ul>
-            <p class="small-note">${tr("orderAddress")}: ${escapeHtml(order.address || "")}</p>
-            <div class="summary-row"><span>${tr("subtotal")}</span><span>${money(Number(order.subtotal) || 0)}</span></div>
-            ${Number(order.discount) > 0 ? `<div class="summary-row"><span>${tr("couponSavings")}</span><span>−${money(Number(order.discount))}</span></div>` : ""}
-            <div class="summary-row"><span>${tr("delivery")}</span><span>${money(Number(order.deliveryFee) || 0)}</span></div>
-            <div class="summary-row"><span>${tr("total")}</span><strong>${money(Number(order.total) || 0)}</strong></div>
-            <p class="small-note">${tr("payment")}: ${escapeHtml(paymentMethod)}</p>
-            ${order.paymentMethod !== "cod" ? `<p class="small-note"><strong>${escapeHtml(paymentStatus)}</strong></p>` : ""}
+            <section class="customer-order-items-card">
+              <strong>${tr("orderItems")}</strong>
+              <ul>${items.map((item) => `<li>${escapeHtml(item.name)} × ${Number(item.quantity) || 1} — ${money(Number(item.price) || 0)}</li>`).join("")}</ul>
+            </section>
+            <section class="customer-order-cost-card">
+              <p class="small-note">${tr("orderAddress")}: <strong>${escapeHtml(order.address || "")}</strong></p>
+              <div class="summary-row"><span>${tr("subtotal")}</span><span>${money(Number(order.subtotal) || 0)}</span></div>
+              ${Number(order.discount) > 0 ? `<div class="summary-row"><span>${tr("couponSavings")}</span><span>−${money(Number(order.discount))}</span></div>` : ""}
+              <div class="summary-row"><span>${tr("delivery")}</span><span>${money(Number(order.deliveryFee) || 0)}</span></div>
+              <div class="summary-row total"><span>${tr("total")}</span><strong>${money(Number(order.total) || 0)}</strong></div>
+              <p class="small-note customer-order-payment">${tr("payment")}: <strong>${escapeHtml(paymentMethod)}</strong></p>
+              ${order.paymentMethod !== "cod" ? `<p class="small-note customer-order-payment-status"><strong>${escapeHtml(paymentStatus)}</strong></p>` : ""}
+            </section>
           </div>
         </details>`;
       }).join("")}</div>
@@ -3566,8 +3906,29 @@
       checkoutDraft = null;
       storage.write("shanvi-cart", cart);
       deliveryFee = null;
-      $("cart-content").innerHTML = `<div class="drawer-head"><h2>${tr("orderPlaced")}</h2><button class="close" id="done-close" aria-label="${language === "hi" ? "बंद करें" : "Close"}">×</button></div><div class="payment-box"><strong>${tr("thankYou")}, ${escapeHtml(order.name)}!</strong><br>${tr("reference")}: <strong>${escapeHtml(order.id)}</strong><br>${tr("total")}: <strong>${money(order.total)}</strong><br>${tr("payment")}: <strong>${paymentLabels[order.paymentMethod]}</strong><br>${db ? tr("approvalPending") : tr("savedOrder")}${order.paymentMethod !== "cod" ? `<p class="small-note"><strong>${tr("paymentCustomerNotMarkedPaid")}</strong> ${tr("verifyUpiNote")}</p>` : ""}</div><div class="customer-order-actions"><button class="btn btn-soft" id="copy-confirmed-order-id" type="button">${tr("copyOrderId")}</button><button class="btn btn-soft" id="copy-confirmed-order-details" type="button">${tr("copyOrderDetails")}</button><a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a></div>${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}<button class="btn btn-primary full" id="done-shopping">${tr("continueShopping")}</button>`;
-      $("done-close").onclick = closeCart;
+      $("cart-content").innerHTML = `
+        <div class="drawer-head order-success-heading"><h2>${tr("orderPlaced")}</h2></div>
+        <section class="order-success-welcome">
+          <span class="order-success-check" aria-hidden="true">✓</span>
+          <h3>${tr("thankYou")}!</h3>
+          <p>${escapeHtml(order.name)}</p>
+        </section>
+        <section class="order-confirmation-card">
+          <div class="order-confirmation-row"><span>${tr("reference")}</span><strong>${escapeHtml(order.id)}</strong></div>
+          <div class="order-confirmation-row"><span>${tr("total")}</span><strong>${money(order.total)}</strong></div>
+          <div class="order-confirmation-row"><span>${tr("payment")}</span><strong>${paymentLabels[order.paymentMethod]}</strong></div>
+        </section>
+        <section class="order-confirmation-card order-confirmation-status">
+          <strong>${db ? tr("approvalPending") : tr("savedOrder")}</strong>
+          ${order.paymentMethod !== "cod" ? `<p class="small-note"><strong>${tr("paymentCustomerNotMarkedPaid")}</strong> ${tr("verifyUpiNote")}</p>` : ""}
+        </section>
+        <div class="customer-order-actions order-confirmation-actions">
+          <button class="btn btn-soft" id="copy-confirmed-order-id" type="button">${tr("copyOrderId")}</button>
+          <button class="btn btn-soft" id="copy-confirmed-order-details" type="button">${tr("copyOrderDetails")}</button>
+          <a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a>
+        </div>
+        ${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}
+        <button class="btn btn-primary full order-confirmation-continue" id="done-shopping">${tr("continueShopping")}</button>`;
       $("done-shopping").onclick = closeCart;
       $("copy-confirmed-order-id").onclick = () => copyCustomerOrderText(order.id);
       $("copy-confirmed-order-details").onclick = () => copyCustomerOrderText(customerOrderShareText(order));
