@@ -312,6 +312,9 @@
     .hero-preview-empty { color: #718078; text-align: center; padding: 42px 10px; font-size: 12px; }
     .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 30; background: #1c4934; color: white; padding: 12px 18px; border-radius: 10px; transition: .2s; font-size: 13px; box-shadow: 0 8px 25px #0002; }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.centered { top: 50%; bottom: auto; transform: translate(-50%, calc(-50% + 14px)) scale(.94); padding: 16px 24px; border-radius: 14px; font-size: 17px; font-weight: 750; box-shadow: 0 12px 36px #0004; }
+    .toast.centered.show { transform: translate(-50%, -50%) scale(1); animation: toast-flash .35s ease-out; }
+    @keyframes toast-flash { 0% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
     @media (max-width: 850px) {
       .nav { grid-template-columns: minmax(170px,1fr) auto; grid-template-areas: "brand utility" "actions actions" "search search"; gap: 9px 12px; padding: 10px 14px; }
@@ -785,7 +788,7 @@
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
         itemsEach: "each",
-        added: "Added {product} to cart", selectPayment: "Please select a payment method.",
+        added: "Item added", thankYouToast: "Thank you for your order!", selectPayment: "Please select a payment method.",
         freeGift: "Free gift", free: "FREE", freeGiftAdded: "Your qualifying order includes this free gift.",
         calculatedAtCheckout: "Calculated at checkout", outOfStock: "That quantity is not in stock.",
         stockLeft: "left",
@@ -895,7 +898,7 @@
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
         itemsEach: "प्रति सामान",
-        added: "{product} कार्ट में जोड़ दिया", selectPayment: "कृपया भुगतान का तरीका चुनें।",
+        added: "सामान जोड़ दिया गया", thankYouToast: "आपके ऑर्डर के लिए धन्यवाद!", selectPayment: "कृपया भुगतान का तरीका चुनें।",
         freeGift: "मुफ़्त उपहार", free: "मुफ़्त", freeGiftAdded: "आपके योग्य ऑर्डर में यह मुफ़्त उपहार शामिल है।",
         calculatedAtCheckout: "चेकआउट पर तय होगा", outOfStock: "इतना स्टॉक उपलब्ध नहीं है।",
         stockLeft: "बाकी",
@@ -1141,9 +1144,12 @@
       }
     }
 
-    function showToast(message) {
+    function showToast(message, centered = false) {
       const toast = $("toast");
       toast.textContent = message;
+      toast.classList.remove("show");
+      toast.classList.toggle("centered", centered);
+      void toast.offsetWidth;
       toast.classList.add("show");
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 2500);
@@ -2148,7 +2154,7 @@
       storage.write("shanvi-cart", cart);
       renderCart();
       renderProducts();
-      if (amount > 0 && product) showToast(formatTranslation("added", { product: product.name }));
+      if (amount > 0 && product) showToast(tr("added"), true);
     }
     function cartProducts() {
       const items = Object.entries(cart).map(([id, quantity]) => {
@@ -3170,7 +3176,7 @@
       const customerNotifyButton = $("customer-approval-notify");
       if (customerNotifyButton) customerNotifyButton.onclick = () => registerCustomerOrderPush(order);
       $("cart-count").textContent = "0";
-      showToast(`${tr("orderSaved")}: ${order.id}`);
+      showToast(tr("thankYouToast"), true);
     }
     function closeCart() { $("cart-overlay").classList.remove("open"); }
     function renderAdminProducts() {
