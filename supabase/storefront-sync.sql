@@ -9,7 +9,9 @@ alter table public.products
   add column if not exists image_x integer not null default 50
     check (image_x between 0 and 100),
   add column if not exists image_y integer not null default 50
-    check (image_y between 0 and 100);
+    check (image_y between 0 and 100),
+  add column if not exists image_aspect_ratio integer not null default 133
+    check (image_aspect_ratio between 50 and 200);
 
 alter table public.products
   drop constraint if exists products_category_check;

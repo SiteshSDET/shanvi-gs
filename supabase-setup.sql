@@ -12,6 +12,8 @@ create table if not exists public.products (
   mrp integer not null check (mrp >= price),
   stock integer not null default 0 check (stock >= 0),
   image_url text not null,
+  image_aspect_ratio integer not null default 133
+    check (image_aspect_ratio between 50 and 200),
   active boolean not null default true,
   created_at timestamptz not null default now()
 );

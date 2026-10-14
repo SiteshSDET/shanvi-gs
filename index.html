@@ -606,7 +606,7 @@
             <div class="field"><label for="p-stock">Stock quantity</label><input id="p-stock" type="number" required min="0" step="1" value="1"></div>
             <div class="field"><label for="p-size">Product size (optional)</label><input id="p-size" maxlength="60" placeholder="e.g. Small, 500 ml, Pack of 3"></div>
             <div class="field"><label for="p-dimensions">Dimensions (optional)</label><input id="p-dimensions" maxlength="80" placeholder="e.g. 20 × 15 × 5 cm"></div>
-            <div class="field"><label for="p-image">Product photo (any dimensions, up to 2 MB)</label><input id="p-image" type="file" accept="image/*"><small class="small-note">Portrait or landscape photos are accepted. Use the live preview below to choose exactly how the customer sees it.</small></div>
+            <div class="field"><label for="p-image">Product photo (any dimensions, up to 2 MB)</label><input id="p-image" type="file" accept="image/*"><input id="p-image-camera" type="file" accept="image/*" capture="environment" hidden><button class="btn btn-soft" id="p-image-take-photo" type="button">Take photo with camera</button><small class="small-note">Choose a photo from your device or take a new product photo with the rear camera.</small></div>
             <div class="field" style="grid-column:1/-1"><label for="p-description">Description / size / other details</label><input id="p-description" maxlength="300" placeholder="Short details customers should know"></div>
           </div>
             <div class="preview-caption" id="p-image-caption">Customer preview · adjust the image below; this frame matches the customer product card.</div>
@@ -617,6 +617,7 @@
             </div>
             <div class="image-adjustments" id="image-adjustments">
               <div class="field"><label for="p-image-fit">Image display</label><select id="p-image-fit"><option value="contain" selected>Show full image (fit inside frame)</option><option value="cover">Fill frame (crop edges)</option></select></div>
+              <div class="field"><label for="p-image-ratio">Photo frame width: <span id="p-image-ratio-label">1.33:1</span></label><input id="p-image-ratio" type="range" min="50" max="200" step="1" value="133"><small class="small-note">Slide left for a taller frame or right for a wider frame.</small></div>
               <div class="field"><label for="p-image-zoom">Zoom / zoom out: <span id="p-image-zoom-label">100%</span></label><input id="p-image-zoom" type="range" min="40" max="200" value="100"></div>
               <div class="field"><label for="p-image-x">Horizontal position: <span id="p-image-x-label">50%</span></label><input id="p-image-x" type="range" min="0" max="100" value="50"></div>
               <div class="field"><label for="p-image-y">Vertical position: <span id="p-image-y-label">50%</span></label><input id="p-image-y" type="range" min="0" max="100" value="50"></div>
@@ -968,6 +969,7 @@
     let heroFormDirty = false;
     let sharedStorefrontLoadSequence = 0;
     let productImageDraft = "";
+    let productImageAspectRatio = 133;
     let productImageFit = "contain";
     let productImageZoom = 100;
     let productImageX = 50;
@@ -1635,8 +1637,9 @@
       );
       $("products").innerHTML = visible.length ? visible.map((product) => {
         const discount = product.mrp > product.price ? Math.round((1 - product.price / product.mrp) * 100) : 0;
+        const imageAspectRatio = boundedImageValue(product.imageAspectRatio, 133, 50, 200);
         return `<article class="product">
-          <div class="product-image"><img src="${escapeAttr(product.image || fallbackImage(product.category))}" alt="${escapeAttr(product.name)}" style="${escapeAttr(productImageStyle(product))}" loading="lazy">${discount ? `<span class="discount">${discount}% ${tr("off")}</span>` : ""}</div>
+          <div class="product-image" style="aspect-ratio:${imageAspectRatio / 100}"><img src="${escapeAttr(product.image || fallbackImage(product.category))}" alt="${escapeAttr(product.name)}" style="${escapeAttr(productImageStyle(product))}" loading="lazy">${discount ? `<span class="discount">${discount}% ${tr("off")}</span>` : ""}</div>
           <div class="product-info"><span class="product-category">${escapeHtml(translatedCategory(product.category))}</span><h3>${escapeHtml(product.name)}</h3>
             ${product.description ? `<p class="small-note">${escapeHtml(product.description)}</p>` : ""}
             ${product.size || product.dimensions ? `<p class="small-note">${[product.size, product.dimensions].filter(Boolean).map(escapeHtml).join(" · ")}</p>` : ""}
@@ -1664,17 +1667,20 @@
     }
     function syncProductImagePreview() {
       $("product-photo-preview").classList.toggle("has-image", Boolean(productImageDraft));
+      $("product-photo-preview").style.aspectRatio = String(boundedImageValue(productImageAspectRatio, 133, 50, 200) / 100);
       $("p-image-preview").style.objectFit = $("p-image-fit").value;
       $("p-image-preview").style.objectPosition = `${$("p-image-x").value}% ${$("p-image-y").value}%`;
       $("p-image-preview").style.transform = `scale(${Number($("p-image-zoom").value) / 100})`;
       $("p-image-preview").style.transformOrigin = `${$("p-image-x").value}% ${$("p-image-y").value}%`;
       $("p-image-fit").disabled = !productImageDraft;
+      $("p-image-ratio").disabled = !productImageDraft;
       $("p-image-zoom").disabled = !productImageDraft;
       $("p-image-x").disabled = !productImageDraft;
       $("p-image-y").disabled = !productImageDraft;
       $("p-image-remove").hidden = !productImageDraft;
       $("image-adjustments").classList.toggle("visible", Boolean(productImageDraft));
       $("p-image-zoom-label").textContent = `${$("p-image-zoom").value}%`;
+      $("p-image-ratio-label").textContent = `${(Number($("p-image-ratio").value) / 100).toFixed(2)}:1`;
       $("p-image-x-label").textContent = `${$("p-image-x").value}%`;
       $("p-image-y-label").textContent = `${$("p-image-y").value}%`;
     }
@@ -1693,7 +1699,8 @@
         imageFit: row.image_fit === "cover" ? "cover" : "contain",
         imageZoom: Number(row.image_zoom ?? 100),
         imageX: Number(row.image_x ?? 50),
-        imageY: Number(row.image_y ?? 50)
+        imageY: Number(row.image_y ?? 50),
+        imageAspectRatio: Number(row.image_aspect_ratio ?? 133)
       };
     }
     const isUuid = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value));
@@ -1730,6 +1737,7 @@
         image_zoom: boundedImageValue(product.imageZoom, 100, 40, 200),
         image_x: boundedImageValue(product.imageX, 50, 0, 100),
         image_y: boundedImageValue(product.imageY, 50, 0, 100),
+        image_aspect_ratio: Math.round(boundedImageValue(product.imageAspectRatio, 133, 50, 200)),
         active: true
       };
     }
@@ -1782,7 +1790,7 @@
       if (!db) return false;
       const requestSequence = ++sharedProductsLoadSequence;
       const { data, error } = await db.from("products")
-        .select("id,name,category,price,mrp,stock,image_url,description,size,dimensions,image_fit,image_zoom,image_x,image_y,active")
+        .select("id,name,category,price,mrp,stock,image_url,description,size,dimensions,image_fit,image_zoom,image_x,image_y,image_aspect_ratio,active")
         .eq("active", true)
         .order("created_at", { ascending: false });
       if (error) {
@@ -3216,11 +3224,13 @@
       $("p-description").value = product.description || "";
       $("p-image").required = false;
       productImageDraft = product.image || "";
+      productImageAspectRatio = boundedImageValue(product.imageAspectRatio, 133, 50, 200);
       productImageFit = product.imageFit === "cover" ? "cover" : "contain";
       productImageZoom = boundedImageValue(product.imageZoom, 100, 40, 200);
       productImageX = boundedImageValue(product.imageX, 50, 0, 100);
       productImageY = boundedImageValue(product.imageY, 50, 0, 100);
       $("p-image-fit").value = productImageFit;
+      $("p-image-ratio").value = productImageAspectRatio;
       $("p-image-zoom").value = productImageZoom;
       $("p-image-x").value = productImageX;
       $("p-image-y").value = productImageY;
@@ -3235,13 +3245,16 @@
       $("product-form").reset();
       $("p-edit-id").value = "";
       $("p-stock").value = 1;
-      $("p-image").required = true;
+      $("p-image").required = false;
+      $("p-image-camera").value = "";
       productImageDraft = "";
+      productImageAspectRatio = 133;
       productImageFit = "contain";
       productImageZoom = 100;
       productImageX = 50;
       productImageY = 50;
       $("p-image-fit").value = productImageFit;
+      $("p-image-ratio").value = productImageAspectRatio;
       $("p-image-zoom").value = productImageZoom;
       $("p-image-x").value = productImageX;
       $("p-image-y").value = productImageY;
@@ -3707,20 +3720,25 @@
         && db
       ) void loadManagerOrders();
     }, 20000);
-    $("p-image").addEventListener("change", async () => {
-      const file = $("p-image").files[0];
+    async function previewProductImage(input) {
+      const file = input.files[0];
       if (!file) return;
       try {
         const preview = await optimizeImage(file, 1200, 900);
         productImageDraft = preview;
         $("p-image-preview").src = preview;
+        $("p-image").value = "";
+        $("p-image-camera").value = "";
         syncProductImagePreview();
         $("p-image-caption").classList.add("visible");
       } catch (error) {
-        $("p-image").value = "";
+        input.value = "";
         showToast(error.message || "Could not preview image.");
       }
-    });
+    }
+    $("p-image").addEventListener("change", () => void previewProductImage($("p-image")));
+    $("p-image-camera").addEventListener("change", () => void previewProductImage($("p-image-camera")));
+    $("p-image-take-photo").onclick = () => $("p-image-camera").click();
     $("brand-logo-input").addEventListener("change", async () => {
       const file = $("brand-logo-input").files[0];
       if (!file) return;
@@ -3844,13 +3862,14 @@
     };
     $("p-image-remove").onclick = () => {
       $("p-image").value = "";
+      $("p-image-camera").value = "";
       productImageDraft = "";
       $("p-image-preview").removeAttribute("src");
       $("p-image-caption").classList.remove("visible");
       syncProductImagePreview();
       showToast("Product photo removed");
     };
-    ["p-image-fit", "p-image-zoom", "p-image-x", "p-image-y"].forEach((id) => {
+    ["p-image-fit", "p-image-ratio", "p-image-zoom", "p-image-x", "p-image-y"].forEach((id) => {
       $(id).addEventListener("input", syncProductImagePreview);
       $(id).addEventListener("change", syncProductImagePreview);
     });
@@ -3863,9 +3882,13 @@
       if (button) button.disabled = true;
       const file = $("p-image").files[0];
       try {
-        const image = file ? productImageDraft || await optimizeImage(file, 1200, 900) : productImageDraft;
         const editId = $("p-edit-id").value;
         const existing = editId ? products.find((item) => item.id === editId) : null;
+        if (!existing && !productImageDraft) {
+          showToast("Choose a product photo or take one with the camera.");
+          return false;
+        }
+        const image = productImageDraft || (file ? await optimizeImage(file, 1200, 900) : "");
         const product = {
           id: editId || `local-${Date.now()}`,
           name: $("p-name").value.trim(),
@@ -3881,6 +3904,7 @@
           imageZoom: Number($("p-image-zoom").value),
           imageX: Number($("p-image-x").value),
           imageY: Number($("p-image-y").value),
+          imageAspectRatio: Number($("p-image-ratio").value),
           active: true
         };
         if (!product.name || product.price < 1 || product.mrp < product.price || product.stock < 0) {
