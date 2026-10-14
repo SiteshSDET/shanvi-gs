@@ -742,8 +742,7 @@
         payment: "Payment", backBasket: "Back to basket", order: "Order",
         paymentPhoneLabel: "Payment phone number",
         itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay by UPI ID",
-        enterYourUpi: "Copy the store UPI ID and paste it into any UPI app.", yourUpi: "Your UPI ID or mobile number (optional)",
-        upiExample: "Optional payment reference for the manager.", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
+        enterYourUpi: "Copy the store UPI ID and paste it into any UPI app.", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
         payStoreAt: "Pay to this store UPI ID:", copyUpi: "Copy store UPI ID",
         storeUpiMissing: "Store UPI ID is not configured. Contact the store.",
         qr: "Pay by QR code", scanQr: "Take a screenshot to scan from Photos, or use another phone to scan this QR.",
@@ -771,8 +770,11 @@
         calculatedAtCheckout: "Calculated at checkout", outOfStock: "That quantity is not in stock.",
         stockLeft: "left",
         paymentUnavailable: "UPI payment is not configured. Choose another method.",
-        invalidPayerUpi: "Enter a valid UPI ID and ensure the store UPI ID is configured.",
         invalidQr: "QR payment is not configured. Choose another method.",
+        paymentSettingsLoadError: "Could not load the store's payment settings. Please close checkout and try again.",
+        paymentSettingsLoading: "Loading the store's payment options…",
+        paymentSettingsWait: "Please wait for the store's payment settings to load.",
+        onlineOrderingUnavailable: "Online ordering is unavailable until the store backend is configured.",
         codDisabled: "Cash on delivery is currently unavailable.",
         copyUnavailable: "Copy not available here. Please select the UPI ID.",
         upiCopied: "UPI ID copied", orderSaved: "Order placed",
@@ -846,8 +848,7 @@
         payment: "भुगतान", backBasket: "कार्ट पर वापस जाएँ", order: "ऑर्डर",
         paymentPhoneLabel: "भुगतान फ़ोन नंबर",
         itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI ID से भुगतान",
-        enterYourUpi: "दुकान की UPI ID कॉपी करें और किसी UPI ऐप में पेस्ट करें।", yourUpi: "आपकी UPI ID या मोबाइल नंबर (वैकल्पिक)",
-        upiExample: "मैनेजर के लिए वैकल्पिक भुगतान संदर्भ।", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
+        enterYourUpi: "दुकान की UPI ID कॉपी करें और किसी UPI ऐप में पेस्ट करें।", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
         payStoreAt: "इस दुकान की UPI ID पर भुगतान करें:", copyUpi: "दुकान की UPI ID कॉपी करें",
         storeUpiMissing: "दुकान की UPI ID सेट नहीं है। दुकान से संपर्क करें।",
         qr: "QR कोड से भुगतान", scanQr: "स्क्रीनशॉट लेकर फ़ोटो से स्कैन करें या दूसरे फ़ोन से QR स्कैन करें।",
@@ -875,8 +876,11 @@
         calculatedAtCheckout: "चेकआउट पर तय होगा", outOfStock: "इतना स्टॉक उपलब्ध नहीं है।",
         stockLeft: "बाकी",
         paymentUnavailable: "UPI भुगतान सेट नहीं है। दूसरा तरीका चुनें।",
-        invalidPayerUpi: "सही UPI ID लिखें और दुकान की UPI ID सेट होने की पुष्टि करें।",
         invalidQr: "QR भुगतान सेट नहीं है। दूसरा तरीका चुनें।",
+        paymentSettingsLoadError: "दुकान की भुगतान जानकारी लोड नहीं हो पाई। चेकआउट बंद करके फिर से कोशिश करें।",
+        paymentSettingsLoading: "दुकान के भुगतान विकल्प लोड हो रहे हैं…",
+        paymentSettingsWait: "दुकान के भुगतान विकल्प लोड होने तक प्रतीक्षा करें।",
+        onlineOrderingUnavailable: "दुकान का ऑनलाइन ऑर्डर सिस्टम अभी उपलब्ध नहीं है।",
         codDisabled: "कैश ऑन डिलीवरी अभी उपलब्ध नहीं है।",
         copyUnavailable: "कॉपी उपलब्ध नहीं है। कृपया UPI ID चुनकर कॉपी करें।",
         upiCopied: "UPI ID कॉपी हो गई", orderSaved: "ऑर्डर हो गया",
@@ -1101,10 +1105,6 @@
           const field = $(id);
           if (field) field.value = value;
         });
-        const payerInput = $("customer-upi-id");
-        if (payerInput && checkoutDraft) {
-          checkoutDraft.payerUpiId = payerInput.value.trim();
-        }
       }
     }
 
@@ -2909,11 +2909,10 @@
         <p class="small-note">${tr("order")} ${escapeHtml(checkoutDraft.id)} · ${checkoutDraft.items.length} ${tr("itemTypes")}</p>
         <div class="summary"><div class="summary-row"><span>${tr("delivery")}</span><strong>${money(checkoutDraft.deliveryFee)}</strong></div><div class="summary-row"><span>${tr("total")}</span><strong>${money(checkoutDraft.total)}</strong></div><div class="summary-row"><span>${tr("deliverTo")}</span><span style="max-width:65%;text-align:right">${escapeHtml(checkoutDraft.address)}</span></div></div>
         <div class="payment-box"><strong>${tr("paymentHelp")}</strong><p>${selectedPayment === "cod" ? tr("paymentAssistanceCod") : tr("paymentAssistance")}</p><button class="btn btn-soft" id="open-payment-help" type="button">${tr("helpTitle")}</button></div>
-        ${!paymentSettingsReady ? `<p class="payment-box">${paymentSettingsError ? "Could not load the store's payment settings. Please close checkout and try again." : "Loading the store's payment options…"}</p>` : ""}
+        ${!paymentSettingsReady ? `<p class="payment-box">${paymentSettingsError ? tr("paymentSettingsLoadError") : tr("paymentSettingsLoading")}</p>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_id" ${selectedPayment === "upi_id" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("upiId")}</strong><small>${tr("enterYourUpi")}</small></span></label>
         ${selectedPayment === "upi_id" ? `<div class="payment-box">
           ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button>${settings.show_upi_phone && settings.upi_phone ? `<p class="small-note">${tr("paymentPhoneLabel")}: <strong>${escapeHtml(settings.upi_phone)}</strong></p>` : ""}` : tr("storeUpiMissing")}
-          <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" inputmode="text" placeholder="UPI ID or 10-digit mobile" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" maxlength="100"><small class="small-note">${tr("upiExample")}</small></div>
         </div>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("qr")}</strong><small>${settings.qr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
         ${selectedPayment === "upi_qr" ? `<div class="payment-box">${settings.qr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}.</p><p class="small-note">${tr("qrPaymentStarted")}</p>` : tr("qrNotConfigured")}</div>` : ""}
@@ -2929,10 +2928,6 @@
           renderPaymentPage();
         });
       });
-      const payerUpiInput = $("customer-upi-id");
-      if (payerUpiInput) payerUpiInput.addEventListener("input", () => {
-        checkoutDraft.payerUpiId = payerUpiInput.value.trim();
-      });
       const copyButton = $("copy-upi");
       if (copyButton) copyButton.onclick = async () => {
         try { await navigator.clipboard.writeText(settings.upi); showToast(tr("upiCopied")); }
@@ -2944,13 +2939,13 @@
     async function saveOrder() {
       if (!checkoutDraft) return;
       if (!db || !orderBackendReady) {
-        showToast("Online ordering is unavailable until the store backend is configured.");
+        showToast(tr("onlineOrderingUnavailable"));
         return;
       }
       if (!paymentSettingsReady) {
         showToast(paymentSettingsError
-          ? "Could not load the store's payment settings. Please close checkout and try again."
-          : "Please wait for the store's payment settings to load.");
+          ? tr("paymentSettingsLoadError")
+          : tr("paymentSettingsWait"));
         return;
       }
       if (!selectedPayment) {
@@ -2973,13 +2968,6 @@
       const button = $("confirm-payment");
       if (!button || button.disabled) return;
       button.disabled = true;
-      const payerReference = checkoutDraft.payerUpiId || "";
-      if (selectedPayment === "upi_id" && payerReference
-        && !(/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(payerReference) || /^[0-9]{10}$/.test(payerReference))) {
-        button.disabled = false;
-        showToast("Enter a valid UPI ID or 10-digit mobile number, or leave it blank.");
-        return;
-      }
       const draft = checkoutDraft;
       const paymentLabels = {
         cod: language === "hi" ? "कैश ऑन डिलीवरी" : "Cash on delivery",
@@ -3036,7 +3024,7 @@
           delivery_fee: order.deliveryFee,
           discount: order.discount,
           payment_method: order.paymentMethod,
-          payer_upi_id: order.paymentMethod === "upi_id" ? payerReference || null : null,
+          payer_upi_id: null,
           payment_confirmed: false,
           status: order.status,
           customer_status_token_hash: order.customerStatusTokenHash
