@@ -335,12 +335,13 @@
       .search-wrap { width: 100%; }
       .search-wrap input { min-height: 40px; padding-top: 9px; padding-bottom: 9px; border-radius: 12px; }
       main { padding: 14px 13px 38px; }
-      .hero { min-height: 275px; padding: 26px 20px; border-radius: 19px; }
-      .hero-copy { max-width: 100%; }
-      h1 { max-width: 330px; font-size: clamp(34px, 10vw, 46px); }
+      .hero { min-height: 190px; padding: 18px 16px; border-radius: 19px; }
+      .hero-copy { max-width: 76%; }
+      h1 { max-width: 330px; margin: 7px 0; font-size: clamp(25px, 8vw, 34px); }
       .hero:before { right: -14px; bottom: 0; font-size: 104px; opacity: .45; }
       .hero:after { width: 230px; height: 230px; top: 55px; right: -120px; }
-      .hero p { max-width: min(280px, 88%); font-size: 14px; line-height: 1.55; }
+      .hero p { max-width: min(280px, 100%); margin-bottom: 10px; font-size: 12px; line-height: 1.4; }
+      .hero .btn { min-height: 36px; padding: 8px 12px; font-size: 12px; }
       .section-heading { margin: 30px 0 13px; }
       .section-heading h2 { font-size: 25px; }
       #refresh-catalog { min-height: 34px; padding: 6px 8px; font-size: 10px; }
@@ -504,8 +505,8 @@
         <p class="small-note" id="manager-auth-note"></p>
         <form id="manager-login">
           <div class="form-grid">
-            <div class="field"><label for="manager-email">Username</label><input id="manager-email" type="text" autocomplete="username" required></div>
-            <div class="field"><label for="manager-password">Password</label><input id="manager-password" type="password" autocomplete="current-password" required></div>
+            <div class="field"><label for="manager-email">Username</label><input id="manager-email" type="text" autocomplete="off" required></div>
+            <div class="field"><label for="manager-password">Password</label><input id="manager-password" type="password" autocomplete="new-password" required></div>
           </div>
           <button class="btn btn-primary" type="submit" id="manager-login-button">Sign in</button>
         </form>
@@ -994,7 +995,14 @@
     const savedViewState = (() => {
       try {
         const value = JSON.parse(sessionStorage.getItem("shanvi-view-state") || "null");
-        return value && typeof value === "object" ? value : {};
+        if (!value || typeof value !== "object") return {};
+        delete value.search;
+        delete value.managerOrderSearch;
+        if (["search", "manager-order-search"].includes(value.focusedElementId)) {
+          delete value.focusedElementId;
+        }
+        sessionStorage.setItem("shanvi-view-state", JSON.stringify(value));
+        return value;
       } catch (error) {
         console.warn("Could not restore the previous storefront view", error);
         return {};
@@ -3893,13 +3901,13 @@
       const activeElement = document.activeElement;
       const state = {
         scrollTop: $("customer-scroll").scrollTop,
-        search: $("search").value,
         category: activeCategory,
         managerOpen: $("admin").classList.contains("open"),
         managerOrderFilter,
-        managerOrderSearch: $("manager-order-search").value,
         adminCategoryFilter: $("admin-category-filter").value,
-        focusedElementId: activeElement instanceof HTMLElement && activeElement.getClientRects().length
+        focusedElementId: activeElement instanceof HTMLElement
+          && !activeElement.matches("input, select, textarea")
+          && activeElement.getClientRects().length
           ? activeElement.id
           : "",
         openAccordions: [...document.querySelectorAll("#admin details[id][open]")].map((item) => item.id)
@@ -3922,14 +3930,9 @@
       };
       requestAnimationFrame(restore);
     }
-    if (typeof savedViewState.search === "string") $("search").value = savedViewState.search;
     if (categories.includes(savedViewState.category)) activeCategory = savedViewState.category;
     if (["pending", "completed", "rejected", "all"].includes(savedViewState.managerOrderFilter)) {
       managerOrderFilter = savedViewState.managerOrderFilter;
-    }
-    if (typeof savedViewState.managerOrderSearch === "string") {
-      managerOrderSearch = savedViewState.managerOrderSearch;
-      $("manager-order-search").value = managerOrderSearch;
     }
     if (typeof savedViewState.adminCategoryFilter === "string") {
       $("admin-category-filter").value = savedViewState.adminCategoryFilter;
