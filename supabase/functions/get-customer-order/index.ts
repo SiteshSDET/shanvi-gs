@@ -45,7 +45,7 @@ Deno.serve(async (request) => {
 
   const supabase = createClient(projectUrl, serviceRoleKey);
   const { data: order, error } = await supabase.from("orders")
-    .select("reference, status, rejection_reason, payment_method, created_at")
+    .select("reference, status, rejection_reason, payment_method, payment_confirmed, created_at")
     .eq("reference", body.reference)
     .eq("customer_status_token_hash", await sha256Hex(body.token))
     .maybeSingle();
@@ -63,6 +63,7 @@ Deno.serve(async (request) => {
       status: order.status,
       rejectionReason: order.rejection_reason,
       paymentMethod: order.payment_method,
+      paymentConfirmed: order.payment_confirmed === true,
       createdAt: order.created_at,
     },
     { headers: corsHeaders },

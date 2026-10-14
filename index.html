@@ -684,7 +684,6 @@
   <div class="coupon-success" id="coupon-success" role="status" aria-live="polite" hidden></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="supabase-config.js"></script>
   <script>
     const translations = {
@@ -742,27 +741,28 @@
         pinTitle: "Enter a 6-digit PIN code.", continuePayment: "Continue to payment",
         payment: "Payment", backBasket: "Back to basket", order: "Order",
         paymentPhoneLabel: "Payment phone number",
-        itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay securely with UPI or QR",
-        enterYourUpi: "Choose a UPI app or scan a verified payment QR in Razorpay secure checkout.", yourUpi: "Your UPI ID or mobile number (optional)",
-        upiExample: "Optional payment reference only; e.g. 9876543210@upi or 9876543210.", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
-        payStoreAt: "Store UPI ID (reference only; pay through secure checkout):", copyUpi: "Copy store UPI ID",
-        storeUpiMissing: "Store UPI ID payment is not configured.",
-        qr: "Scan UPI QR code", scanQr: "Scan the store QR code with your UPI app.",
+        itemTypes: "item type(s)", deliverTo: "Deliver to", upiId: "Pay by UPI ID",
+        enterYourUpi: "Copy the store UPI ID and paste it into any UPI app.", yourUpi: "Your UPI ID or mobile number (optional)",
+        upiExample: "Optional payment reference for the manager.", sampleStoreUpi: "Sample store UPI ID — do not send real payment.",
+        payStoreAt: "Pay to this store UPI ID:", copyUpi: "Copy store UPI ID",
+        storeUpiMissing: "Store UPI ID is not configured. Contact the store.",
+        qr: "Pay by QR code", scanQr: "Take a screenshot to scan from Photos, or use another phone to scan this QR.",
         qrMissing: "Not configured yet; ask the store to add its QR code.",
         sampleOnly: "Sample only — do not send real payment.",
         scanToPay: "Scan to pay",
         qrNotConfigured: "QR payment is not configured.",
         cod: "Cash on delivery", codPay: "Pay the delivery person when your order arrives.",
         codUnavailable: "Currently unavailable; the store manager has disabled COD.",
-        back: "Back", confirmOrder: "Confirm order", verifyUpiNote: "The order is saved only after Razorpay securely verifies payment. Do not pay outside this checkout.",
-        paymentAssistance: "Use secure checkout to pay the exact total. The order is saved only after Razorpay confirms payment. If payment fails, try again or contact the store.",
+        placeOrderForVerification: "Place order for payment verification",
+        back: "Back", confirmOrder: "Place order for payment verification", verifyUpiNote: "Pay the exact total using the store UPI ID or QR. Your order will be marked payment pending until the manager checks the store account and accepts it. Refresh Profile to see the payment status.",
+        paymentAssistance: "UPI ID: copy the store ID, open your UPI app, paste it as the recipient, and enter the exact total shown. QR: screenshot this QR and scan it from your payment app if supported, or scan it with another phone. After paying, place the order for manager verification. Do not submit an order before paying.",
         paymentAssistanceCod: "Cash on delivery is selected: confirm the order, then pay the delivery person when it arrives.",
         paymentHelp: "Need help with payment?",
-        continueToPay: "Continue to pay with UPI", startQrPayment: "Pay with UPI or QR", qrPaymentStarted: "Complete payment in Razorpay checkout.",
-        paymentFlowPending: "Complete payment in Razorpay checkout. The order is saved after payment verification.",
-        paymentFlowReturned: "Payment verified successfully.",
-        paymentCustomerMarkedPaid: "Payment verified by Razorpay.",
-        paymentCustomerNotMarkedPaid: "Payment is not verified.",
+        qrPaymentStarted: "Scan this QR with another phone, or scan a screenshot from your payment app.",
+        paymentFlowPending: "Payment status: waiting for the manager to verify your payment.",
+        paymentFlowReturned: "Payment received and verified by the store.",
+        paymentCustomerMarkedPaid: "Payment received and verified by the store.",
+        paymentCustomerNotMarkedPaid: "Payment pending — the store will verify it before accepting the order.",
         orderPlaced: "Order placed", thankYou: "Thank you", reference: "Order reference",
         awaitingVerification: "awaiting store verification", savedOrder: "We have saved your order details.",
         itemsEach: "each", invalidCoupon: "That coupon code is not valid", couponApplied: "WELCOME10 applied",
@@ -845,27 +845,28 @@
         pinTitle: "6 अंकों का पिन कोड लिखें।", continuePayment: "भुगतान पर जाएँ",
         payment: "भुगतान", backBasket: "कार्ट पर वापस जाएँ", order: "ऑर्डर",
         paymentPhoneLabel: "भुगतान फ़ोन नंबर",
-        itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI या QR से सुरक्षित भुगतान",
-        enterYourUpi: "Razorpay सुरक्षित भुगतान में UPI ऐप चुनें या सत्यापित QR स्कैन करें।", yourUpi: "आपकी UPI ID या मोबाइल नंबर (वैकल्पिक)",
-        upiExample: "केवल भुगतान संदर्भ के लिए वैकल्पिक; जैसे 9876543210@upi या 9876543210।", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
-        payStoreAt: "दुकान की UPI ID (केवल जानकारी; सुरक्षित चेकआउट से भुगतान करें):", copyUpi: "दुकान की UPI ID कॉपी करें",
-        storeUpiMissing: "दुकान की UPI ID अभी सेट नहीं है।",
-        qr: "UPI QR कोड स्कैन करें", scanQr: "अपने UPI ऐप से दुकान का QR कोड स्कैन करें।",
+        itemTypes: "तरह के सामान", deliverTo: "डिलीवरी का पता", upiId: "UPI ID से भुगतान",
+        enterYourUpi: "दुकान की UPI ID कॉपी करें और किसी UPI ऐप में पेस्ट करें।", yourUpi: "आपकी UPI ID या मोबाइल नंबर (वैकल्पिक)",
+        upiExample: "मैनेजर के लिए वैकल्पिक भुगतान संदर्भ।", sampleStoreUpi: "यह नमूना दुकान UPI ID है — भुगतान न करें।",
+        payStoreAt: "इस दुकान की UPI ID पर भुगतान करें:", copyUpi: "दुकान की UPI ID कॉपी करें",
+        storeUpiMissing: "दुकान की UPI ID सेट नहीं है। दुकान से संपर्क करें।",
+        qr: "QR कोड से भुगतान", scanQr: "स्क्रीनशॉट लेकर फ़ोटो से स्कैन करें या दूसरे फ़ोन से QR स्कैन करें।",
         qrMissing: "अभी सेट नहीं है; दुकान से QR कोड जोड़ने को कहें।",
         sampleOnly: "यह नमूना है — भुगतान न करें।",
         scanToPay: "भुगतान के लिए स्कैन करें",
         qrNotConfigured: "QR भुगतान अभी सेट नहीं है।",
         cod: "कैश ऑन डिलीवरी", codPay: "सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         codUnavailable: "अभी उपलब्ध नहीं; दुकान ने COD बंद किया है।",
-        back: "वापस", confirmOrder: "ऑर्डर की पुष्टि करें", verifyUpiNote: "ऑर्डर तभी सेव होगा जब Razorpay भुगतान की सुरक्षित पुष्टि करेगा। इस चेकआउट के बाहर भुगतान न करें।",
-        paymentAssistance: "सटीक कुल राशि के भुगतान के लिए सुरक्षित चेकआउट बटन दबाएँ। Razorpay से भुगतान की पुष्टि होने के बाद ही ऑर्डर सेव होगा। भुगतान न हो तो फिर कोशिश करें या दुकान से संपर्क करें।",
+        placeOrderForVerification: "भुगतान जाँच के लिए ऑर्डर भेजें",
+        back: "वापस", confirmOrder: "भुगतान जाँच के लिए ऑर्डर भेजें", verifyUpiNote: "दुकान की UPI ID या QR से सटीक कुल राशि का भुगतान करें। मैनेजर दुकान के खाते में जाँचकर ऑर्डर स्वीकार करने तक भुगतान लंबित रहेगा। भुगतान की स्थिति देखने के लिए Profile रीफ़्रेश करें।",
+        paymentAssistance: "UPI ID: दुकान की ID कॉपी करें, UPI ऐप खोलें और प्राप्तकर्ता में पेस्ट करें; दिखाई गई पूरी राशि डालें। QR: स्क्रीनशॉट लेकर भुगतान ऐप में फ़ोटो से स्कैन करें, या दूसरे फ़ोन से स्कैन करें। भुगतान के बाद मैनेजर की जाँच के लिए ऑर्डर भेजें। भुगतान किए बिना ऑर्डर न भेजें।",
         paymentAssistanceCod: "कैश ऑन डिलीवरी चुना है: ऑर्डर की पुष्टि करें और सामान मिलने पर डिलीवरी वाले को भुगतान करें।",
         paymentHelp: "भुगतान में मदद चाहिए?",
-        continueToPay: "UPI से भुगतान जारी रखें", startQrPayment: "UPI या QR से भुगतान करें", qrPaymentStarted: "Razorpay चेकआउट में भुगतान पूरा करें।",
-        paymentFlowPending: "Razorpay चेकआउट में भुगतान करें। भुगतान सत्यापित होने पर ऑर्डर सेव होगा।",
-        paymentFlowReturned: "भुगतान सफलतापूर्वक सत्यापित हुआ।",
-        paymentCustomerMarkedPaid: "Razorpay द्वारा भुगतान सत्यापित।",
-        paymentCustomerNotMarkedPaid: "भुगतान सत्यापित नहीं है।",
+        qrPaymentStarted: "दूसरे फ़ोन से QR स्कैन करें या भुगतान ऐप में स्क्रीनशॉट स्कैन करें।",
+        paymentFlowPending: "भुगतान स्थिति: मैनेजर द्वारा भुगतान की जाँच बाकी है।",
+        paymentFlowReturned: "दुकान ने भुगतान प्राप्त कर सत्यापित किया।",
+        paymentCustomerMarkedPaid: "दुकान ने भुगतान प्राप्त कर सत्यापित किया।",
+        paymentCustomerNotMarkedPaid: "भुगतान लंबित — ऑर्डर स्वीकार करने से पहले दुकान भुगतान की जाँच करेगी।",
         orderPlaced: "ऑर्डर हो गया", thankYou: "धन्यवाद", reference: "ऑर्डर नंबर",
         awaitingVerification: "दुकान की पुष्टि बाकी", savedOrder: "आपके ऑर्डर की जानकारी सुरक्षित है।",
         itemsEach: "प्रति सामान", invalidCoupon: "यह कूपन कोड मान्य नहीं है", couponApplied: "WELCOME10 लागू हुआ",
@@ -1220,6 +1221,8 @@
         }[status] ?? 0);
         const paymentMethod = order.paymentMethod === "cod" ? tr("cod")
           : order.paymentMethod === "upi_qr" ? tr("qr") : tr("upiId");
+        const paymentStatus = order.paymentMethod === "cod" ? tr("codPay")
+          : order.paymentConfirmed === true ? tr("paymentCustomerMarkedPaid") : tr("paymentCustomerNotMarkedPaid");
         return `<details class="customer-order-details" data-customer-order-id="${escapeAttr(reference)}" ${expandedCustomerOrderDetails.has(reference) ? "open" : ""}>
           <summary aria-label="${escapeAttr(`${tr("order")} ${reference}; ${tr("orderStatusLabel")}: ${customerOrderStatusLabel(status)}. ${tr("viewOrderDetails")}`)}"><span class="customer-order-reference">${tr("order")} ${escapeHtml(reference)}</span><span class="customer-order-view-hint">${tr("viewOrderDetails")}</span><span class="customer-order-status" data-state="${status === "Completed" ? "completed" : status === "Approved" || status === "Delivered" ? "in-progress" : "pending"}">${escapeHtml(customerOrderStatusLabel(status))}</span></summary>
           <div class="customer-order-details-content">
@@ -1241,6 +1244,7 @@
             <div class="summary-row"><span>${tr("delivery")}</span><span>${money(Number(order.deliveryFee) || 0)}</span></div>
             <div class="summary-row"><span>${tr("total")}</span><strong>${money(Number(order.total) || 0)}</strong></div>
             <p class="small-note">${tr("payment")}: ${escapeHtml(paymentMethod)}</p>
+            ${order.paymentMethod !== "cod" ? `<p class="small-note"><strong>${escapeHtml(paymentStatus)}</strong></p>` : ""}
           </div>
         </details>`;
       }).join("")}</div>
@@ -1305,7 +1309,8 @@
       const previousOrderState = new Map(ordersToCheck.map((order) => [order, {
         status: order.status,
         rejectionReason: order.rejectionReason,
-        paymentMethod: order.paymentMethod
+        paymentMethod: order.paymentMethod,
+        paymentConfirmed: order.paymentConfirmed
       }]));
       try {
         await Promise.all(ordersToCheck.map(async (order) => {
@@ -1334,6 +1339,11 @@
               order.paymentMethod = data.paymentMethod;
               orderChanged = true;
             }
+            const paymentConfirmed = data.paymentConfirmed === true;
+            if (order.paymentConfirmed !== paymentConfirmed) {
+              order.paymentConfirmed = paymentConfirmed;
+              orderChanged = true;
+            }
             if (orderChanged) updated += 1;
             verifiedCustomerOrderStatuses.set(order.id || order.reference, data.status);
             verified += 1;
@@ -1347,6 +1357,7 @@
             order.status = previous.status;
             order.rejectionReason = previous.rejectionReason;
             order.paymentMethod = previous.paymentMethod;
+            order.paymentConfirmed = previous.paymentConfirmed;
             verifiedCustomerOrderStatuses.delete(order.id || order.reference);
           });
           updated = 0;
@@ -2161,7 +2172,7 @@
     async function checkOrderBackend() {
       if (!db) return;
       const { error } = await db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, razorpay_payment_id, status, customer_status_token_hash")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, status, customer_status_token_hash")
         .limit(0);
       if (error) {
         console.warn("Shared ordering is not ready yet", error.message);
@@ -2387,7 +2398,7 @@
       }
       $("load-more-orders").hidden = true;
       let ordersQuery = db.from("orders")
-        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, razorpay_payment_id, rejection_reason, status, created_at")
+        .select("reference, customer_name, customer_phone, delivery_note, items, total, delivery_fee, discount, payment_method, payer_upi_id, payment_confirmed, rejection_reason, status, created_at")
         .order("created_at", { ascending: false });
       if (managerOrderSearch) {
         ordersQuery = ordersQuery.or(`reference.ilike.%${managerOrderSearch}%,customer_phone.ilike.%${managerOrderSearch}%`);
@@ -2523,7 +2534,6 @@
       const isOpen = group === "pending" && !isAccepted && !isDelivered;
       const createdAt = order.created_at || order.createdAt;
       const payerUpi = order.payer_upi_id || order.payerUpiId || "";
-      const razorpayPaymentId = order.razorpay_payment_id || "";
       const paymentMethod = order.payment_method || order.paymentMethod || "Not specified";
       const rejectionReason = order.rejection_reason || order.rejectionReason || "";
       const paymentConfirmed = order.payment_confirmed === true || order.paymentConfirmed === true;
@@ -2547,13 +2557,12 @@
           <div class="order-line"><span>Delivery</span><span>${money(delivery)}</span></div>
           <div class="order-line"><strong>Total</strong><strong>${money(total)}</strong></div>
           <p class="small-note">Payment method: ${escapeHtml(paymentMethod)}${payerUpi ? ` · Customer payment reference: ${escapeHtml(payerUpi)}` : ""}</p>
-          ${razorpayPaymentId ? `<p class="small-note">Razorpay payment ID: ${escapeHtml(razorpayPaymentId)}</p>` : ""}
           ${paymentConfirmation ? `<p class="small-note"><strong>${escapeHtml(paymentConfirmation)}</strong></p>` : ""}
           ${rejectionReason ? `<p class="small-note"><strong>Rejection reason:</strong> ${escapeHtml(rejectionReason)}</p>` : ""}
         </section>
         <button class="btn btn-soft manager-order-print" type="button" data-print-order="${escapeAttr(reference)}">Generate / print bill</button>
         <div class="order-status-actions">
-          <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen || (paymentMethod !== "cod" && !paymentConfirmed) ? "disabled" : ""} ${paymentMethod !== "cod" && !paymentConfirmed ? 'title="Customer has not confirmed payment. Accept as COD or reject instead."' : ""}>Accept</button>
+          <button class="btn btn-soft" data-order-action="approve" data-order-reference="${escapeAttr(reference)}" ${!isOpen ? "disabled" : ""}>${paymentMethod === "cod" ? "Accept COD order" : "Verify payment & accept"}</button>
           ${!isAccepted && isOpen && paymentMethod !== "cod" ? `<button class="btn btn-soft" data-order-action="approve-cod" data-order-reference="${escapeAttr(reference)}">Accept as COD</button>` : ""}
           <button class="btn btn-soft" data-order-action="Delivered" data-order-reference="${escapeAttr(reference)}" ${!isAccepted ? "disabled" : ""}>Delivered</button>
           <button class="btn btn-soft" data-order-action="show-rejection-form" data-order-reference="${escapeAttr(reference)}" ${!isOpen && !isAccepted ? "disabled" : ""}>${paymentMethod === "cod" ? "Reject COD order" : "Reject order"}</button>
@@ -2660,12 +2669,22 @@
     }
     async function approveOrder(reference, button, asCashOnDelivery = false) {
       if (!isAuthorizedManager) return;
+      const orderToApprove = managerOrders.find((order) => (order.reference || order.id) === reference);
+      const manualPaymentCheck = !asCashOnDelivery && orderToApprove
+        && (orderToApprove.payment_method || orderToApprove.paymentMethod) !== "cod";
+      if (manualPaymentCheck && !window.confirm("First check the store bank/UPI account and confirm the exact order amount was received. Continue to mark payment verified and accept this order?")) {
+        return;
+      }
       button.disabled = true;
       if (db) {
         const { data, error } = await db.from("orders")
           .update({
             status: "Approved",
-            ...(asCashOnDelivery ? { payment_method: "cod", payer_upi_id: null, payment_confirmed: false } : {})
+            ...(asCashOnDelivery
+              ? { payment_method: "cod", payer_upi_id: null, payment_confirmed: false }
+              : manualPaymentCheck
+                ? { payment_confirmed: true }
+                : {})
           })
           .eq("reference", reference)
           .eq("status", "Awaiting manager approval")
@@ -2684,14 +2703,15 @@
       } else {
         if (!updateLocalOrderStatus(reference, "Approved", asCashOnDelivery
           ? { paymentMethod: "cod", payerUpiId: "", paymentConfirmed: false }
+          : manualPaymentCheck ? { paymentConfirmed: true }
           : {})) {
           button.disabled = false;
           return;
         }
       }
       showToast(db
-        ? `Order ${reference} accepted${asCashOnDelivery ? " as Cash on delivery" : ""}; customer push will be sent if enabled.`
-        : `Order ${reference} accepted${asCashOnDelivery ? " as Cash on delivery" : ""} on this browser.`);
+        ? `Order ${reference} accepted${asCashOnDelivery ? " as Cash on delivery" : manualPaymentCheck ? " after manually verifying payment" : ""}; customer push will be sent if enabled.`
+        : `Order ${reference} accepted${asCashOnDelivery ? " as Cash on delivery" : manualPaymentCheck ? " after manually verifying payment" : ""} on this browser.`);
       await loadManagerOrders();
     }
     function updateLocalOrderStatus(reference, status, changes = {}) {
@@ -2877,8 +2897,13 @@
     function renderPaymentPage() {
       if (!checkoutDraft) { renderCart(); return; }
       const codAvailable = paymentSettingsReady && settings.cod_enabled === true;
-      const canPayUpiId = Boolean(settings.upi);
+      const canPayUpiId = Boolean(settings.upi) && settings.demo_upi !== true;
+      const canPayUpiQr = Boolean(settings.qr) && settings.demo_qr !== true;
       if (selectedPayment === "upi") selectedPayment = "upi_id";
+      const paymentAvailable = selectedPayment === "cod" ? codAvailable
+        : selectedPayment === "upi_id" ? canPayUpiId
+        : selectedPayment === "upi_qr" ? canPayUpiQr
+        : false;
       $("cart-content").innerHTML = `
         <div class="drawer-head"><h2>${tr("payment")}</h2><button class="close" id="payment-back" aria-label="${tr("backBasket")}">←</button></div>
         <p class="small-note">${tr("order")} ${escapeHtml(checkoutDraft.id)} · ${checkoutDraft.items.length} ${tr("itemTypes")}</p>
@@ -2887,33 +2912,27 @@
         ${!paymentSettingsReady ? `<p class="payment-box">${paymentSettingsError ? "Could not load the store's payment settings. Please close checkout and try again." : "Loading the store's payment options…"}</p>` : ""}
         <label class="payment-choice"><input type="radio" name="payment-method" value="upi_id" ${selectedPayment === "upi_id" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("upiId")}</strong><small>${tr("enterYourUpi")}</small></span></label>
         ${selectedPayment === "upi_id" ? `<div class="payment-box">
-          <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" inputmode="text" placeholder="9876543210@upi or 9876543210" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" maxlength="100"><small class="small-note">${tr("upiExample")}</small></div>
-          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button>${settings.show_upi_phone && settings.upi_phone ? `<p class="small-note">${tr("paymentPhoneLabel")}: <strong>${escapeHtml(settings.upi_phone)}</strong></p>` : ""}` : ""}
-          ${checkoutDraft.razorpayVerified ? "" : `<button class="btn btn-primary full" id="open-upi" type="button" style="margin-top:10px">${checkoutDraft.razorpayProof ? "Retry payment verification" : tr("continueToPay")}</button>`}
+          ${canPayUpiId ? `${settings.demo_upi ? `<strong>${tr("sampleStoreUpi")}</strong><br>` : `${tr("payStoreAt")} `}<strong id="store-upi-id">${escapeHtml(settings.upi)}</strong> <button class="btn btn-soft" id="copy-upi" type="button" style="padding:5px 9px;font-size:11px">${tr("copyUpi")}</button>${settings.show_upi_phone && settings.upi_phone ? `<p class="small-note">${tr("paymentPhoneLabel")}: <strong>${escapeHtml(settings.upi_phone)}</strong></p>` : ""}` : tr("storeUpiMissing")}
+          <div class="field"><label for="customer-upi-id">${tr("yourUpi")}</label><input id="customer-upi-id" type="text" autocomplete="off" inputmode="text" placeholder="UPI ID or 10-digit mobile" value="${escapeAttr(checkoutDraft.payerUpiId || "")}" maxlength="100"><small class="small-note">${tr("upiExample")}</small></div>
         </div>` : ""}
+        <label class="payment-choice"><input type="radio" name="payment-method" value="upi_qr" ${selectedPayment === "upi_qr" ? "checked" : ""} ${!paymentSettingsReady ? "disabled" : ""}><span><strong>${tr("qr")}</strong><small>${settings.qr ? tr("scanQr") : tr("qrMissing")}</small></span></label>
+        ${selectedPayment === "upi_qr" ? `<div class="payment-box">${settings.qr ? `${settings.demo_qr ? `<strong>${tr("sampleOnly")}</strong><br>` : ""}<img src="${escapeAttr(settings.qr)}" alt="${tr("qr")}"><p class="small-note" style="text-align:center">${tr("scanToPay")} ${money(checkoutDraft.total)}.</p><p class="small-note">${tr("qrPaymentStarted")}</p>` : tr("qrNotConfigured")}</div>` : ""}
         <label class="payment-choice" ${codAvailable ? "" : 'aria-disabled="true"'}><input type="radio" name="payment-method" value="cod" ${codAvailable ? "" : "disabled"} ${selectedPayment === "cod" ? "checked" : ""}><span><strong>${tr("cod")}</strong><small>${codAvailable ? tr("codPay") : tr("codUnavailable")}</small></span></label>
-        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button>${selectedPayment === "cod" || checkoutDraft.paymentConfirmed ? `<button class="btn btn-primary full" id="confirm-payment">${tr("confirmOrder")}</button>` : ""}</div>
-        ${selectedPayment === "upi_id" ? `<p class="small-note" id="payment-flow-status">${checkoutDraft.paymentConfirmed ? tr("paymentFlowReturned") : tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
+        <div class="payment-actions"><button class="btn btn-soft" id="back-to-cart">${tr("back")}</button><button class="btn btn-primary full" id="confirm-payment" ${paymentAvailable ? "" : "disabled"}>${selectedPayment === "cod" ? tr("confirmOrder") : tr("placeOrderForVerification")}</button></div>
+        ${selectedPayment === "upi_id" || selectedPayment === "upi_qr" ? `<p class="small-note">${tr("paymentFlowPending")}</p><p class="small-note">${tr("verifyUpiNote")}</p>` : ""}`;
       $("payment-back").onclick = () => { checkoutDraft = null; renderCart(); };
       $("back-to-cart").onclick = () => { checkoutDraft = null; renderCart(); };
       $("open-payment-help").onclick = () => $("help-open").click();
       $("cart-content").querySelectorAll('input[name="payment-method"]').forEach((radio) => {
-        radio.disabled = checkoutDraft.razorpayVerified === true;
         radio.addEventListener("change", () => {
-        selectedPayment = radio.value;
-        checkoutDraft.paymentConfirmed = false;
-        renderPaymentPage();
+          selectedPayment = radio.value;
+          renderPaymentPage();
         });
       });
       const payerUpiInput = $("customer-upi-id");
       if (payerUpiInput) payerUpiInput.addEventListener("input", () => {
         checkoutDraft.payerUpiId = payerUpiInput.value.trim();
       });
-      const openUpiButton = $("open-upi");
-      if (openUpiButton) openUpiButton.onclick = () => {
-        if (checkoutDraft.razorpayProof) void verifyRazorpayPayment(openUpiButton);
-        else void startRazorpayCheckout(openUpiButton);
-      };
       const copyButton = $("copy-upi");
       if (copyButton) copyButton.onclick = async () => {
         try { await navigator.clipboard.writeText(settings.upi); showToast(tr("upiCopied")); }
@@ -2921,101 +2940,6 @@
       };
       const confirmButton = $("confirm-payment");
       if (confirmButton) confirmButton.onclick = saveOrder;
-    }
-    async function startRazorpayCheckout(button) {
-      if (!checkoutDraft || !db || typeof window.Razorpay !== "function") {
-        showToast("Secure payment checkout is not available. Please reload or choose cash on delivery.");
-        return;
-      }
-      const payerReference = checkoutDraft.payerUpiId || "";
-      if (payerReference && !(/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(payerReference) || /^[0-9]{10}$/.test(payerReference))) {
-        showToast("Enter a valid UPI ID or 10-digit mobile number, or leave it blank.");
-        return;
-      }
-      button.disabled = true;
-      try {
-        const { data, error } = await db.functions.invoke("create-razorpay-order", {
-          body: {
-            reference: checkoutDraft.id,
-            name: checkoutDraft.name,
-            phone: checkoutDraft.phone,
-            address: checkoutDraft.address,
-            statusTokenHash: checkoutDraft.customerStatusTokenHash,
-            couponApplied: coupon,
-            expectedTotal: checkoutDraft.total,
-            payerReference: checkoutDraft.payerUpiId || "",
-            items: checkoutDraft.items.map((item) => ({
-              productId: item.productId || item.id,
-              quantity: item.quantity,
-              isFreeGift: Boolean(item.isFreeGift)
-            }))
-          }
-        });
-        if (error) throw new Error(error.message || "Could not start secure payment.");
-        if (!data?.orderId || !data?.keyId || !Number.isInteger(data.amount)
-          || data.amount !== checkoutDraft.total * 100) {
-          throw new Error("Secure payment setup returned an invalid order.");
-        }
-        const payment = new window.Razorpay({
-          key: data.keyId,
-          amount: data.amount,
-          currency: "INR",
-          name: "Shanvi General Store",
-          description: `Order ${checkoutDraft.id}`,
-          order_id: data.orderId,
-          prefill: { name: checkoutDraft.name, contact: checkoutDraft.phone },
-          notes: { reference: checkoutDraft.id },
-          method: { upi: true },
-          theme: { color: "#236b4a" },
-          modal: {
-            ondismiss: () => {
-              button.disabled = false;
-              if (checkoutDraft) showToast("Payment was not completed. You can try again.");
-            }
-          },
-          handler: async (response) => {
-            checkoutDraft.razorpayProof = response;
-            const verifyButton = $("open-upi");
-            if (verifyButton) verifyButton.textContent = "Verify payment";
-            await verifyRazorpayPayment(verifyButton || button);
-          }
-        });
-        payment.on("payment.failed", (response) => {
-          button.disabled = false;
-          showToast(response.error?.description || "Payment failed. Please try again.");
-        });
-        payment.open();
-      } catch (error) {
-        button.disabled = false;
-        showToast(error.message || "Could not start secure payment.");
-      }
-    }
-    async function verifyRazorpayPayment(button) {
-      if (!checkoutDraft?.razorpayProof || !db) return;
-      button.disabled = true;
-      try {
-        const proof = checkoutDraft.razorpayProof;
-        const { data, error } = await db.functions.invoke("verify-razorpay-payment", {
-          body: {
-            orderId: proof.razorpay_order_id,
-            paymentId: proof.razorpay_payment_id,
-            signature: proof.razorpay_signature
-          }
-        });
-        if (error) throw new Error(error.message || "Could not verify payment.");
-        if (data?.verified !== true || data?.reference !== checkoutDraft.id) {
-          throw new Error("Payment is not confirmed yet. Do not pay again; retry verification shortly.");
-        }
-        checkoutDraft.paymentConfirmed = true;
-        checkoutDraft.razorpayVerified = true;
-        selectedPayment = "upi_id";
-        renderPaymentPage();
-        showToast("Payment verified. Confirm to place your order.");
-      } catch (error) {
-        button.disabled = false;
-        button.textContent = "Retry payment verification";
-        showToast(`${error.message || "Payment could not be verified."} Do not pay again.`);
-      }
     }
     async function saveOrder() {
       if (!checkoutDraft) return;
@@ -3038,47 +2962,31 @@
         renderPaymentPage();
         return;
       }
+      if (selectedPayment === "upi_id" && (!settings.upi || settings.demo_upi === true)) {
+        showToast(tr("storeUpiMissing"));
+        return;
+      }
+      if (selectedPayment === "upi_qr" && (!settings.qr || settings.demo_qr === true)) {
+        showToast(tr("qrNotConfigured"));
+        return;
+      }
       const button = $("confirm-payment");
       if (!button || button.disabled) return;
       button.disabled = true;
-      if (selectedPayment === "upi_id" && checkoutDraft.razorpayVerified !== true) {
+      const payerReference = checkoutDraft.payerUpiId || "";
+      if (selectedPayment === "upi_id" && payerReference
+        && !(/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(payerReference) || /^[0-9]{10}$/.test(payerReference))) {
         button.disabled = false;
-        showToast(tr("paymentFlowPending"));
+        showToast("Enter a valid UPI ID or 10-digit mobile number, or leave it blank.");
         return;
-      }
-      if (selectedPayment === "upi_id") {
-        const proof = checkoutDraft.razorpayProof;
-        if (!proof?.razorpay_order_id || !proof?.razorpay_payment_id || !proof?.razorpay_signature) {
-          button.disabled = false;
-          showToast(tr("paymentFlowPending"));
-          return;
-        }
-        let verification;
-        try {
-          verification = await db.functions.invoke("verify-razorpay-payment", {
-            body: {
-              orderId: proof.razorpay_order_id,
-              paymentId: proof.razorpay_payment_id,
-              signature: proof.razorpay_signature
-            }
-          });
-        } catch (error) {
-          button.disabled = false;
-          showToast(error.message || "Payment verification is not complete. Do not pay again.");
-          return;
-        }
-        if (verification.error || verification.data?.verified !== true || verification.data?.reference !== checkoutDraft.id) {
-          button.disabled = false;
-          showToast(verification.error?.message || "Payment verification is not complete. Do not pay again.");
-          return;
-        }
       }
       const draft = checkoutDraft;
       const paymentLabels = {
         cod: language === "hi" ? "कैश ऑन डिलीवरी" : "Cash on delivery",
-        upi_id: language === "hi" ? "UPI या QR (Razorpay)" : "UPI or QR (Razorpay)"
+        upi_id: "UPI ID",
+        upi_qr: language === "hi" ? "UPI QR कोड" : "UPI QR code"
       };
-      const order = { ...draft, paymentMethod: selectedPayment, paymentConfirmed: selectedPayment === "upi_id" && draft.razorpayVerified === true, status: "Awaiting manager approval" };
+      const order = { ...draft, paymentMethod: selectedPayment, paymentConfirmed: false, status: "Awaiting manager approval" };
       const previousProducts = products;
       const quantitiesByProduct = new Map();
       order.items.forEach((item) => {
@@ -3108,39 +3016,37 @@
         renderProducts();
         renderAdminProducts();
       };
-      if (selectedPayment === "cod") {
-        try {
-          const { error } = await db.from("orders").insert({
-            reference: order.id,
-            customer_name: order.name,
-            customer_phone: order.phone,
-            delivery_note: order.address,
-            items: order.items.map(({ id, productId, name, category, size, dimensions, price, quantity, isFreeGift }) => ({
-              id: productId || id,
-              name,
-              category,
-              size,
-              dimensions,
-              price,
-              quantity,
-              is_free_gift: Boolean(isFreeGift)
-            })),
-            total: order.total,
-            delivery_fee: order.deliveryFee,
-            discount: order.discount,
-            payment_method: order.paymentMethod,
-            payer_upi_id: order.paymentMethod === "upi_id" ? order.payerUpiId : null,
-            payment_confirmed: order.paymentConfirmed,
-            status: order.status,
-            customer_status_token_hash: order.customerStatusTokenHash
-          });
-          if (error) throw error;
-        } catch (error) {
-          rollbackInventory();
-          button.disabled = false;
-          showToast(`${tr("orderSaveError")}: ${error.message || (language === "hi" ? "कृपया फिर कोशिश करें।" : "Please try again.")}`);
-          return;
-        }
+      try {
+        const { error } = await db.from("orders").insert({
+          reference: order.id,
+          customer_name: order.name,
+          customer_phone: order.phone,
+          delivery_note: order.address,
+          items: order.items.map(({ id, productId, name, category, size, dimensions, price, quantity, isFreeGift }) => ({
+            id: productId || id,
+            name,
+            category,
+            size,
+            dimensions,
+            price,
+            quantity,
+            is_free_gift: Boolean(isFreeGift)
+          })),
+          total: order.total,
+          delivery_fee: order.deliveryFee,
+          discount: order.discount,
+          payment_method: order.paymentMethod,
+          payer_upi_id: order.paymentMethod === "upi_id" ? payerReference || null : null,
+          payment_confirmed: false,
+          status: order.status,
+          customer_status_token_hash: order.customerStatusTokenHash
+        });
+        if (error) throw error;
+      } catch (error) {
+        rollbackInventory();
+        button.disabled = false;
+        showToast(`${tr("orderSaveError")}: ${error.message || (language === "hi" ? "कृपया फिर कोशिश करें।" : "Please try again.")}`);
+        return;
       }
       renderProducts();
       renderAdminProducts();
@@ -3161,6 +3067,7 @@
         deliveryFee: order.deliveryFee,
         total: order.total,
         paymentMethod: order.paymentMethod,
+        paymentConfirmed: false,
         customerStatusToken: order.customerStatusToken
       };
       customerOrders = [...customerOrders.filter((item) => item.id !== order.id), profileOrder].slice(-30);
@@ -3169,7 +3076,7 @@
       checkoutDraft = null;
       storage.write("shanvi-cart", cart);
       deliveryFee = null;
-      $("cart-content").innerHTML = `<div class="drawer-head"><h2>${tr("orderPlaced")}</h2><button class="close" id="done-close" aria-label="${language === "hi" ? "बंद करें" : "Close"}">×</button></div><div class="payment-box"><strong>${tr("thankYou")}, ${escapeHtml(order.name)}!</strong><br>${tr("reference")}: <strong>${escapeHtml(order.id)}</strong><br>${tr("total")}: <strong>${money(order.total)}</strong><br>${tr("payment")}: <strong>${paymentLabels[order.paymentMethod]}</strong><br>${db ? tr("approvalPending") : tr("savedOrder")}</div><div class="customer-order-actions"><button class="btn btn-soft" id="copy-confirmed-order-id" type="button">${tr("copyOrderId")}</button><button class="btn btn-soft" id="copy-confirmed-order-details" type="button">${tr("copyOrderDetails")}</button><a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a></div>${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}<button class="btn btn-primary full" id="done-shopping">${tr("continueShopping")}</button>`;
+      $("cart-content").innerHTML = `<div class="drawer-head"><h2>${tr("orderPlaced")}</h2><button class="close" id="done-close" aria-label="${language === "hi" ? "बंद करें" : "Close"}">×</button></div><div class="payment-box"><strong>${tr("thankYou")}, ${escapeHtml(order.name)}!</strong><br>${tr("reference")}: <strong>${escapeHtml(order.id)}</strong><br>${tr("total")}: <strong>${money(order.total)}</strong><br>${tr("payment")}: <strong>${paymentLabels[order.paymentMethod]}</strong><br>${db ? tr("approvalPending") : tr("savedOrder")}${order.paymentMethod !== "cod" ? `<p class="small-note"><strong>${tr("paymentCustomerNotMarkedPaid")}</strong> ${tr("verifyUpiNote")}</p>` : ""}</div><div class="customer-order-actions"><button class="btn btn-soft" id="copy-confirmed-order-id" type="button">${tr("copyOrderId")}</button><button class="btn btn-soft" id="copy-confirmed-order-details" type="button">${tr("copyOrderDetails")}</button><a class="btn btn-soft" href="${escapeAttr(customerOrderWhatsAppUrl(order))}" target="_blank" rel="noopener noreferrer">${tr("whatsappOrder")}</a></div>${db ? `<button class="btn btn-soft full" id="customer-approval-notify" type="button">${tr("notifyOnApproval")}</button><p class="small-note" id="customer-notification-status"></p>` : ""}<button class="btn btn-primary full" id="done-shopping">${tr("continueShopping")}</button>`;
       $("done-close").onclick = closeCart;
       $("done-shopping").onclick = closeCart;
       $("copy-confirmed-order-id").onclick = () => copyCustomerOrderText(order.id);
