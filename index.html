@@ -181,16 +181,10 @@
     .profile-order-group[data-customer-order-group="in-progress"] { border-color: #e7c96e; background: #fffdf5; }
     .profile-order-group[data-customer-order-group="pending"] { border-color: #e8b5ae; background: #fff8f7; }
     .profile-order-group[data-customer-order-group="completed"] { border-color: #a9cfad; background: #f5fbf5; }
-    .profile-order-group > summary { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto 28px; align-items: center; gap: 10px; min-height: 58px; padding: 10px 13px; list-style: none; color: var(--green-dark); font-size: 14px; font-weight: 800; cursor: pointer; }
+    .profile-order-group > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto 28px; align-items: center; gap: 10px; min-height: 58px; padding: 10px 13px; list-style: none; color: var(--green-dark); font-size: 14px; font-weight: 800; cursor: pointer; }
     .profile-order-group > summary::-webkit-details-marker, .customer-order-details > summary::-webkit-details-marker { display: none; }
-    .profile-order-group-number { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #e3eee1; color: var(--green-dark); font-size: 13px; }
-    .profile-order-group[data-customer-order-group="in-progress"] .profile-order-group-number,
     .profile-order-group[data-customer-order-group="in-progress"] > summary { color: #80600a; }
-    .profile-order-group[data-customer-order-group="in-progress"] .profile-order-group-number { background: #f8ebbc; }
-    .profile-order-group[data-customer-order-group="pending"] .profile-order-group-number,
     .profile-order-group[data-customer-order-group="pending"] > summary { color: #a33b2d; }
-    .profile-order-group[data-customer-order-group="pending"] .profile-order-group-number { background: #fde4df; }
-    .profile-order-group[data-customer-order-group="completed"] .profile-order-group-number,
     .profile-order-group[data-customer-order-group="completed"] > summary { color: #205b35; }
     .profile-order-group-count { min-width: 28px; padding: 4px 8px; border-radius: 999px; background: #edf3ed; font-size: 11px; text-align: center; }
     .profile-order-group > summary::after { content: "+"; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #eaf2e8; font-size: 20px; }
@@ -1206,9 +1200,9 @@
         completed: tr("orderGroupCompleted"),
         rejected: tr("orderGroupRejected")
       };
-      container.innerHTML = Object.entries(groupedOrders).filter(([, orders]) => orders.length > 0).map(([group, orders], index) => `
+      container.innerHTML = Object.entries(groupedOrders).filter(([, orders]) => orders.length > 0).map(([group, orders]) => `
         <details class="profile-order-group" data-customer-order-group="${group}" ${expandedCustomerOrderGroups.has(group) ? "open" : ""}>
-          <summary><span class="profile-order-group-number">${index + 1}</span><span>${groupLabels[group]}</span><span class="profile-order-group-count">${orders.length}</span></summary>
+          <summary><span>${groupLabels[group]}</span><span class="profile-order-group-count">${orders.length}</span></summary>
           <div class="profile-order-group-content">${orders.slice().reverse().map((order) => {
         const reference = order.id || order.reference;
         const items = Array.isArray(order.items) ? order.items : [];
