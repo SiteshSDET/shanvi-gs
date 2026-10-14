@@ -580,7 +580,9 @@
       </div>
       <div class="admin-card">
         <h3>Delivery charges</h3>
-        <p class="small-note">Delivery is free when the discounted items subtotal is ₹100 or more. Orders below ₹100 have a flat ₹20 delivery charge. Customer location is not required.</p>
+        <label class="payment-choice"><input id="delivery-charges-enabled" type="checkbox" checked><span><strong>Charge for delivery below the minimum order value</strong><small>Turn this off to offer free delivery on every order.</small></span></label>
+        <div class="field"><label for="delivery-minimum-order">Minimum order value for free delivery (₹)</label><input id="delivery-minimum-order" type="number" min="1" max="1000000" step="1" value="100"><small class="small-note">The threshold applies to the items subtotal after coupon discounts. Orders below it have a flat ₹20 delivery charge.</small></div>
+        <button class="btn btn-primary" id="save-delivery-settings" type="button">Save delivery settings</button>
       </div>
       <details class="admin-card manager-accordion" id="checkout-address-settings">
         <summary>Checkout address fields</summary>
@@ -775,7 +777,8 @@
         couponHint: "Try coupon", couponDeal: "for {percent}% off (up to {maxDiscount}).",
         subtotal: "Items subtotal", couponSavings: "Coupon savings", delivery: "Delivery",
         deliveryArranged: "Arranged with store", total: "Total", deliveryDetails: "Delivery details",
-        deliveryPolicy: "Items subtotal ₹100 or more after coupon: free delivery. Below ₹100: ₹20 delivery charge.",
+        deliveryPolicy: "Items subtotal {minimum} or more after coupon: free delivery. Below {minimum}: {fee} delivery charge.",
+        deliveryPolicyDisabled: "Delivery charges are off; delivery is free on every order.",
         deliveryChargeFree: "Free · order ₹100 or more",
         deliveryChargeBelowMinimum: "₹20 for orders below ₹100",
         fullName: "Full name", startLetter: "Start with a letter",
@@ -887,7 +890,8 @@
         couponHint: "कूपन", couponDeal: "{percent}% छूट पाएँ ({maxDiscount} तक)।",
         subtotal: "सामान का कुल मूल्य", couponSavings: "कूपन की बचत", delivery: "डिलीवरी",
         deliveryArranged: "दुकान से तय करें", total: "कुल", deliveryDetails: "डिलीवरी की जानकारी",
-        deliveryPolicy: "₹100 या अधिक का सामान (कूपन के बाद): मुफ़्त डिलीवरी। ₹100 से कम: ₹20 डिलीवरी शुल्क।",
+        deliveryPolicy: "कूपन के बाद सामान का कुल {minimum} या अधिक होने पर मुफ़्त डिलीवरी। {minimum} से कम पर {fee} डिलीवरी शुल्क।",
+        deliveryPolicyDisabled: "डिलीवरी शुल्क बंद हैं; हर ऑर्डर पर डिलीवरी मुफ़्त है।",
         deliveryChargeFree: "मुफ़्त · ₹100 या अधिक की खरीदारी",
         deliveryChargeBelowMinimum: "₹100 से कम की खरीदारी पर ₹20",
         fullName: "पूरा नाम", startLetter: "नाम अक्षर से शुरू करें",
@@ -998,7 +1002,7 @@
     let brandLogoDraft = brandLogo;
     let offerSettings = { enabled: false, threshold: 100, giftProductId: "", ...storage.read("shanvi-offer", {}) };
     let couponSettings = { enabled: true, code: "WELCOME10", percent: 10, maxDiscount: 100, ...(storage.read("shanvi-coupon", {}) || {}) };
-    let deliverySettings = { latitude: "", longitude: "", ...storage.read("shanvi-delivery", {}) };
+    let deliverySettings = normalizeDeliverySettings({ latitude: "", longitude: "", ...storage.read("shanvi-delivery", {}) });
     const defaultCheckoutAddressFields = { landmark: true, locality: true, postOffice: true, district: true, state: true, pin: true };
     let checkoutAddressFields = { ...defaultCheckoutAddressFields };
     let checkoutAddressSettingsReady = !db;
@@ -1025,6 +1029,7 @@
     let heroDraftImage = heroSettings.image;
     let heroFormDirty = false;
     let couponFormDirty = false;
+    let deliveryFormDirty = false;
     let sharedStorefrontLoadSequence = 0;
     let productImageDraft = "";
     let productImageAspectRatio = 133;
@@ -2108,7 +2113,7 @@
         || previousCoupon.percent !== couponSettings.percent
         || previousCoupon.maxDiscount !== couponSettings.maxDiscount
         || previousCoupon.enabled !== couponSettings.enabled) coupon = false;
-      deliverySettings = { latitude: "", longitude: "", ...(value.delivery || {}) };
+      deliverySettings = normalizeDeliverySettings({ latitude: "", longitude: "", ...(value.delivery || {}) });
       heroSettings = { ...defaultHero, ...(value.hero || {}) };
       if (!heroFormDirty) heroDraftImage = heroSettings.image;
       updateBrandLogo();
@@ -2120,6 +2125,10 @@
         $("offer-enabled").checked = Boolean(offerSettings.enabled);
         $("offer-threshold").value = Number(offerSettings.threshold) || 100;
         $("offer-product").value = offerSettings.giftProductId || "";
+        if (!deliveryFormDirty) {
+          $("delivery-charges-enabled").checked = deliverySettings.enabled;
+          $("delivery-minimum-order").value = deliverySettings.minimumOrderValue;
+        }
         if (!couponFormDirty) {
           $("coupon-enabled").checked = Boolean(couponSettings.enabled);
           $("coupon-code-manager").value = couponSettings.code;
@@ -2261,7 +2270,7 @@
         </div>`).join("")}</div>
         <div class="coupon" ${couponSettings.enabled ? "" : "hidden"}><input id="coupon-code" aria-label="${tr("coupon")}" placeholder="${tr("coupon")}" autocomplete="off" autocapitalize="characters" maxlength="20" value="${coupon ? escapeAttr(couponSettings.code) : escapeAttr(preservedCheckoutValues["coupon-code"] || "")}" style="min-width:0;flex:1;border:1px solid #dfe4dd;border-radius:9px;padding:10px"><button class="btn btn-soft" id="apply-coupon" type="button" ${coupon ? "disabled" : ""}>${coupon ? tr("applied") : tr("apply")}</button></div>
         <div class="small-note coupon-hint" style="margin-top:6px" ${couponSettings.enabled ? "" : "hidden"}>${tr("couponHint")} <strong>${escapeHtml(couponSettings.code)}</strong> <button class="btn btn-soft" id="copy-coupon" type="button">${tr("copyCoupon")}</button> ${formatTranslation("couponDeal", { percent: couponSettings.percent, maxDiscount: money(couponSettings.maxDiscount) })}${coupon ? ` <button class="btn btn-danger" id="remove-coupon" type="button">${tr("removeCoupon")}</button>` : ""}</div>
-        <p class="small-note">${tr("deliveryPolicy")}</p>
+        <p class="small-note">${deliveryPolicyText()}</p>
         <div class="summary">
           <div class="summary-row"><span>${tr("subtotal")}</span><strong>${money(subtotal)}</strong></div>
           ${discount ? `<div class="summary-row"><span>${tr("couponSavings")}</span><strong>−${money(discount)}</strong></div>` : ""}
@@ -2319,8 +2328,26 @@
         continueToPayment();
       });
     }
+    function normalizeDeliverySettings(value) {
+      const settings = value && typeof value === "object" ? value : {};
+      const minimumOrderValue = Number(settings.minimumOrderValue);
+      return {
+        ...settings,
+        enabled: settings.enabled !== false,
+        minimumOrderValue: Number.isInteger(minimumOrderValue) && minimumOrderValue >= 1
+          ? minimumOrderValue
+          : 100
+      };
+    }
+    function deliveryPolicyText() {
+      if (!deliverySettings.enabled) return tr("deliveryPolicyDisabled");
+      return formatTranslation("deliveryPolicy", {
+        minimum: money(deliverySettings.minimumOrderValue),
+        fee: money(20)
+      });
+    }
     function calculateDeliveryFee(subtotal, discount) {
-      return subtotal - discount >= 100 ? 0 : 20;
+      return !deliverySettings.enabled || subtotal - discount >= deliverySettings.minimumOrderValue ? 0 : 20;
     }
     async function checkOrderBackend() {
       if (!db) return;
@@ -3358,6 +3385,9 @@
       $("upi-phone").value = settings.upi_phone || "";
       $("show-upi-phone").checked = settings.show_upi_phone === true;
       $("cod-enabled").checked = settings.cod_enabled !== false;
+      $("delivery-charges-enabled").checked = deliverySettings.enabled;
+      $("delivery-minimum-order").value = deliverySettings.minimumOrderValue;
+      deliveryFormDirty = false;
       brandLogoDraft = brandLogo;
       updateBrandLogo();
       $("offer-enabled").checked = Boolean(offerSettings.enabled);
@@ -3857,6 +3887,50 @@
         return false;
       }
     };
+    $("delivery-charges-enabled").addEventListener("change", () => {
+      deliveryFormDirty = true;
+    });
+    $("delivery-minimum-order").addEventListener("input", () => {
+      deliveryFormDirty = true;
+    });
+    $("save-delivery-settings").onclick = async () => {
+      if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
+      const minimumOrderValue = Number($("delivery-minimum-order").value);
+      if (!Number.isInteger(minimumOrderValue) || minimumOrderValue < 1 || minimumOrderValue > 1_000_000) {
+        showToast("Enter a whole-number minimum order value between ₹1 and ₹1,000,000.");
+        $("delivery-minimum-order").focus();
+        return false;
+      }
+      const nextDeliverySettings = normalizeDeliverySettings({
+        ...deliverySettings,
+        enabled: $("delivery-charges-enabled").checked,
+        minimumOrderValue
+      });
+      try {
+        if (db) {
+          await saveSharedStorefront({
+            logo: brandLogo,
+            offer: offerSettings,
+            delivery: nextDeliverySettings,
+            hero: heroSettings
+          });
+        } else {
+          deliverySettings = nextDeliverySettings;
+        }
+        if (!storage.write("shanvi-delivery", deliverySettings)) return false;
+        deliveryFormDirty = false;
+        $("delivery-charges-enabled").checked = deliverySettings.enabled;
+        $("delivery-minimum-order").value = deliverySettings.minimumOrderValue;
+        renderCart();
+        showManagerSaved(db
+          ? "Delivery charge settings shared with all customers."
+          : "Delivery charge settings saved on this device.");
+        return true;
+      } catch (error) {
+        showToast(error.message || "Could not save delivery settings.");
+        return false;
+      }
+    };
     $("save-coupon-settings").onclick = async () => {
       if (!isAuthorizedManager) { showToast("Please sign in as manager."); return false; }
       const code = $("coupon-code-manager").value.trim().toUpperCase();
@@ -3915,6 +3989,7 @@
           "save-coupon-settings",
           "save-brand-logo",
           "save-offer",
+          "save-delivery-settings",
           "save-hero",
           "save-payment",
           "save-checkout-address-fields",

@@ -113,6 +113,7 @@ Deno.serve(async (request) => {
   const settings = storefrontRow?.value && typeof storefrontRow.value === "object" ? storefrontRow.value : {};
   const coupon = settings.coupon && typeof settings.coupon === "object" ? settings.coupon : {};
   const offer = settings.offer && typeof settings.offer === "object" ? settings.offer : {};
+  const delivery = settings.delivery && typeof settings.delivery === "object" ? settings.delivery : {};
 
   const giftLines = lines.filter((line) => line.isFreeGift);
   if (giftLines.length > 1 || giftLines.some((line) => line.quantity !== 1)) {
@@ -163,7 +164,11 @@ Deno.serve(async (request) => {
     }
     discount = Math.min(Math.round(subtotal * percent / 100), maxDiscount);
   }
-  const deliveryFee = subtotal - discount >= 100 ? 0 : 20;
+  const minimumOrderValue = Number.isInteger(Number(delivery.minimumOrderValue))
+    && Number(delivery.minimumOrderValue) >= 1
+    ? Number(delivery.minimumOrderValue)
+    : 100;
+  const deliveryFee = delivery.enabled === false || subtotal - discount >= minimumOrderValue ? 0 : 20;
   const total = subtotal - discount + deliveryFee;
   if (total !== expectedTotal) {
     return json({ error: "The cart total changed. Return to your cart and review the current prices." }, 409);

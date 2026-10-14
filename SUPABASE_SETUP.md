@@ -60,7 +60,7 @@ The customer Profile shows **Pending** in red, **In Progress** in yellow after t
 - **Free-item offer:** choose an integer minimum basket amount and a product to give free. The threshold is checked against the item subtotal after the existing coupon discount and before delivery. One free unit is added to eligible baskets; it counts against available stock. Offer settings are shared with all customers.
 - **Coupon:** enable or disable the coupon and set its code, discount percentage, and maximum discount in Manager. Customers see a celebration when the coupon is applied. Coupon settings are shared with all customers.
 - **Inventory:** tracked products show remaining units to customers and cannot be added beyond the saved stock. Manager stock edits are shared with all customers.
-- **Delivery:** customers receive free delivery when their item subtotal after coupon discounts is ₹100 or more. Orders below ₹100 have a flat ₹20 delivery charge. The fee is shown in the basket and checkout before customers place an order; no location permission is requested.
+- **Delivery charges:** in Manager → Delivery charges, set the minimum item subtotal for free delivery after coupon discounts. Orders below it have a flat ₹20 fee when charging is enabled. Disable charges to make all delivery free. The setting is shared through the storefront configuration and applied to secure UPI order totals; no location permission is requested.
 - The top announcement strip has been removed; the English/Hindi button is beside the cart.
 
 ## Free-tier orders, approvals, and push notification setup
